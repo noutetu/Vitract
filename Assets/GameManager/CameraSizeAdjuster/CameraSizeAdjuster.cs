@@ -6,7 +6,7 @@ namespace Umbrella.Utility
     [RequireComponent(typeof(Camera))]
     public class CameraSizeAdjuster : MonoBehaviour
     {
-        [SerializeField] private Vector2Int _baseAspectRatio = new Vector2Int(9, 16);
+        [SerializeField] private Vector2Int _baseAspectRatio = new Vector2Int(16, 9);
         [SerializeField] private float _baseCameraSize = 5;
         [SerializeField, Range(1, 179)] private float _baseCameraFOV = 60;
         [SerializeField] private bool _showBaseAspectArea = false;
