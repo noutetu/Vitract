@@ -31,7 +31,7 @@ public class CharacterAnimator : MonoBehaviour
 
         }
 
-        if (Input.GetKey(KeyCode.B))
+        if (Input.GetKeyDown(KeyCode.B))
         {
             anim.SetTrigger("Attack");
         }

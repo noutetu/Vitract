@@ -18,4 +18,4 @@ MonoBehaviour:
   speed: 0.1
   range: 0
   characterType: 0
-  sprite: {fileID: 0}
+  sprite: {fileID: 1128076747, guid: e47867207bb0d4f969442985a0279b0f, type: 3}

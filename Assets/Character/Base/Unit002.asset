@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 791d0042c0834446288f6de7e41d2e9e, type: 3}
-  m_Name: Unit000
+  m_Name: Unit002
   m_EditorClassIdentifier: 
   name: "\u30AB\u30A4\u30EB"
-  maxHp: 100
-  atk: 25
+  maxHp: 600
+  atk: 150
   speed: 0.1
   range: 0
   characterType: 0
-  sprite: {fileID: 25119439, guid: 285269b6c10164bb09e19eaf190dc41c, type: 3}
+  sprite: {fileID: -468272165, guid: 1be3df94bbdb545dab885542078b2653, type: 3}
