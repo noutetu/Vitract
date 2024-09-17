@@ -43,7 +43,7 @@ public class CharacterAnimator : MonoBehaviour
 
     public void IdleAnim()
     {
-        anim.SetFloat("RunState", 0.0f);
+        anim.SetFloat("RunState", 0f);
     }
 
     public void NormalAttackAnim(float attackSpeed)
