@@ -11,6 +11,11 @@ public class CharacterBase : ScriptableObject
     [SerializeField] new string name;
     public string Name { get => name;}
 
+    //コスト
+    [SerializeField] int cost;
+    public int Cost { get => cost;}
+
+
     //体力
     [SerializeField] float maxHp;
     public float MaxHp { get => maxHp;}
@@ -34,7 +39,6 @@ public class CharacterBase : ScriptableObject
     //キャラクター画像
     [SerializeField] Sprite sprite;
     public Sprite Sprite { get => sprite;}
-
     //ソードマンなら射程を0に
     private void OnEnable() 
     {

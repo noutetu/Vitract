@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Unit001
   m_EditorClassIdentifier: 
   name: "\u30AB\u30A4\u30EB"
+  cost: 10
   maxHp: 200
   atk: 50
-  speed: 0.1
+  speed: 0.2
   range: 0
   characterType: 0
   sprite: {fileID: 1128076747, guid: e47867207bb0d4f969442985a0279b0f, type: 3}

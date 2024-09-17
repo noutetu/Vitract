@@ -6,9 +6,9 @@ using UnityEditor;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CapsuleCollider2D))]
-public class CharacterAnimator : MonoBehaviour 
+public class CharacterAnimator : MonoBehaviour
 {
-  
+
     private Animator anim = null;
 
 
@@ -17,26 +17,32 @@ public class CharacterAnimator : MonoBehaviour
         anim = GetComponent<Animator>();
     }
 
-    void Update()
+    public void RunAnim(float speed)
     {
-        if (Input.GetKey(KeyCode.A))
-        {
-            anim.SetFloat("RunState", 0.5f);
+        anim.SetFloat("RunState", speed);
+    }
 
-        }
+    public void IdleAnim()
+    {
+        anim.SetFloat("RunState", 0.0f);
+    }
 
-        if (Input.GetKey(KeyCode.S))
-        {
-            anim.SetFloat("RunState", 0.0f);
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            anim.SetTrigger("Attack");
-        }
+    public void NormalAttackAnim()
+    {
+        anim.SetTrigger("Attack");
+    }
+    public void SkillAttackAnim()
+    {
+        anim.SetFloat("AttackState", 2);
+        anim.SetTrigger("Attack");
+    }
+    public void DeadAnim()
+    {
+        anim.SetTrigger("Die");
+    }
+    public void DebuffAnim()
+    {
 
     }
 }
 
-         
