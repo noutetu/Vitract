@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterAnimator))]
@@ -14,13 +15,19 @@ public class Character : MonoBehaviour
     private new string name;
     private float maxHp;
     private float atk;
+    private float attackSpeed;
     private float speed;
     private float range;
     private int cost;
     private CharacterType characterType;
-    
+
     private CharacterState characterState;
     public CharacterState CharacterState { get => characterState; set => characterState = value; }
+
+    private void OnEnable()
+    {
+        InitCharacter();
+    }
 
     private void Awake()
     {
@@ -33,9 +40,20 @@ public class Character : MonoBehaviour
         HundleCharacter();
     }
 
+    private void OnCollisionStay2D(Collision2D other)
+    {
+       if(other.gameObject.tag != "Ground")
+       {
+            characterState = CharacterState.Attack;
+       }
+    }
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        characterState = CharacterState.Run;
+    }
+
     private void HundleCharacter()
     {
-        // 状態による処理の切り替えを switch 文で行う
         switch (CharacterState)
         {
             case CharacterState.Run:
@@ -62,9 +80,15 @@ public class Character : MonoBehaviour
         charaMover.Move(speed);
     }
 
+    private IEnumerator HandleAttackWithDelay()
+    {
+        characterState = CharacterState.Wait; // 攻撃後は待機状態にする
+        HandleAttackState(); // 攻撃アニメーションを実行
+        yield return new WaitForSeconds(attackSpeed); // 指定された時間待機
+    }
     private void HandleAttackState()
     {
-        anim.NormalAttackAnim();
+        anim.NormalAttackAnim(attackSpeed);
     }
 
     private void HandleSkillAttackState()
@@ -82,11 +106,6 @@ public class Character : MonoBehaviour
         anim.DebuffAnim();
     }
 
-    private void OnEnable()
-    {
-        InitCharacter();
-    }
-
     private void InitCharacter()
     {
         if (characterBase != null)
@@ -95,6 +114,7 @@ public class Character : MonoBehaviour
             name = characterBase.Name;
             maxHp = characterBase.MaxHp;
             atk = characterBase.Atk;
+            attackSpeed = characterBase.AttackSpeed;
             speed = characterBase.Speed;
             range = characterBase.Range;
             cost = characterBase.Cost;
@@ -125,4 +145,5 @@ public enum CharacterState
     SkillAttack,
     Die,
     Debuff,
+    Wait,
 }

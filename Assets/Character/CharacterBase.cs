@@ -24,6 +24,11 @@ public class CharacterBase : ScriptableObject
     [SerializeField] float atk;
     public float Atk { get => atk;}
 
+    //攻撃速度
+    [SerializeField] float attackSpeed;
+    public float AttackSpeed { get => attackSpeed;}
+
+
     //スピード
     [SerializeField] float speed;
     public float Speed { get => speed;}

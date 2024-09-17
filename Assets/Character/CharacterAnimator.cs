@@ -8,6 +8,25 @@ using UnityEditor;
 [RequireComponent(typeof(CapsuleCollider2D))]
 public class CharacterAnimator : MonoBehaviour
 {
+    /// <summary>
+    /// 
+    /// AttackState => 0 => NormalAttack
+    ///                1 => SkillAttack
+    ///                
+    /// NormalState => 0 => SwordMan
+    ///                0.5 => BowMan
+    ///                1 => Magician
+    ///                
+    /// NormalState => 0 => SwordMan
+    ///                0.5 => BowMan
+    ///                1 => Magician
+    ///                
+    /// RunState    => 0 => Idle
+    ///             => 0.1~1.2 => Run
+    ///             => 1.3~ => Debuff
+    ///                
+    /// </summary>
+
 
     private Animator anim = null;
 
@@ -27,13 +46,16 @@ public class CharacterAnimator : MonoBehaviour
         anim.SetFloat("RunState", 0.0f);
     }
 
-    public void NormalAttackAnim()
+    public void NormalAttackAnim(float attackSpeed)
     {
         anim.SetTrigger("Attack");
+        anim.SetFloat("AttackSpeed",attackSpeed);
     }
+
+    
     public void SkillAttackAnim()
     {
-        anim.SetFloat("AttackState", 2);
+        anim.SetFloat("AttackState", 0);
         anim.SetTrigger("Attack");
     }
     public void DeadAnim()
@@ -42,7 +64,7 @@ public class CharacterAnimator : MonoBehaviour
     }
     public void DebuffAnim()
     {
-
+        anim.SetFloat ("RunState", 3);
     }
 }
 
