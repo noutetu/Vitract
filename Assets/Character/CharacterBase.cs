@@ -7,6 +7,9 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterBase : ScriptableObject
 {
+    [SerializeField] Character prefab;
+    public Character Prefab { get => prefab;}
+
     //名前
     [SerializeField] new string name;
     public string Name { get => name;}

@@ -31,7 +31,7 @@ namespace Umbrella.Utility
 #if UNITY_EDITOR
         private void Update()
         {
-            AdjustCameraSize();
+            //AdjustCameraSize();
         }
 #endif
 

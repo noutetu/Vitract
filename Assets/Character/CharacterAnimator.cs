@@ -33,7 +33,7 @@ public class CharacterAnimator : MonoBehaviour
 
     void Start()
     {
-        anim = GetComponent<Animator>();
+        anim = GetComponentInChildren<Animator>();
     }
 
     public void RunAnim(float speed)
