@@ -48,8 +48,8 @@ public class CharacterAnimator : MonoBehaviour
 
     public void NormalAttackAnim(float attackSpeed)
     {
+        anim.speed = attackSpeed;
         anim.SetTrigger("Attack");
-        anim.SetFloat("AttackSpeed",attackSpeed);
     }
 
     

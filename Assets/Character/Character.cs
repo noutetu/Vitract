@@ -14,8 +14,12 @@ public class Character : MonoBehaviour
 
     private new string name;
     private float maxHp;
+    private float currentHp;
+    private float deffence;
+    private float magicDeffence;
     private float atk;
     private float attackSpeed;
+    private float attackCoolTime;
     private float speed;
     private float range;
     private int cost;
@@ -40,12 +44,12 @@ public class Character : MonoBehaviour
         HundleCharacter();
     }
 
-    private void OnCollisionStay2D(Collision2D other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
-       if(other.gameObject.tag != "Ground")
-       {
-            characterState = CharacterState.Attack;
-       }
+        if (other.gameObject.tag != "Ground")
+        {
+            StartCoroutine(HandleAttackState());
+        }
     }
     private void OnCollisionExit2D(Collision2D other)
     {
@@ -59,18 +63,6 @@ public class Character : MonoBehaviour
             case CharacterState.Run:
                 HandleRunState();
                 break;
-            case CharacterState.Attack:
-                HandleAttackState();
-                break;
-            case CharacterState.SkillAttack:
-                HandleSkillAttackState();
-                break;
-            case CharacterState.Die:
-                HandleDieState();
-                break;
-            case CharacterState.Debuff:
-                HandleDebuffState();
-                break;
         }
     }
 
@@ -80,14 +72,10 @@ public class Character : MonoBehaviour
         charaMover.Move(speed);
     }
 
-    private IEnumerator HandleAttackWithDelay()
+    private IEnumerator HandleAttackState()
     {
-        characterState = CharacterState.Wait; // 攻撃後は待機状態にする
-        HandleAttackState(); // 攻撃アニメーションを実行
-        yield return new WaitForSeconds(attackSpeed); // 指定された時間待機
-    }
-    private void HandleAttackState()
-    {
+        //クールタイム待機
+        yield return new WaitForSeconds(attackCoolTime);
         anim.NormalAttackAnim(attackSpeed);
     }
 
@@ -113,8 +101,12 @@ public class Character : MonoBehaviour
             // CharacterBase のデータをフィールドにコピー
             name = characterBase.Name;
             maxHp = characterBase.MaxHp;
+            currentHp = characterBase.CurrentHp;
+            deffence = characterBase.Defence;
+            magicDeffence = characterBase.MagicDefence;
             atk = characterBase.Atk;
             attackSpeed = characterBase.AttackSpeed;
+            attackCoolTime = characterBase.AttackCoolTime;
             speed = characterBase.Speed;
             range = characterBase.Range;
             cost = characterBase.Cost;
