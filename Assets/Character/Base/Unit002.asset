@@ -19,8 +19,8 @@ MonoBehaviour:
   defence: 0
   magicDefence: 0
   atk: 150
-  attackSpeed: 0
-  attackCoolTime: 0
+  attackSpeed: 0.6
+  attackCoolTime: 1
   speed: 0.2
   range: 0
   characterType: 0
