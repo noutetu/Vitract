@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class CharacterFlame : MonoBehaviour
 {
     public UnityAction<Character> OnTouch;
     public CharacterBase Base;
     private Character prefab;
+    public Image icon;
 
     private void Start()
     {
@@ -22,13 +24,10 @@ public class CharacterFlame : MonoBehaviour
             return;
         }
         prefab = Base.Prefab;
-
     }
     public void PressButton()
     {
-        Debug.Log("タッチできなかった");
         if (prefab == null) { return; }
-        Debug.Log("タッチできた");
         OnTouch(prefab);
     }
 }

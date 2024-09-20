@@ -9,7 +9,7 @@ public class CharacterSelectPanel : MonoBehaviour
 
     private void Awake()
     {
-        // リストのサイズをチェックして制約を確認
+        // リストのサイズをチェック
         if (characterBases.Count < 1 || characterBases.Count > 9)
         {
             Debug.LogError("Character list must have between 1 and 9 elements.");
@@ -33,6 +33,7 @@ public class CharacterSelectPanel : MonoBehaviour
             if (characterBases[i] == null) { return; }
             // 各フレームに対応するCharacterBaseを設定
             characterFlames[i].Base = characterBases[i];
+            characterFlames[i].icon.sprite = characterBases[i].Sprite;
         }
     }
 }
