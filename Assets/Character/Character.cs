@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterAnimator))]
 [RequireComponent(typeof(CharaMover))]
 
 public class Character : MonoBehaviour
 {
+    //攻撃を与える対象
+    Character enemyCharacter;
+
+    [SerializeField] private HPBar hpBar;
     [SerializeField] private CharacterBase characterBase;
     public bool isPlayer;
     private CharacterAnimator anim;
@@ -37,8 +40,14 @@ public class Character : MonoBehaviour
 
     private void Awake()
     {
-        anim = GetComponent<CharacterAnimator>();
+        anim = GetComponentInChildren<CharacterAnimator>();
+        anim.OnAttack += HitAttack;
         charaMover = GetComponent<CharaMover>();
+    }
+
+    private void Start()
+    {
+        hpBar.SetHP((float)currentHp / maxHp);
     }
 
     private void Update()
@@ -46,13 +55,6 @@ public class Character : MonoBehaviour
         HundleCharacter();
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.gameObject.tag != "Ground" && other.gameObject.tag != gameObject.tag)
-        {
-            StartCoroutine(HandleAttackState());
-        }
-    }
     private void OnCollisionExit2D(Collision2D other)
     {
         characterState = CharacterState.Run;
@@ -68,16 +70,47 @@ public class Character : MonoBehaviour
         }
     }
 
+    private void HandleIdleState()
+    {
+        anim.IdleAnim();
+    }
+
     private void HandleRunState()
     {
         anim.RunAnim(speed / 2);
         charaMover.Move(speed, isPlayer);
     }
 
+//ーーーーーーーーーーーー----------------攻撃に関する処理-----------------------------------
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        AttackEvent(other);
+    }
+
+    private void AttackEvent(Collision2D other)
+    {
+        enemyCharacter = other.gameObject.GetComponent<Character>();
+
+        if (isPlayer)
+        {
+            if (other.gameObject.tag == "Enemy" || other.gameObject.tag == "EnemyCastle")
+            {
+                StartCoroutine(HandleAttackState());
+            }
+        }
+        else
+        {
+            if (other.gameObject.tag == "Player" || other.gameObject.tag == "PlayerCastle")
+            {
+                StartCoroutine(HandleAttackState());
+            }
+        }
+    }
+
     private IEnumerator HandleAttackState()
     {
         //クールタイム待機
-        yield return new WaitForSeconds(attackCoolTime);
+        yield return new WaitForSeconds(0);
         anim.NormalAttackAnim(attackSpeed);
     }
 
@@ -85,6 +118,20 @@ public class Character : MonoBehaviour
     {
         anim.SkillAttackAnim();
     }
+    //unityアニメーションイベントに設定
+    public void HitAttack()
+    {
+        enemyCharacter.TakeDamage(atk);
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHp -= damage;
+        if (currentHp <= 0) { currentHp = 0; }
+        hpBar.UpdateHP((float)currentHp / maxHp);
+        //StartCoroutine(hpBar.SetHPSmooth((float)currentHp / maxHp));
+    }
+//------------------------------------------------------------------------------------------
 
     private void HandleDieState()
     {
@@ -96,6 +143,7 @@ public class Character : MonoBehaviour
         anim.DebuffAnim();
     }
 
+
     private void InitCharacter()
     {
         if (characterBase != null)
@@ -103,7 +151,7 @@ public class Character : MonoBehaviour
             // CharacterBase のデータをフィールドにコピー
             name = characterBase.Name;
             maxHp = characterBase.MaxHp;
-            currentHp = characterBase.CurrentHp;
+            currentHp = maxHp;
             deffence = characterBase.Defence;
             magicDeffence = characterBase.MagicDefence;
             canBlockCount = characterBase.CanBlockCount;

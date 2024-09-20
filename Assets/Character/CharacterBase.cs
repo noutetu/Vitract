@@ -23,10 +23,6 @@ public class CharacterBase : ScriptableObject
     [SerializeField] float maxHp;
     public float MaxHp { get => maxHp;}
 
-    //現在体力
-    private float currentHp;
-    public float CurrentHp { get => currentHp;}
-
     //防御力
     [SerializeField] float defence;
     public float Defence { get => defence;}
@@ -71,17 +67,12 @@ public class CharacterBase : ScriptableObject
     //ソードマンなら射程を0に
     private void OnEnable() 
     {
-        currentHp = maxHp;
         if(characterType == CharacterType.SwordMan)
         {
             range = 0;
         }
     }
 
-    public void TakeDamage(float damage)
-    {
-        currentHp -= damage;
-    }
 }
 
 public enum CharacterType

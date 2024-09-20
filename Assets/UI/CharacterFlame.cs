@@ -28,6 +28,6 @@ public class CharacterFlame : MonoBehaviour
     public void PressButton()
     {
         if (prefab == null) { return; }
-        OnTouch(prefab);
+        OnTouch?.Invoke(prefab);
     }
 }

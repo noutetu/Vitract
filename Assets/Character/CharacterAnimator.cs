@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Events;
 
 
-[RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(CapsuleCollider2D))]
 public class CharacterAnimator : MonoBehaviour
 {
     /// <summary>
@@ -29,11 +28,19 @@ public class CharacterAnimator : MonoBehaviour
 
 
     private Animator anim = null;
+    public UnityAction OnAttack;
 
 
     void Start()
     {
-        anim = GetComponentInChildren<Animator>();
+        anim = GetComponent<Animator>();
+        if (anim == null)
+        {
+            Debug.LogWarning("animatorが見つかりません");
+            return;
+        }
+        Debug.Log("animatorが見つかりました");
+
     }
 
     public void RunAnim(float speed)
@@ -65,6 +72,12 @@ public class CharacterAnimator : MonoBehaviour
     public void DebuffAnim()
     {
         anim.SetFloat ("RunState", 3);
+    }
+
+    //unity animationEventで呼び出すメソッド
+    public void TriggerAttackEvent()
+    {
+        OnAttack?.Invoke();
     }
 }
 

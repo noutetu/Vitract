@@ -5,8 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
-  - Castle
   - Ground
+  - PlayerCastle
+  - EnemyCastle
   layers:
   - Default
   - TransparentFX
