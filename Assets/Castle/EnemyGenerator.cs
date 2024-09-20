@@ -14,4 +14,16 @@ public class EnemyGenerator : MonoBehaviour
         enemyCharacter.gameObject.tag = "Enemy";
         enemyCharacter.isPlayer = false;
     }
+    public void MakeUnit001()
+    {
+        Character enemyCharacter = Instantiate(unit001.Prefab,transform);
+        enemyCharacter.gameObject.tag = "Enemy";
+        enemyCharacter.isPlayer = false;
+    }
+    public void MakeUnit002()
+    {
+        Character enemyCharacter = Instantiate(unit002.Prefab,transform);
+        enemyCharacter.gameObject.tag = "Enemy";
+        enemyCharacter.isPlayer = false;
+    }
 }

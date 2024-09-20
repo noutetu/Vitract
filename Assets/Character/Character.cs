@@ -8,7 +8,7 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     //攻撃を与える対象
-    Character enemyCharacter;
+    public Character enemyCharacter;
 
     [SerializeField] private HPBar hpBar;
     [SerializeField] private CharacterBase characterBase;
@@ -17,32 +17,41 @@ public class Character : MonoBehaviour
     private CharaMover charaMover;
     private CharacterState characterState;
     public CharacterState CharacterState { get => characterState; set => characterState = value; }
-//------------------------------キャラクターのステータス----------------------------------------------
+    //------------------------------キャラクターのステータス----------------------------------------------
     private new string name;                //名前
     private int cost;                       //コスト
     private float maxHp;                    //最大体力
     private float currentHp;                //現在体力
     private float deffence;                 //防御力
     private float magicDeffence;            //魔法耐性
-    private int canBlockCount;              //ブロック数
+    private int canBlockCount;              //最大ブロック数
+    private int currentBlockCount;          //現在のブロック数
     private float atk;                      //攻撃力
     private float attackSpeed;              //攻撃速度
     private float attackCoolTime;           //攻撃クールタイム
     private float speed;                    //スピード
     private float range;                    //攻撃範囲
     private CharacterType characterType;    //タイプ
-//-------------------------------------------------------------------------------------------------
-    
+    public bool isDead;
+    //-------------------------------------------------------------------------------------------------
+
 
     private void OnEnable()
     {
         InitCharacter();
     }
+    private void OnDisable()
+    {
+        anim.OnAttack -= HitAttack;
+        anim.OnDead -= Dead;
+    }
+
 
     private void Awake()
     {
         anim = GetComponentInChildren<CharacterAnimator>();
         anim.OnAttack += HitAttack;
+        anim.OnDead += Dead;
         charaMover = GetComponent<CharaMover>();
     }
 
@@ -67,6 +76,9 @@ public class Character : MonoBehaviour
         {
             case CharacterState.Run:
                 HandleRunState();
+                break;
+            case CharacterState.Die:
+                HandleDieState();
                 break;
         }
     }
@@ -93,7 +105,7 @@ public class Character : MonoBehaviour
     }
 
 
-//ーーーーーーーーーーーー----------------攻撃に関する処理-----------------------------------
+    //ーーーーーーーーーーーー----------------攻撃に関する処理-----------------------------------
     private void OnCollisionEnter2D(Collision2D other)
     {
         AttackEvent(other);
@@ -121,6 +133,7 @@ public class Character : MonoBehaviour
 
     private IEnumerator HandleAttackState()
     {
+        characterState = CharacterState.Attack;
         //クールタイム待機
         yield return new WaitForSeconds(0);
         anim.NormalAttackAnim(attackSpeed);
@@ -130,21 +143,38 @@ public class Character : MonoBehaviour
     {
         anim.SkillAttackAnim();
     }
-    //unityアニメーションイベントに設定
-    public void HitAttack()
-    {
-        enemyCharacter.TakeDamage(atk);
-    }
 
-    public void TakeDamage(float damage)
+    public bool TakeDamage(float damage)
     {
         currentHp -= damage;
-        if (currentHp <= 0) { currentHp = 0; }
-        hpBar.UpdateHP((float)currentHp / maxHp);
-        //StartCoroutine(hpBar.SetHPSmooth((float)currentHp / maxHp));
-    }
-//------------------------------------------------------------------------------------------
+        currentHp = Mathf.Max(currentHp, 0);  // currentHpが0を下回らないように
+        hpBar.UpdateHP(currentHp / maxHp);
 
+        if (currentHp <= 0)
+        {
+            Debug.Log("HPが0になった");
+            characterState = CharacterState.Die;
+            return true;  // キャラクターが死亡したことを示す
+        }
+
+        return false;  // キャラクターがまだ生きていることを示す
+    }
+
+    //------------------------------------------------------------------------------------------
+    //--------------------------unityアニメーションイベントに設定------------------------------------
+    public void HitAttack()
+    {
+        bool isDead = enemyCharacter.TakeDamage(atk);
+        if (isDead)
+        {
+            enemyCharacter = null;
+        }
+    }
+    public void Dead()
+    {
+        Destroy(gameObject);
+    }
+    //-------------------------------------------------------------------------------------------
     private void InitCharacter()
     {
         if (characterBase != null)

@@ -29,6 +29,7 @@ public class CharacterAnimator : MonoBehaviour
 
     private Animator anim = null;
     public UnityAction OnAttack;
+    public UnityAction OnDead;
 
 
     void Start()
@@ -74,10 +75,15 @@ public class CharacterAnimator : MonoBehaviour
         anim.SetFloat ("RunState", 3);
     }
 
-    //unity animationEventで呼び出すメソッド
+//---------------------------unity animationEventで呼び出すメソッド---------------------------------
     public void TriggerAttackEvent()
     {
         OnAttack?.Invoke();
     }
+    public void TriggerDeadAction()
+    {
+        OnDead?.Invoke();
+    }
+//------------------------------------------------------------------------------------------------
 }
 

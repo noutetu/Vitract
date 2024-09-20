@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 85f227f6a1e4b475ca347b720f0af5ca
+guid: a8036f3c797da4a64bf8af5f91147773
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -139,10 +139,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_0
       rect:
         serializedVersion: 2
-        x: 8
-        y: 1563
-        width: 360
-        height: 332
+        x: 18
+        y: 1565
+        width: 355
+        height: 341
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -150,8 +150,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 19c8a7be5a3644e179937aa56b48a3af
-      internalID: -2057878155
+      spriteID: cd4a2d6b8de1140ebb6ca4fddbb43a2d
+      internalID: 93113198
       vertices: []
       indices: 
       edges: []
@@ -160,10 +160,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_1
       rect:
         serializedVersion: 2
-        x: 523
-        y: 1563
+        x: 533
+        y: 1565
         width: 360
-        height: 333
+        height: 342
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -171,8 +171,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 512f011e3ea5347dba440f855068c066
-      internalID: 844246120
+      spriteID: 31af6add3cdea4cdfbaf142575229898
+      internalID: -247612152
       vertices: []
       indices: 
       edges: []
@@ -181,10 +181,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_2
       rect:
         serializedVersion: 2
-        x: 1045
-        y: 1563
-        width: 370
-        height: 332
+        x: 1056
+        y: 1565
+        width: 369
+        height: 342
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -192,8 +192,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 20eb795600d484752829dfd79955972a
-      internalID: 1738460425
+      spriteID: 1930ffd9268db4dfcb55403662b2848a
+      internalID: 316872933
       vertices: []
       indices: 
       edges: []
@@ -202,10 +202,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_3
       rect:
         serializedVersion: 2
-        x: 1571
-        y: 1563
-        width: 377
-        height: 333
+        x: 1582
+        y: 1565
+        width: 375
+        height: 335
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -213,8 +213,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 00049da6dc29a4b448f4982c2b9dd430
-      internalID: 381151419
+      spriteID: f46951f6b32bc4b85a3f1619fd0a92f2
+      internalID: 1046201478
       vertices: []
       indices: 
       edges: []
@@ -223,10 +223,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_4
       rect:
         serializedVersion: 2
-        x: 47
-        y: 1051
-        width: 379
-        height: 332
+        x: 59
+        y: 1053
+        width: 376
+        height: 323
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -234,8 +234,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 50fb7662cbbd24845b3eb80c018028d4
-      internalID: 805771372
+      spriteID: ca883e17dd7e447b3a30d08ec35e0c8f
+      internalID: 1285289546
       vertices: []
       indices: 
       edges: []
@@ -244,10 +244,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_5
       rect:
         serializedVersion: 2
-        x: 568
-        y: 1051
-        width: 377
-        height: 329
+        x: 579
+        y: 1053
+        width: 374
+        height: 313
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -255,8 +255,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 32e462b6900f2434cb2588bc952ebaee
-      internalID: -1157098853
+      spriteID: 5692beadb24ef4b2c85e18110842defb
+      internalID: -241003850
       vertices: []
       indices: 
       edges: []
@@ -265,10 +265,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_6
       rect:
         serializedVersion: 2
-        x: 1076
-        y: 1051
-        width: 377
-        height: 330
+        x: 1087
+        y: 1053
+        width: 375
+        height: 318
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -276,8 +276,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 167a09f0e685f4dcd9777971f76b4d1c
-      internalID: -482903667
+      spriteID: 30b3788356d264eefb6e44d16f79483c
+      internalID: -1431984297
       vertices: []
       indices: 
       edges: []
@@ -286,10 +286,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_7
       rect:
         serializedVersion: 2
-        x: 1568
-        y: 1051
-        width: 375
-        height: 331
+        x: 1579
+        y: 1053
+        width: 374
+        height: 338
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -297,8 +297,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3e3566351065f49e6bfa26c2fa49ee77
-      internalID: -276778697
+      spriteID: 041eed477c69e439dbb7653b5d398317
+      internalID: 769207163
       vertices: []
       indices: 
       edges: []
@@ -307,10 +307,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_8
       rect:
         serializedVersion: 2
-        x: 6
-        y: 539
-        width: 362
-        height: 332
+        x: 16
+        y: 541
+        width: 356
+        height: 341
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -318,8 +318,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e37e742b63d1347ba9a73904b24319f8
-      internalID: -294294807
+      spriteID: 56fcf385845db46139dfe2bf24df3409
+      internalID: 1484909644
       vertices: []
       indices: 
       edges: []
@@ -328,10 +328,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_9
       rect:
         serializedVersion: 2
-        x: 512
-        y: 539
-        width: 368
-        height: 321
+        x: 515
+        y: 541
+        width: 357
+        height: 328
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -339,8 +339,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b3de9b279192c43cc9c2906afda96222
-      internalID: -1663313451
+      spriteID: 3591276a39e484555acd70a2cdf63a42
+      internalID: -1257247007
       vertices: []
       indices: 
       edges: []
@@ -349,10 +349,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_10
       rect:
         serializedVersion: 2
-        x: 1024
-        y: 539
-        width: 368
-        height: 304
+        x: 1027
+        y: 541
+        width: 357
+        height: 310
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -360,8 +360,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d98d6bed47960432287d98180694228c
-      internalID: -384178353
+      spriteID: a96f53ec0e05041a0b0e89f2fd32e020
+      internalID: 1926831405
       vertices: []
       indices: 
       edges: []
@@ -370,10 +370,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_11
       rect:
         serializedVersion: 2
-        x: 1538
-        y: 539
-        width: 366
-        height: 297
+        x: 1543
+        y: 541
+        width: 353
+        height: 304
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -381,8 +381,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2254ac4135e9643c6be982bb081d5dd8
-      internalID: -932020345
+      spriteID: 64074aa36c71843a7b54b2cfcec72384
+      internalID: 683791359
       vertices: []
       indices: 
       edges: []
@@ -391,10 +391,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_12
       rect:
         serializedVersion: 2
-        x: 0
-        y: 27
-        width: 368
-        height: 301
+        x: 5
+        y: 29
+        width: 355
+        height: 307
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -402,8 +402,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 63cd89f6526ce4ee8a5715d41a892f74
-      internalID: -434763862
+      spriteID: b10fe22dd9bb9403886ffc83a6cdd08d
+      internalID: -1595359296
       vertices: []
       indices: 
       edges: []
@@ -412,10 +412,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_13
       rect:
         serializedVersion: 2
-        x: 512
-        y: 27
-        width: 368
-        height: 312
+        x: 513
+        y: 29
+        width: 359
+        height: 316
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -423,8 +423,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 20c7d85aa2c38469cabac9dc9b04697a
-      internalID: -1201563755
+      spriteID: ffe1e10b7257e40c88e71ec9ccb82528
+      internalID: -465465456
       vertices: []
       indices: 
       edges: []
@@ -433,10 +433,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_14
       rect:
         serializedVersion: 2
-        x: 1024
-        y: 27
-        width: 368
-        height: 324
+        x: 1028
+        y: 29
+        width: 356
+        height: 334
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -444,8 +444,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d6542dde551bc4f7c99f875c169b6b92
-      internalID: -1822001391
+      spriteID: b7d6df7a586964427bf256e023ce3a55
+      internalID: 343350323
       vertices: []
       indices: 
       edges: []
@@ -454,10 +454,10 @@ TextureImporter:
       name: Unit001_3_3_Debuff_Stun_0_15
       rect:
         serializedVersion: 2
-        x: 1539
-        y: 27
-        width: 365
-        height: 332
+        x: 1548
+        y: 29
+        width: 355
+        height: 342
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -465,8 +465,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e2434e5808563402493f44e36f597b1b
-      internalID: 137013556
+      spriteID: 5c443db4f9ef340f592ab39282e6a845
+      internalID: -420172193
       vertices: []
       indices: 
       edges: []
@@ -482,22 +482,22 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Unit001_3_3_Debuff_Stun_0_0: -2057878155
-      Unit001_3_3_Debuff_Stun_0_1: 844246120
-      Unit001_3_3_Debuff_Stun_0_10: -384178353
-      Unit001_3_3_Debuff_Stun_0_11: -932020345
-      Unit001_3_3_Debuff_Stun_0_12: -434763862
-      Unit001_3_3_Debuff_Stun_0_13: -1201563755
-      Unit001_3_3_Debuff_Stun_0_14: -1822001391
-      Unit001_3_3_Debuff_Stun_0_15: 137013556
-      Unit001_3_3_Debuff_Stun_0_2: 1738460425
-      Unit001_3_3_Debuff_Stun_0_3: 381151419
-      Unit001_3_3_Debuff_Stun_0_4: 805771372
-      Unit001_3_3_Debuff_Stun_0_5: -1157098853
-      Unit001_3_3_Debuff_Stun_0_6: -482903667
-      Unit001_3_3_Debuff_Stun_0_7: -276778697
-      Unit001_3_3_Debuff_Stun_0_8: -294294807
-      Unit001_3_3_Debuff_Stun_0_9: -1663313451
+      Unit001_3_3_Debuff_Stun_0_0: 93113198
+      Unit001_3_3_Debuff_Stun_0_1: -247612152
+      Unit001_3_3_Debuff_Stun_0_10: 1926831405
+      Unit001_3_3_Debuff_Stun_0_11: 683791359
+      Unit001_3_3_Debuff_Stun_0_12: -1595359296
+      Unit001_3_3_Debuff_Stun_0_13: -465465456
+      Unit001_3_3_Debuff_Stun_0_14: 343350323
+      Unit001_3_3_Debuff_Stun_0_15: -420172193
+      Unit001_3_3_Debuff_Stun_0_2: 316872933
+      Unit001_3_3_Debuff_Stun_0_3: 1046201478
+      Unit001_3_3_Debuff_Stun_0_4: 1285289546
+      Unit001_3_3_Debuff_Stun_0_5: -241003850
+      Unit001_3_3_Debuff_Stun_0_6: -1431984297
+      Unit001_3_3_Debuff_Stun_0_7: 769207163
+      Unit001_3_3_Debuff_Stun_0_8: 1484909644
+      Unit001_3_3_Debuff_Stun_0_9: -1257247007
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
