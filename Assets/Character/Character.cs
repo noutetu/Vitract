@@ -15,23 +15,24 @@ public class Character : MonoBehaviour
     public bool isPlayer;
     private CharacterAnimator anim;
     private CharaMover charaMover;
-
-    private new string name;
-    private int cost;
-    private float maxHp;
-    private float currentHp;
-    private float deffence;
-    private float magicDeffence;
-    private int canBlockCount;
-    private float atk;
-    private float attackSpeed;
-    private float attackCoolTime;
-    private float speed;
-    private float range;
-    private CharacterType characterType;
-
     private CharacterState characterState;
     public CharacterState CharacterState { get => characterState; set => characterState = value; }
+//------------------------------キャラクターのステータス----------------------------------------------
+    private new string name;                //名前
+    private int cost;                       //コスト
+    private float maxHp;                    //最大体力
+    private float currentHp;                //現在体力
+    private float deffence;                 //防御力
+    private float magicDeffence;            //魔法耐性
+    private int canBlockCount;              //ブロック数
+    private float atk;                      //攻撃力
+    private float attackSpeed;              //攻撃速度
+    private float attackCoolTime;           //攻撃クールタイム
+    private float speed;                    //スピード
+    private float range;                    //攻撃範囲
+    private CharacterType characterType;    //タイプ
+//-------------------------------------------------------------------------------------------------
+    
 
     private void OnEnable()
     {
@@ -69,17 +70,28 @@ public class Character : MonoBehaviour
                 break;
         }
     }
-
+    //アイドル状態
     private void HandleIdleState()
     {
         anim.IdleAnim();
     }
-
+    //走る状態
     private void HandleRunState()
     {
         anim.RunAnim(speed / 2);
         charaMover.Move(speed, isPlayer);
     }
+    //死んだ状態
+    private void HandleDieState()
+    {
+        anim.DeadAnim();
+    }
+    //デバフ状態
+    private void HandleDebuffState()
+    {
+        anim.DebuffAnim();
+    }
+
 
 //ーーーーーーーーーーーー----------------攻撃に関する処理-----------------------------------
     private void OnCollisionEnter2D(Collision2D other)
@@ -132,17 +144,6 @@ public class Character : MonoBehaviour
         //StartCoroutine(hpBar.SetHPSmooth((float)currentHp / maxHp));
     }
 //------------------------------------------------------------------------------------------
-
-    private void HandleDieState()
-    {
-        anim.DeadAnim();
-    }
-
-    private void HandleDebuffState()
-    {
-        anim.DebuffAnim();
-    }
-
 
     private void InitCharacter()
     {
