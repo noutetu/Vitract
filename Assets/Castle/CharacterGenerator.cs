@@ -17,6 +17,8 @@ public class CharacterGenerator : MonoBehaviour
 
     private void InstantiateCharacter(Character prefab)
     {
-        Instantiate(prefab,transform);
+        Character playerCharacter = Instantiate(prefab, transform.position, Quaternion.Euler(0,180,0),transform);
+        playerCharacter.gameObject.tag = "Player";
+        playerCharacter.isPlayer = true;
     }
 }

@@ -18,6 +18,7 @@ MonoBehaviour:
   maxHp: 200
   defence: 0
   magicDefence: 0
+  canBlockCount: 2
   atk: 50
   attackSpeed: 0.6
   attackCoolTime: 1

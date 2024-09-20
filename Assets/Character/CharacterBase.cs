@@ -35,6 +35,10 @@ public class CharacterBase : ScriptableObject
     [SerializeField] float magicDefence;
     public float MagicDefence { get => magicDefence;}
 
+    //ブロック数
+    [SerializeField] int canBlockCount;
+    public int CanBlockCount { get => canBlockCount;}
+
     //攻撃力
     [SerializeField] float atk;
     public float Atk { get => atk;}

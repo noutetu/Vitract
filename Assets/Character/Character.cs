@@ -9,20 +9,22 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     [SerializeField] private CharacterBase characterBase;
+    public bool isPlayer;
     private CharacterAnimator anim;
     private CharaMover charaMover;
 
     private new string name;
+    private int cost;
     private float maxHp;
     private float currentHp;
     private float deffence;
     private float magicDeffence;
+    private int canBlockCount;
     private float atk;
     private float attackSpeed;
     private float attackCoolTime;
     private float speed;
     private float range;
-    private int cost;
     private CharacterType characterType;
 
     private CharacterState characterState;
@@ -46,7 +48,7 @@ public class Character : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag != "Ground")
+        if (other.gameObject.tag != "Ground" && other.gameObject.tag != gameObject.tag)
         {
             StartCoroutine(HandleAttackState());
         }
@@ -69,7 +71,7 @@ public class Character : MonoBehaviour
     private void HandleRunState()
     {
         anim.RunAnim(speed / 2);
-        charaMover.Move(speed);
+        charaMover.Move(speed, isPlayer);
     }
 
     private IEnumerator HandleAttackState()
@@ -104,6 +106,7 @@ public class Character : MonoBehaviour
             currentHp = characterBase.CurrentHp;
             deffence = characterBase.Defence;
             magicDeffence = characterBase.MagicDefence;
+            canBlockCount = characterBase.CanBlockCount;
             atk = characterBase.Atk;
             attackSpeed = characterBase.AttackSpeed;
             attackCoolTime = characterBase.AttackCoolTime;

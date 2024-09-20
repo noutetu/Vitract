@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class CharaMover : MonoBehaviour
 {
-    public void Move(float speed)
+    Vector3 direction = Vector3.left;  // デフォルトは左方向
+
+    public void Move(float speed, bool isPlayer)
     {
-        // 横方向に移動させる
-        transform.Translate(Vector3.left * speed * Time.deltaTime);
+        transform.Translate(direction * speed * Time.deltaTime);
     }
 }
