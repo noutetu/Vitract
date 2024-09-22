@@ -1399,9 +1399,9 @@ GameObject:
   - component: {fileID: 4020845928731207952}
   - component: {fileID: 9084009972161634627}
   - component: {fileID: 7229174618374542855}
-  - component: {fileID: 651193879824335475}
   - component: {fileID: 966055320557703414}
   - component: {fileID: 521048657064497001}
+  - component: {fileID: 5883703621201438826}
   m_Layer: 5
   m_Name: Unit001
   m_TagString: Untagged
@@ -1475,8 +1475,35 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!70 &651193879824335475
-CapsuleCollider2D:
+--- !u!114 &966055320557703414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2534896665565900937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d904ff0ea0e8b42adb5ac910d40060a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &521048657064497001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2534896665565900937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65086c29b0f1f4e6d9b1e7e2c4a10e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hpBar: {fileID: 6370078252479155502}
+  characterBase: {fileID: 11400000, guid: c284ade13ad3046c4a5f3848dd0367b1, type: 2}
+  isPlayer: 0
+--- !u!61 &5883703621201438826
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1508,37 +1535,18 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.45}
-  m_Size: {x: 0.6, y: 0.7}
-  m_Direction: 0
---- !u!114 &966055320557703414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2534896665565900937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d904ff0ea0e8b42adb5ac910d40060a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &521048657064497001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2534896665565900937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65086c29b0f1f4e6d9b1e7e2c4a10e46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyCharacter: {fileID: 0}
-  hpBar: {fileID: 6370078252479155502}
-  characterBase: {fileID: 11400000, guid: c284ade13ad3046c4a5f3848dd0367b1, type: 2}
-  isPlayer: 0
-  isDead: 0
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.7, y: 0.7}
+  m_EdgeRadius: 0
 --- !u!1 &2751041853316523534
 GameObject:
   m_ObjectHideFlags: 0

@@ -4166,7 +4166,7 @@ GameObject:
   - component: {fileID: 5296991774510162239}
   - component: {fileID: 3396739712077597273}
   - component: {fileID: 893566226127816254}
-  - component: {fileID: 6918490292208050731}
+  - component: {fileID: 3986090303000618529}
   - component: {fileID: 2108187390754438458}
   - component: {fileID: 4105144314368073903}
   m_Layer: 5
@@ -4243,8 +4243,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!70 &6918490292208050731
-CapsuleCollider2D:
+--- !u!61 &3986090303000618529
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4276,8 +4276,18 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.45}
-  m_Size: {x: 0.6, y: 0.7}
-  m_Direction: 0
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.7, y: 0.7}
+  m_EdgeRadius: 0
 --- !u!114 &2108187390754438458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4302,11 +4312,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65086c29b0f1f4e6d9b1e7e2c4a10e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyCharacter: {fileID: 0}
   hpBar: {fileID: 2247943339024959225}
   characterBase: {fileID: 11400000, guid: b2a2e5cab263b4a248aaa15ec9c6d1b0, type: 2}
   isPlayer: 0
-  isDead: 0
 --- !u!1 &6214788437371034105
 GameObject:
   m_ObjectHideFlags: 0

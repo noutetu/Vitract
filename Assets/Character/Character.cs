@@ -3,11 +3,13 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(CharaMover))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class Character : MonoBehaviour
 {
     // ------------- キャラクターのステータス ------------------
-    
+
     private Character enemyCharacter; // 攻撃対象
+    private Castle enemyCastle; // 攻撃対象
     private bool isFirstAttack;
     [SerializeField] private HPBar hpBar;
     [SerializeField] private CharacterBase characterBase;
@@ -110,19 +112,39 @@ public class Character : MonoBehaviour
     // ------------- 衝突イベント ------------------
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Ground") || IsOwnBase(other.gameObject.tag)) return;
-
-        enemyCharacter = other.gameObject.GetComponent<Character>();
-        if (enemyCharacter != null)
+        if (other.gameObject.CompareTag("Ground") || IsOwnBase(other.gameObject.tag)) { return; }
+        //キャラクターとの衝突
+        if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Enemy"))
         {
-            AttackEvent();
+            enemyCharacter = other.gameObject.GetComponent<Character>();
+            if (enemyCharacter != null)
+            {
+                AttackEvent();
+            }
+        }
+        //相手拠点との衝突
+        else if (other.gameObject.CompareTag("PlayerCastle") || other.gameObject.CompareTag("EnemyCastle"))
+        {
+            enemyCastle = other.gameObject.GetComponent<Castle>();
+            if (enemyCastle != null)
+            {
+                AttackEvent();
+            }
         }
     }
 
     private bool IsOwnBase(string tag)
     {
-        return (isPlayer && tag == "PlayerCastle" || tag == "Player") || (!isPlayer && tag == "EnemyCastle" || tag == "Enemy");
+        if (isPlayer)
+        {
+            return tag == "PlayerCastle" || tag == "Player";
+        }
+        else
+        {
+            return tag == "EnemyCastle" || tag == "Enemy";
+        }
     }
+
 
     // ------------- 攻撃処理 ------------------
     private void AttackEvent()
@@ -135,12 +157,12 @@ public class Character : MonoBehaviour
 
     private IEnumerator HandleAttackState()
     {
-        if(!isFirstAttack)
+        if (!isFirstAttack)
         {
             yield return new WaitForSeconds(attackCoolTime);
             characterState = CharacterState.Idle;
         }
-        if(isDead){yield break;}
+        if (isDead) { yield break; }
         CharacterState = CharacterState.Attack;
         anim.NormalAttackAnim(attackSpeed);
     }
@@ -162,21 +184,45 @@ public class Character : MonoBehaviour
     //------------ unity animation event -------------
     public void HitAttack()
     {
-        bool enemyIsDead = enemyCharacter.TakeDamageAndCheckDead(atk);
-
-        if (enemyIsDead)
+        //キャラクターへの攻撃
+        if (enemyCharacter != null)
         {
-            enemyCharacter = null;
-            isFirstAttack = true;
-            if(!isDead)
+            bool enemyIsDead = enemyCharacter.TakeDamageAndCheckDead(atk);
+            if (enemyIsDead)
             {
-                characterState = CharacterState.Run;
+                enemyCharacter = null;
+                isFirstAttack = true;
+                if (!isDead)
+                {
+                    characterState = CharacterState.Run;
+                }
+            }
+            else
+            {
+                isFirstAttack = false;
+                AttackEvent();
             }
         }
-        else
+        //的拠点への攻撃
+        else if (enemyCastle != null)
         {
-            isFirstAttack = false;
-            AttackEvent();
+            bool enemyCastleIsDead = enemyCastle.TakeDamageAndCheckDead(atk);
+
+            if (enemyCastleIsDead)
+            {
+                enemyCastle = null;
+                isFirstAttack = true;
+                if (!isDead)
+                {
+                    characterState = CharacterState.Idle;
+                }
+            }
+            else
+            {
+                isFirstAttack = false;
+                AttackEvent();
+            }
+
         }
     }
     public void Dead()
