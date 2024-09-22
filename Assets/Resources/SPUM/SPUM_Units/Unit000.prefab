@@ -4892,9 +4892,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65086c29b0f1f4e6d9b1e7e2c4a10e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyCharacter: {fileID: 0}
   hpBar: {fileID: 426101429959452413}
   characterBase: {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
   isPlayer: 0
+  isDead: 0
 --- !u!1 &6822023230457472988
 GameObject:
   m_ObjectHideFlags: 0

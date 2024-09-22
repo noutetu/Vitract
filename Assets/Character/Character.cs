@@ -1,23 +1,25 @@
 using System.Collections;
-using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(CharaMover))]
-
 public class Character : MonoBehaviour
 {
-    //攻撃を与える対象
-    public Character enemyCharacter;
-
+    // ------------- キャラクターのステータス ------------------
+    
+    private Character enemyCharacter; // 攻撃対象
+    private bool isFirstAttack;
     [SerializeField] private HPBar hpBar;
     [SerializeField] private CharacterBase characterBase;
-    public bool isPlayer;
+
+    public bool isPlayer; // プレイヤーかどうか
+    private bool isDead;   // 死亡フラグ
+
     private CharacterAnimator anim;
     private CharaMover charaMover;
     private CharacterState characterState;
-    public CharacterState CharacterState { get => characterState; set => characterState = value; }
-    //------------------------------キャラクターのステータス----------------------------------------------
+
+    // ------------- キャラクターのステータス ------------------
     private new string name;                //名前
     private int cost;                       //コスト
     private float maxHp;                    //最大体力
@@ -32,183 +34,172 @@ public class Character : MonoBehaviour
     private float speed;                    //スピード
     private float range;                    //攻撃範囲
     private CharacterType characterType;    //タイプ
-    public bool isDead;
-    //-------------------------------------------------------------------------------------------------
 
+    // ------------- プロパティ ------------------
+    public CharacterState CharacterState
+    {
+        get => characterState;
+        set => characterState = value;
+    }
+
+    // ------------- Unity ライフサイクル ------------------
+    private void Awake()
+    {
+        anim = GetComponentInChildren<CharacterAnimator>();
+        charaMover = GetComponent<CharaMover>();
+
+        anim.OnAttack += HitAttack;
+        anim.OnDead += Dead;
+    }
 
     private void OnEnable()
     {
         InitCharacter();
     }
+
     private void OnDisable()
     {
         anim.OnAttack -= HitAttack;
         anim.OnDead -= Dead;
     }
 
-
-    private void Awake()
-    {
-        anim = GetComponentInChildren<CharacterAnimator>();
-        anim.OnAttack += HitAttack;
-        anim.OnDead += Dead;
-        charaMover = GetComponent<CharaMover>();
-    }
-
     private void Start()
     {
-        hpBar.SetHP((float)currentHp / maxHp);
+        hpBar.SetHP(currentHp / maxHp);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        HundleCharacter();
+        HandleCharacterState();
     }
 
-    private void OnCollisionExit2D(Collision2D other)
-    {
-        characterState = CharacterState.Run;
-    }
-
-    private void HundleCharacter()
+    // ------------- キャラクターの状態管理 ------------------
+    private void HandleCharacterState()
     {
         switch (CharacterState)
         {
             case CharacterState.Run:
-                HandleRunState();
+                MoveCharacter();
                 break;
             case CharacterState.Die:
                 HandleDieState();
                 break;
         }
     }
-    //アイドル状態
-    private void HandleIdleState()
-    {
-        anim.IdleAnim();
-    }
-    //走る状態
-    private void HandleRunState()
+
+    private void MoveCharacter()
     {
         anim.RunAnim(speed / 2);
         charaMover.Move(speed, isPlayer);
     }
-    //死んだ状態
+
     private void HandleDieState()
     {
         anim.DeadAnim();
     }
-    //デバフ状態
-    private void HandleDebuffState()
-    {
-        anim.DebuffAnim();
-    }
 
-
-    //ーーーーーーーーーーーー----------------攻撃に関する処理-----------------------------------
+    // ------------- 衝突イベント ------------------
     private void OnCollisionEnter2D(Collision2D other)
     {
-        AttackEvent(other);
+        if (other.gameObject.CompareTag("Ground") || IsOwnBase(other.gameObject.tag)) return;
+
+        enemyCharacter = other.gameObject.GetComponent<Character>();
+        if (enemyCharacter != null)
+        {
+            AttackEvent();
+        }
     }
 
-    private void AttackEvent(Collision2D other)
+    private bool IsOwnBase(string tag)
     {
-        enemyCharacter = other.gameObject.GetComponent<Character>();
+        return (isPlayer && tag == "PlayerCastle") || (!isPlayer && tag == "EnemyCastle");
+    }
 
-        if (isPlayer)
+    // ------------- 攻撃処理 ------------------
+    private void AttackEvent()
+    {
+        if (!isDead)
         {
-            if (other.gameObject.tag == "Enemy" || other.gameObject.tag == "EnemyCastle")
-            {
-                StartCoroutine(HandleAttackState());
-            }
-        }
-        else
-        {
-            if (other.gameObject.tag == "Player" || other.gameObject.tag == "PlayerCastle")
-            {
-                StartCoroutine(HandleAttackState());
-            }
+            StartCoroutine(HandleAttackState());
         }
     }
 
     private IEnumerator HandleAttackState()
     {
-        characterState = CharacterState.Attack;
-        //クールタイム待機
-        yield return new WaitForSeconds(0);
+        if(!isFirstAttack)
+        {
+            yield return new WaitForSeconds(attackCoolTime);
+        }
+        if(isDead){yield break;}
+        CharacterState = CharacterState.Attack;
         anim.NormalAttackAnim(attackSpeed);
     }
 
-    private void HandleSkillAttackState()
+    public bool TakeDamageAndCheckDead(float damage)
     {
-        anim.SkillAttackAnim();
-    }
-
-    public bool TakeDamage(float damage)
-    {
-        currentHp -= damage;
-        currentHp = Mathf.Max(currentHp, 0);  // currentHpが0を下回らないように
+        currentHp = Mathf.Max(currentHp - damage, 0);
         hpBar.UpdateHP(currentHp / maxHp);
 
         if (currentHp <= 0)
         {
-            Debug.Log("HPが0になった");
+            isDead = true;
             characterState = CharacterState.Die;
-            return true;  // キャラクターが死亡したことを示す
+            return true;
         }
-
-        return false;  // キャラクターがまだ生きていることを示す
+        return false;
     }
-
-    //------------------------------------------------------------------------------------------
-    //--------------------------unityアニメーションイベントに設定------------------------------------
+    //------------ unity animation event -------------
     public void HitAttack()
     {
-        bool isDead = enemyCharacter.TakeDamage(atk);
-        if (isDead)
+        if (isDead) return; // キャラクターが死んでいるなら処理を終了
+
+        bool enemyIsDead = enemyCharacter.TakeDamageAndCheckDead(atk);
+
+        if (enemyIsDead)
         {
             enemyCharacter = null;
+            isFirstAttack = true;
+            characterState = CharacterState.Run;
+        }
+        else
+        {
+            isFirstAttack = false;
+            AttackEvent();
         }
     }
     public void Dead()
     {
         Destroy(gameObject);
     }
-    //-------------------------------------------------------------------------------------------
+    // ------------- キャラクターの初期化 ------------------
     private void InitCharacter()
     {
-        if (characterBase != null)
-        {
-            // CharacterBase のデータをフィールドにコピー
-            name = characterBase.Name;
-            maxHp = characterBase.MaxHp;
-            currentHp = maxHp;
-            deffence = characterBase.Defence;
-            magicDeffence = characterBase.MagicDefence;
-            canBlockCount = characterBase.CanBlockCount;
-            atk = characterBase.Atk;
-            attackSpeed = characterBase.AttackSpeed;
-            attackCoolTime = characterBase.AttackCoolTime;
-            speed = characterBase.Speed;
-            range = characterBase.Range;
-            cost = characterBase.Cost;
-            characterType = characterBase.CharacterType;
-        }
-        else
+        if (characterBase == null)
         {
             Debug.LogError("CharacterBase is not assigned.");
+            return;
         }
+
+        name = characterBase.Name;
+        maxHp = characterBase.MaxHp;
+        currentHp = maxHp;
+        atk = characterBase.Atk;
+        attackSpeed = characterBase.AttackSpeed;
+        attackCoolTime = characterBase.AttackCoolTime;
+        speed = characterBase.Speed;
+        range = characterBase.Range;
+        deffence = characterBase.Defence;
+        magicDeffence = characterBase.MagicDefence;
+        canBlockCount = characterBase.CanBlockCount;
+        cost = characterBase.Cost;
+        characterType = characterBase.CharacterType;
+        isFirstAttack = true;
     }
 
+    // ------------- ログ出力 ------------------
     public void DisplayLogCharacterInfo()
     {
-        Debug.Log($"Name: {name}");
-        Debug.Log($"Max HP: {maxHp}");
-        Debug.Log($"Attack: {atk}");
-        Debug.Log($"Speed: {speed}");
-        Debug.Log($"Range: {range}");
-        Debug.Log($"Cost: {cost}");
-        Debug.Log($"Character Type: {characterType}");
+        Debug.Log($"Name: {name}, Max HP: {maxHp}, Attack: {atk}, Speed: {speed}, Range: {range}, Cost: {cost}, Type: {characterType}");
     }
 }
 
@@ -219,5 +210,5 @@ public enum CharacterState
     SkillAttack,
     Die,
     Debuff,
-    Wait,
+    Wait
 }

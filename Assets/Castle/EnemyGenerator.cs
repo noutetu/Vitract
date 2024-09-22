@@ -10,20 +10,23 @@ public class EnemyGenerator : MonoBehaviour
 
     public void MakeUnit000()
     {
-        Character enemyCharacter = Instantiate(unit000.Prefab,transform);
-        enemyCharacter.gameObject.tag = "Enemy";
-        enemyCharacter.isPlayer = false;
+        MakeUnit(unit000);
     }
+
     public void MakeUnit001()
     {
-        Character enemyCharacter = Instantiate(unit001.Prefab,transform);
-        enemyCharacter.gameObject.tag = "Enemy";
-        enemyCharacter.isPlayer = false;
+        MakeUnit(unit001);
     }
     public void MakeUnit002()
     {
-        Character enemyCharacter = Instantiate(unit002.Prefab,transform);
+        MakeUnit(unit002);
+    }
+    
+    private void MakeUnit(CharacterBase unit)
+    {
+        Character enemyCharacter = Instantiate(unit.Prefab, transform);
         enemyCharacter.gameObject.tag = "Enemy";
+        enemyCharacter.gameObject.layer = LayerMask.NameToLayer("Enemy");
         enemyCharacter.isPlayer = false;
     }
 }

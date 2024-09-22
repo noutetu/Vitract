@@ -19,6 +19,7 @@ public class CharacterGenerator : MonoBehaviour
     {
         Character playerCharacter = Instantiate(prefab, transform.position, Quaternion.Euler(0,180,0),transform);
         playerCharacter.gameObject.tag = "Player";
+        playerCharacter.gameObject.layer = LayerMask.NameToLayer("Player");
         playerCharacter.isPlayer = true;
     }
 }
