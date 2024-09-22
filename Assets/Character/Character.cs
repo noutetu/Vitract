@@ -79,15 +79,18 @@ public class Character : MonoBehaviour
         switch (CharacterState)
         {
             case CharacterState.Run:
-                MoveCharacter();
+                HandleRunState();
                 break;
             case CharacterState.Die:
                 HandleDieState();
                 break;
+            case CharacterState.Idle:
+                HandleIdleState();
+                break;
         }
     }
 
-    private void MoveCharacter()
+    private void HandleRunState()
     {
         anim.RunAnim(speed / 2);
         charaMover.Move(speed, isPlayer);
@@ -95,7 +98,13 @@ public class Character : MonoBehaviour
 
     private void HandleDieState()
     {
+        charaMover.Stop();
         anim.DeadAnim();
+    }
+
+    private void HandleIdleState()
+    {
+        anim.IdleAnim();
     }
 
     // ------------- 衝突イベント ------------------
@@ -112,7 +121,7 @@ public class Character : MonoBehaviour
 
     private bool IsOwnBase(string tag)
     {
-        return (isPlayer && tag == "PlayerCastle") || (!isPlayer && tag == "EnemyCastle");
+        return (isPlayer && tag == "PlayerCastle" || tag == "Player") || (!isPlayer && tag == "EnemyCastle" || tag == "Enemy");
     }
 
     // ------------- 攻撃処理 ------------------
@@ -129,6 +138,7 @@ public class Character : MonoBehaviour
         if(!isFirstAttack)
         {
             yield return new WaitForSeconds(attackCoolTime);
+            characterState = CharacterState.Idle;
         }
         if(isDead){yield break;}
         CharacterState = CharacterState.Attack;
@@ -142,6 +152,7 @@ public class Character : MonoBehaviour
 
         if (currentHp <= 0)
         {
+            Debug.Log("HPが0になった");
             isDead = true;
             characterState = CharacterState.Die;
             return true;
@@ -151,15 +162,16 @@ public class Character : MonoBehaviour
     //------------ unity animation event -------------
     public void HitAttack()
     {
-        if (isDead) return; // キャラクターが死んでいるなら処理を終了
-
         bool enemyIsDead = enemyCharacter.TakeDamageAndCheckDead(atk);
 
         if (enemyIsDead)
         {
             enemyCharacter = null;
             isFirstAttack = true;
-            characterState = CharacterState.Run;
+            if(!isDead)
+            {
+                characterState = CharacterState.Run;
+            }
         }
         else
         {
@@ -210,5 +222,5 @@ public enum CharacterState
     SkillAttack,
     Die,
     Debuff,
-    Wait
+    Idle,
 }
