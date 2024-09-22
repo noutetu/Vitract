@@ -21,8 +21,8 @@ MonoBehaviour:
   canBlockCount: 2
   atk: 50
   attackSpeed: 0.6
-  attackCoolTime: 1
-  speed: 0.2
+  attackCoolTime: 0.9
+  speed: 0.3
   range: 0
   characterType: 0
   sprite: {fileID: 114712159, guid: 3458c3542cc4d4bb186bc6f65d6982b9, type: 3}

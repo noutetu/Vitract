@@ -148,7 +148,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hp: 1000
   cost: 0
-  maxHp: 0
   hpBar: {fileID: 5484995092009279017}
 --- !u!50 &1889592760464130589
 Rigidbody2D:
@@ -203,7 +202,7 @@ Transform:
   m_GameObject: {fileID: 8819377876929283594}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.316, y: 0, z: 0}
+  m_LocalPosition: {x: -0.602, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

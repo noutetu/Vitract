@@ -4,6 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharaMover))]
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class Character : MonoBehaviour
 {
     // ------------- キャラクターのステータス ------------------
@@ -257,7 +258,8 @@ public class Character : MonoBehaviour
     // ------------- ログ出力 ------------------
     public void DisplayLogCharacterInfo()
     {
-        Debug.Log($"Name: {name}, Max HP: {maxHp}, Attack: {atk}, Speed: {speed}, Range: {range}, Cost: {cost}, Type: {characterType}");
+        Debug.Log
+        ($"Name: {name}, Max HP: {maxHp}, Attack: {atk}, Speed: {speed}, Range: {range}, Cost: {cost}, Type: {characterType}");
     }
 }
 
