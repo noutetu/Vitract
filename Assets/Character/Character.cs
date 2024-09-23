@@ -14,13 +14,13 @@ public class Character : MonoBehaviour, IDamageable
     private Character enemyCharacter; // 現在攻撃対象のキャラクター
     private List<Character> enemies;  // 攻撃対象の敵リスト
     private Castle enemyCastle;       // 攻撃対象の城
-    private bool isFirstAttack;       // 最初の攻撃フラグ
 
     [SerializeField] private HPBar hpBar;               // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
 
     public bool isPlayer;             // プレイヤーかどうか
     private bool isDead;              // 死亡フラグ
+    public bool IsDead { get => isDead; }
 
     private CharacterAnimator anim;   // アニメーション制御
     private CharaMover charaMover;    // 移動制御
@@ -63,7 +63,7 @@ public class Character : MonoBehaviour, IDamageable
     private void OnEnable()
     {
         // キャラクターの初期化
-        InitCharacter(); 
+        InitCharacter();
         // HPバーの初期化
         hpBar.SetHP(currentHp / maxHp);
     }
@@ -83,49 +83,67 @@ public class Character : MonoBehaviour, IDamageable
 
     private void Start()
     {
-       
+
     }
 
     private void FixedUpdate()
     {
-        // キャラクターの状態に応じて処理を実行
-        HandleCharacterState();
+        // 攻撃対象がすでに死んでいるかを確認
+        CheckEnemiesState();
+
+        HandleState();
     }
 
+    // ---------------- 敵状態管理 ------------------
+    private void CheckEnemiesState()
+    {
+        if (enemyCharacter == null && enemies.Count > 0)
+        {
+            enemyCharacter = SelectNextEnemy();
+            if (enemyCharacter != null)
+            {
+                ScheduleNextAttack();
+            }
+            else
+            {
+                characterState = CharacterState.Run;
+            }
+        }
+    }
     // ------------- キャラクターの状態管理 ------------------
 
-    private void HandleCharacterState()
+    private void HandleState()
     {
         switch (CharacterState)
         {
             case CharacterState.Run:
-                HandleRunState();
+                HandleRunningState();
                 break;
             case CharacterState.Die:
-                HandleDieState();
+                HandleDyingState();
                 break;
             case CharacterState.Idle:
-                HandleIdleState();
+                HandleIdllingState();
                 break;
         }
     }
 
     // 走行状態の処理
-    private void HandleRunState()
+    private void HandleRunningState()
     {
         anim.RunAnim(speed / 2); // 走行アニメーションの再生
         charaMover.Move(speed, isPlayer);  // キャラクターを移動させる
     }
 
     // 死亡状態の処理
-    private void HandleDieState()
+    private void HandleDyingState()
     {
         charaMover.Stop();      // 移動を停止
         anim.DeadAnim();        // 死亡アニメーションの再生
     }
 
     // 待機状態の処理
-    private void HandleIdleState()
+    private void HandleIdllingState()
     {
         anim.IdleAnim();        // 待機アニメーションの再生
     }
@@ -150,7 +168,8 @@ public class Character : MonoBehaviour, IDamageable
 
             // 最初の敵キャラクターを攻撃対象とする
             enemyCharacter = enemies[0];
-            if (enemyCharacter != null)
+            //敵キャラクターがいて、現在攻撃中でなければ
+            if (enemyCharacter != null && characterState != CharacterState.Attack)
             {
                 AttackEvent();  // 攻撃イベントの開始
             }
@@ -159,17 +178,19 @@ public class Character : MonoBehaviour, IDamageable
         // 敵の城との衝突処理
         else if (other.gameObject.CompareTag("PlayerCastle") || other.gameObject.CompareTag("EnemyCastle"))
         {
+            Debug.Log("城との衝突");
             enemyCastle = other.gameObject.GetComponent<Castle>();
 
             // 城に攻撃を行う
             if (enemyCastle != null)
             {
+                Debug.Log("城への攻撃");
                 AttackEvent();  // 攻撃イベントの開始
             }
         }
     }
 
-    // 自分の拠点かどうかを確認
+    // 味方かどうかを確認
     private bool IsOwnBase(string tag)
     {
         return (isPlayer && (tag == "PlayerCastle" || tag == "Player")) ||
@@ -180,89 +201,119 @@ public class Character : MonoBehaviour, IDamageable
 
     private void AttackEvent()
     {
-        if (!isDead)
+        if (!IsDead)
         {
-            StartCoroutine(HandleAttackState());  // 攻撃状態の開始
+            if (enemyCharacter != null || enemyCastle != null)
+            {
+                HandleAttackState();
+            }
         }
     }
 
-    private IEnumerator HandleAttackState()
+    private void HandleAttackState()
     {
-        // 最初の攻撃でなければ、クールタイムを待機
-        if (!isFirstAttack)
-        {
-            CharacterState = CharacterState.Idle;
-            yield return new WaitForSeconds(attackCoolTime);
-        }
+        if (IsDead) return;
 
-        if (isDead) yield break;  // 死亡していれば攻撃を中断
-
-        CharacterState = CharacterState.Attack;  // 攻撃状態に遷移
-        anim.NormalAttackAnim(attackSpeed);      // 攻撃アニメーションの再生
+        CharacterState = CharacterState.Attack;
+        anim.NormalAttackAnim(attackSpeed);
     }
-
-    // 次の敵キャラクターを選択
-    private Character SelectNextEnemy()
-    {
-        enemies.RemoveAt(0);  // リストの先頭を削除し、次の敵を取得
-        return enemies.Count > 0 ? enemies[0] : null;
-    }
-
-    // ダメージ処理と死亡判定
+    // ------------- ダメージ処理と死亡判定 --------------------
     private bool HandleDamageAndCheckDead(IDamageable target)
     {
+        if (target == null) return true;
         bool targetIsDead = target.TakeDamageAndCheckDead(atk);  // ダメージを与える
-        isFirstAttack = targetIsDead;  // ターゲットが死んだ場合、最初の攻撃をリセット
         return targetIsDead;
     }
 
-    // ダメージを受けた時の処理
     public bool TakeDamageAndCheckDead(float damage)
     {
-        currentHp = Mathf.Max(currentHp - damage, 0);  // HPを更新
-        hpBar.UpdateHP(currentHp / maxHp);  // HPバーを更新
+        if (isDead) return true;  // 既に死亡している場合はすぐに終了
+
+        currentHp = Mathf.Max(currentHp - damage, 0);
+        hpBar.UpdateHP(currentHp / maxHp);
 
         if (currentHp <= 0)
         {
             isDead = true;
-            CharacterState = CharacterState.Die;  // 死亡状態に遷移
+            CharacterState = CharacterState.Die;
             return true;
         }
         return false;
     }
 
+    // ------------- 攻撃関連処理 -------------
+    private Character SelectNextEnemy()
+    {
+        if (enemies.Count > 0)
+        {
+            enemies.RemoveAt(0);  // リストの先頭を削除
+        }
+
+        return enemies.Count > 0 ? enemies[0] : null;
+    }
+    // 次の敵を探し、必要であれば攻撃再開か走行状態に遷移
+    private void HandleNextEnemyOrRun()
+    {
+        // 次の敵キャラクターを選択する
+        enemyCharacter = SelectNextEnemy();
+
+        // 敵キャラクターが存在する場合は攻撃を再開
+        if (enemyCharacter != null)
+        {
+            ScheduleNextAttack();
+        }
+        else
+        {
+            characterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
+        }
+    }
+    // 城が破壊された場合の処理
+    private void HandleCastleDestruction()
+    {
+        enemyCastle = null;
+        if (!IsDead)
+        {
+            CharacterState = CharacterState.Idle;
+        }
+    }
+
+    // クールタイムを待って次の攻撃を実行
+    private void ScheduleNextAttack()
+    {
+        DOVirtual.DelayedCall(attackCoolTime, () =>
+        {
+            if (!IsDead) AttackEvent();
+        });
+    }
     // ------------- アニメーションイベント ------------------
 
-    public void HitAttack()
+    private void HitAttack()
     {
         // 敵キャラクターへの攻撃
-        if (enemyCharacter != null && HandleDamageAndCheckDead(enemyCharacter))
+        if (enemyCharacter != null)
         {
-            // 次の敵を選択し、再度攻撃
-            enemyCharacter = SelectNextEnemy();
-            if (enemyCharacter != null)
+            // 敵が死んだ場合
+            if (HandleDamageAndCheckDead(enemyCharacter))
             {
-                AttackEvent();
+                HandleNextEnemyOrRun();
+                return;
             }
-            else if (!isDead)
-            {
-                CharacterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
-            }
+
+            // 敵がまだ生きている場合
+            ScheduleNextAttack();
+            return;
         }
+
         // 敵の城への攻撃
-        else if (enemyCastle != null)
+        if (enemyCastle != null)
         {
             if (HandleDamageAndCheckDead(enemyCastle))
             {
-                enemyCastle = null;  // 城が破壊された場合
-                if (!isDead)
-                {
-                    CharacterState = CharacterState.Idle;  // 城が破壊された後は待機状態に
-                }
+                HandleCastleDestruction();
             }
             else
             {
-                AttackEvent();  // 城が破壊されなければ再度攻撃
+                ScheduleNextAttack();
             }
         }
     }
@@ -273,7 +324,7 @@ public class Character : MonoBehaviour, IDamageable
         Destroy(gameObject);  // キャラクターを削除
     }
     //--------------DOTWEEN--------------
-    public void SmoothApper()
+    public void SmoothAppear()
     {
         // 透明からフェードインさせるために全てのSpriteRendererの透明度を設定
         SpriteRenderer[] spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
@@ -310,7 +361,6 @@ public class Character : MonoBehaviour, IDamageable
         magicDeffence = characterBase.MagicDefence;
         cost = characterBase.Cost;
         characterType = characterBase.CharacterType;
-        isFirstAttack = true;
 
         enemies = new List<Character>();
     }
