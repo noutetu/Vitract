@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -62,7 +63,9 @@ public class Character : MonoBehaviour, IDamageable
     private void OnEnable()
     {
         // キャラクターの初期化
-        InitCharacter();
+        InitCharacter(); 
+        // HPバーの初期化
+        hpBar.SetHP(currentHp / maxHp);
     }
 
     private void OnDisable()
@@ -72,10 +75,15 @@ public class Character : MonoBehaviour, IDamageable
         anim.OnDead -= Dead;
     }
 
+    private void OnDestroy()
+    {
+        //DOTweenの破棄
+        DOTween.Kill(this);
+    }
+
     private void Start()
     {
-        // HPバーの初期化
-        hpBar.SetHP(currentHp / maxHp);
+       
     }
 
     private void FixedUpdate()
@@ -264,7 +272,23 @@ public class Character : MonoBehaviour, IDamageable
     {
         Destroy(gameObject);  // キャラクターを削除
     }
+    //--------------DOTWEEN--------------
+    public void SmoothApper()
+    {
+        // 透明からフェードインさせるために全てのSpriteRendererの透明度を設定
+        SpriteRenderer[] spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
 
+        foreach (var spriteRenderer in spriteRenderers)
+        {
+            // 最初は完全に透明に設定
+            Color color = spriteRenderer.color;
+            color.a = 0f;
+            spriteRenderer.color = color;
+
+            // 透明度を1（完全に表示）まで1秒かけてフェードイン
+            spriteRenderer.DOFade(1f, 0.5f);  // 1秒かけてフェードイン
+        }
+    }
     // ------------- キャラクターの初期化 ------------------
     private void InitCharacter()
     {

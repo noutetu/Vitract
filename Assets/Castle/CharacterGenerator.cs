@@ -22,22 +22,6 @@ public class CharacterGenerator : MonoBehaviour
         playerCharacter.gameObject.layer = LayerMask.NameToLayer("Player");
         playerCharacter.isPlayer = true;
 
-        SmoothApper(playerCharacter);
-    }
-    private static void SmoothApper(Character playerCharacter)
-    {
-        // 透明からフェードインさせるために全てのSpriteRendererの透明度を設定
-        SpriteRenderer[] spriteRenderers = playerCharacter.GetComponentsInChildren<SpriteRenderer>();
-
-        foreach (var spriteRenderer in spriteRenderers)
-        {
-            // 最初は完全に透明に設定
-            Color color = spriteRenderer.color;
-            color.a = 0f;
-            spriteRenderer.color = color;
-
-            // 透明度を1（完全に表示）まで1秒かけてフェードイン
-            spriteRenderer.DOFade(1f, 2f);  // 1秒かけてフェードイン
-        }
+        playerCharacter.SmoothApper();
     }
 }
