@@ -61,8 +61,9 @@ public class CharacterAnimator : MonoBehaviour
     }
 
     
-    public void SkillAttackAnim()
+    public void SkillAttackAnim(float attackSpeed)
     {
+        anim.speed = attackSpeed;
         anim.SetFloat("AttackState", 0);
         anim.SetTrigger("Attack");
     }

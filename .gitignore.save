@@ -1,0 +1,34 @@
+sa# Unity generated folders
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild
+/[Bb]uilds/
+/[Ll]ogs/
+/[Mm]emoryCaptures/
+/AssetStoreTools/
+
+# Visual Studio
+.vs/
+*.csproj
+*.sln
+*.user
+
+# Rider
+.idea/
+/*.sln.iml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# User specific settings
+/UserSettings/
+
+# Ignore Fantasy RPG Icons Pack
+/Assets/Assets/Fantasy RPG Icons Pack/
+

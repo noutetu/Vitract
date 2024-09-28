@@ -25,7 +25,7 @@ public class Character : MonoBehaviour, IDamageable
     private CharacterAnimator anim;   // アニメーション制御
     private CharaMover charaMover;    // 移動制御
     private CharacterState characterState; // キャラクターの現在の状態
-
+    
     // ------------- キャラクターのステータス ------------------
     private string name;               // キャラクターの名前
     private int cost;                  // コスト
@@ -216,6 +216,14 @@ public class Character : MonoBehaviour, IDamageable
 
         CharacterState = CharacterState.Attack;
         anim.NormalAttackAnim(attackSpeed);
+    }
+
+    private void SkillAttackState()
+    {
+        if(isDead) {return;}
+
+        characterState = CharacterState.SkillAttack;
+        anim.SkillAttackAnim(attackSpeed);
     }
     // ------------- ダメージ処理と死亡判定 --------------------
     private bool HandleDamageAndCheckDead(IDamageable target)

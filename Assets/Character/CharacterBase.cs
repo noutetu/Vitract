@@ -72,7 +72,6 @@ public class CharacterBase : ScriptableObject
             range = 0;
         }
     }
-
 }
 
 public enum CharacterType
