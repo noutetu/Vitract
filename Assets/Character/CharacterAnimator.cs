@@ -47,6 +47,7 @@ public class CharacterAnimator : MonoBehaviour
     public void RunAnim(float speed)
     {
         anim.SetFloat("RunState", speed);
+        anim.speed = speed * 3.5f;
     }
 
     public void IdleAnim()

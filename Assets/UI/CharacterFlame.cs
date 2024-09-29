@@ -28,6 +28,14 @@ public class CharacterFlame : MonoBehaviour
     public void PressButton()
     {
         if (prefab == null) { return; }
-        OnTouch?.Invoke(prefab);
+        if (OnTouch != null)
+        {
+            Debug.Log("OnTouch has subscribers."); // イベントにリスナーが登録されている
+            OnTouch.Invoke(prefab); // イベントを呼び出す
+        }
+        else
+        {
+            Debug.Log("OnTouch has no subscribers."); // イベントにリスナーが登録されていない
+        }
     }
 }

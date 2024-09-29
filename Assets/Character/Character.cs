@@ -7,13 +7,14 @@ using UnityEngine;
 [RequireComponent(typeof(CharaMover))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class Character : MonoBehaviour, IDamageable
+public abstract class Character : MonoBehaviour, IDamageable
 {
     // ------------- キャラクターのステータス ------------------
+    //　今日も頑張ろう
 
-    private Character enemyCharacter; // 現在攻撃対象のキャラクター
-    private List<Character> enemies;  // 攻撃対象の敵リスト
-    private Castle enemyCastle;       // 攻撃対象の城
+    private IDamageable enemyCharacter; // 現在攻撃対象のキャラクター
+    private List<IDamageable> enemies;  // 攻撃対象の敵リスト
+    private IDamageable enemyCastle;       // 攻撃対象の城
 
     [SerializeField] private HPBar hpBar;               // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
@@ -37,7 +38,7 @@ public class Character : MonoBehaviour, IDamageable
     private float attackSpeed;         // 攻撃速度
     private float attackCoolTime;      // 攻撃クールタイム
     private float speed;               // 移動速度
-    private float range;               // 射程
+    protected float range;               // 射程
     private CharacterType characterType;  // キャラクターのタイプ
 
     // ------------- プロパティ ------------------
@@ -86,11 +87,14 @@ public class Character : MonoBehaviour, IDamageable
 
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         // 攻撃対象がすでに死んでいるかを確認
         CheckEnemiesState();
-
+        if(isDead)
+        {
+            characterState = CharacterState.Die;
+        }
         HandleState();
     }
 
@@ -120,6 +124,7 @@ public class Character : MonoBehaviour, IDamageable
                 HandleRunningState();
                 break;
             case CharacterState.Die:
+                Debug.Log("HPが0になった");
                 HandleDyingState();
                 break;
             case CharacterState.Idle:
@@ -158,7 +163,7 @@ public class Character : MonoBehaviour, IDamageable
         // 敵キャラクターとの衝突処理
         if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Enemy"))
         {
-            Character collidedCharacter = other.gameObject.GetComponent<Character>();
+            IDamageable collidedCharacter = other.gameObject.GetComponent<IDamageable>();
 
             // まだリストにない敵キャラクターを登録
             if (collidedCharacter != null && !enemies.Contains(collidedCharacter))
@@ -179,7 +184,7 @@ public class Character : MonoBehaviour, IDamageable
         else if (other.gameObject.CompareTag("PlayerCastle") || other.gameObject.CompareTag("EnemyCastle"))
         {
             Debug.Log("城との衝突");
-            enemyCastle = other.gameObject.GetComponent<Castle>();
+            enemyCastle = other.gameObject.GetComponent<IDamageable>();
 
             // 城に攻撃を行う
             if (enemyCastle != null)
@@ -191,7 +196,7 @@ public class Character : MonoBehaviour, IDamageable
     }
 
     // 味方かどうかを確認
-    private bool IsOwnBase(string tag)
+    protected bool IsOwnBase(string tag)
     {
         return (isPlayer && (tag == "PlayerCastle" || tag == "Player")) ||
                (!isPlayer && (tag == "EnemyCastle" || tag == "Enemy"));
@@ -250,7 +255,7 @@ public class Character : MonoBehaviour, IDamageable
     }
 
     // ------------- 攻撃関連処理 -------------
-    private Character SelectNextEnemy()
+    private IDamageable SelectNextEnemy()
     {
         if (enemies.Count > 0)
         {
@@ -370,7 +375,7 @@ public class Character : MonoBehaviour, IDamageable
         cost = characterBase.Cost;
         characterType = characterBase.CharacterType;
 
-        enemies = new List<Character>();
+        enemies = new List<IDamageable>();
     }
 
     // ------------- ログ出力 ------------------

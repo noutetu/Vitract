@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 791d0042c0834446288f6de7e41d2e9e, type: 3}
   m_Name: Unit003
   m_EditorClassIdentifier: 
-  prefab: {fileID: 4105144314368073903, guid: 8a05288dd988d4cfbad5d1a12f089995, type: 3}
-  name: "\u30AB\u30A4\u30EB"
-  cost: 30
-  maxHp: 600
+  prefab: {fileID: 6741135070882131618, guid: 48b0abeab4be9447f99e250a49a9d7d0, type: 3}
+  name: "\u30A8\u30EA\u30AB"
+  cost: 15
+  maxHp: 50
   defence: 0
-  magicDefence: 0
-  canBlockCount: 2
-  atk: 150
-  attackSpeed: 0.6
-  attackCoolTime: 0.8
+  magicDefence: 10
+  canBlockCount: 1
+  atk: 50
+  attackSpeed: 0.4
+  attackCoolTime: 1.5
   speed: 0.35
   range: 0
   characterType: 0
-  sprite: {fileID: -468272165, guid: 1be3df94bbdb545dab885542078b2653, type: 3}
+  sprite: {fileID: 1562503072, guid: 49b65b4f3e37e41a9931208ef8f9cd7d, type: 3}
