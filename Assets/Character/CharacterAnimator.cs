@@ -52,6 +52,7 @@ public class CharacterAnimator : MonoBehaviour
 
     public void IdleAnim()
     {
+        anim.speed = 1;
         anim.SetFloat("RunState", 0f);
     }
 
@@ -70,11 +71,18 @@ public class CharacterAnimator : MonoBehaviour
     }
     public void DeadAnim()
     {
+        anim.speed = 0.6f;
         anim.SetTrigger("Die");
     }
     public void DebuffAnim()
     {
+        anim.speed = 1;
         anim.SetFloat ("RunState", 3);
+    }
+
+    public void StopAnim()
+    {
+        anim.speed = 0;
     }
 
 //---------------------------unity animationEventで呼び出すメソッド---------------------------------

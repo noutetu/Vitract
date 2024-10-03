@@ -2587,6 +2587,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 927262697789078562, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 1933694175625079825, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.36
@@ -2627,9 +2631,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2317639221320023393, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2839010746406385424, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8784810805111247809, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
       propertyPath: m_Name
       value: EnemyCastle
+      objectReference: {fileID: 0}
+    - target: {fileID: 8784810805111247809, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8819377876929283594, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

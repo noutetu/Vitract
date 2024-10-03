@@ -1,70 +1,51 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Magician : Character
 {
-    public LayerMask hitLayers;  // レイキャストを当てるレイヤーを指定
-
-    private void Update()
+    public Vector2 boxSize;  // 検知するボックスのサイズ
+    public LayerMask detectionLayer; // 検知対象のレイヤー
+    Vector2 detectionCenter;  // 現在の位置を中心にボックス範囲を設定
+    Collider2D[] hitColliders; // 指定したサイズとレイヤーで範囲内のすべてのオブジェクトを検出
+    protected override void Start()
     {
-        PerformRaycastAttack();
+        // rangeを使ってboxSizeを初期化
+        boxSize = new Vector2(range, 2);
     }
 
-    // レイキャストによる遠距離攻撃
-    private void PerformRaycastAttack()
+    protected override void FixedUpdate()
     {
-        Vector2 rayOrigin = transform.position;   // レイキャストの始点
-        Vector2 rayDirection = -transform.right;  // 左方向にレイキャストを飛ばす
+        base.FixedUpdate();
+        DetectObjects();
+    }
 
-        // レイキャストで全てのヒットを取得 (味方を無視するため)
-        RaycastHit2D[] hits = Physics2D.RaycastAll(rayOrigin, rayDirection, range, hitLayers);
+    void DetectObjects()
+    {
+        // 現在の位置を中心にボックス範囲を設定
+        detectionCenter = transform.position;
+        // 指定したサイズとレイヤーで範囲内のすべてのオブジェクトを検出
+        hitColliders = Physics2D.OverlapBoxAll(detectionCenter, boxSize, 0f, detectionLayer);
 
-        foreach (var hit in hits)
+        // 検出されたオブジェクトを全てループで処理
+        foreach (var hitCollider in hitColliders)
         {
-            if (hit.collider != null)
-            {
-                GameObject hitObject = hit.collider.gameObject;
-
-                // 自身と同じタグを持つオブジェクト（味方）なら無視する
-                if (IsOwnBase(hitObject.tag))
-                {
-                    Debug.Log("Ignored friendly unit: " + hitObject.name);
-                    continue; // 次のオブジェクトをチェック
-                }
-                else
-                {
-                    // 敵にヒットした場合
-                    Debug.Log("Hit enemy: " + hitObject.name);
-                    
-                    // ダメージを与えるなどの処理を実行
-                    DealDamageToEnemy(hitObject);
-
-                    // レイキャストを終了
-                    Debug.Log("Raycast stopped after hitting enemy.");
-                    return; // 敵に当たったのでレイキャストを終了する
-                }
-            }
+            IDamageable detectedObject = hitCollider.GetComponent<IDamageable>();
+            
+            detectedObject.TakeDamageAndCheckDead(1);            
+            /*
+            ラピスみたいなDotダメージ！！！
+            */
         }
+
+        // デバッグ用に範囲を可視化
+        Debug.DrawRay(detectionCenter, Vector2.right * boxSize.x / 2, Color.red);
+        Debug.DrawRay(detectionCenter, Vector2.up * boxSize.y / 2, Color.red);
     }
 
-    // 敵にダメージを与える関数（仮の実装）
-    private void DealDamageToEnemy(GameObject enemy)
-    {
-        // ここで敵にダメージを与える処理を実装します
-        // 例: enemy.GetComponent<Enemy>().TakeDamage(attackDamage);
-        Debug.Log("Dealt damage to: " + enemy.name);
-    }
-
-    // デバッグ用にレイを可視化（シーンビューで確認）
+    // シーン上で可視化するためのメソッド
     private void OnDrawGizmosSelected()
-{
-    Vector2 rayOrigin = transform.position;
-    Vector2 rayDirection = -transform.right;  // 左方向にレイを飛ばす
-
-    Gizmos.color = Color.red;
-
-    // レイの終点を計算して可視化
-    Vector2 rayEnd = rayOrigin + rayDirection * range;
-    Gizmos.DrawLine(rayOrigin, rayEnd);  // レイの始点から終点までをラインで描画
-}
-
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(transform.position, boxSize);
+    }
 }

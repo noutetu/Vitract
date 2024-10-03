@@ -26,7 +26,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     private CharacterAnimator anim;   // アニメーション制御
     private CharaMover charaMover;    // 移動制御
     private CharacterState characterState; // キャラクターの現在の状態
-    
+
     // ------------- キャラクターのステータス ------------------
     private string name;               // キャラクターの名前
     private int cost;                  // コスト
@@ -34,7 +34,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     private float currentHp;           // 現在の体力
     private float deffence;            //防御力
     private float magicDeffence;       //魔法防御力
-    private float atk;                 // 攻撃力
+    protected float atk;                 // 攻撃力
     private float attackSpeed;         // 攻撃速度
     private float attackCoolTime;      // 攻撃クールタイム
     private float speed;               // 移動速度
@@ -82,7 +82,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         DOTween.Kill(this);
     }
 
-    private void Start()
+    protected virtual void Start()
     {
 
     }
@@ -91,7 +91,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         // 攻撃対象がすでに死んでいるかを確認
         CheckEnemiesState();
-        if(isDead)
+        if (isDead)
         {
             characterState = CharacterState.Die;
         }
@@ -225,7 +225,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void SkillAttackState()
     {
-        if(isDead) {return;}
+        if (isDead) { return; }
 
         characterState = CharacterState.SkillAttack;
         anim.SkillAttackAnim(attackSpeed);
@@ -293,6 +293,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     // クールタイムを待って次の攻撃を実行
     private void ScheduleNextAttack()
     {
+        characterState = CharacterState.Idle;
         DOVirtual.DelayedCall(attackCoolTime, () =>
         {
             if (!IsDead) AttackEvent();

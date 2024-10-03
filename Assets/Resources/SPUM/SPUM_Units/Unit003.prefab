@@ -1561,7 +1561,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.008726557, z: -0, w: 0.9999619}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.4, y: 1.6, z: 1}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 834406552148194399}
@@ -1689,7 +1689,8 @@ MonoBehaviour:
   hpBar: {fileID: 3139487639045028912}
   characterBase: {fileID: 11400000, guid: 8a507b4ccb836423998f62782310180a, type: 2}
   isPlayer: 0
-  hitLayers:
+  boxSize: {x: 0, y: 0}
+  detectionLayer:
     serializedVersion: 2
     m_Bits: 128
 --- !u!1 &4731368596200748237

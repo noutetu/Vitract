@@ -23,6 +23,6 @@ MonoBehaviour:
   attackSpeed: 0.4
   attackCoolTime: 1.5
   speed: 0.35
-  range: 0
-  characterType: 0
+  range: 10
+  characterType: 2
   sprite: {fileID: 1562503072, guid: 49b65b4f3e37e41a9931208ef8f9cd7d, type: 3}
