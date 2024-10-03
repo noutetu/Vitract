@@ -12,8 +12,8 @@ public abstract class Character : MonoBehaviour, IDamageable
     // ------------- キャラクターのステータス ------------------
     //　今日も頑張ろう
 
-    private IDamageable enemyCharacter; // 現在攻撃対象のキャラクター
-    private List<IDamageable> enemies;  // 攻撃対象の敵リスト
+    protected IDamageable enemyCharacter; // 現在攻撃対象のキャラクター
+    protected List<IDamageable> enemies;  // 攻撃対象の敵リスト
     private IDamageable enemyCastle;       // 攻撃対象の城
 
     [SerializeField] private HPBar hpBar;               // HPバーの参照
@@ -204,7 +204,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     // ------------- 攻撃処理 ------------------
 
-    private void AttackEvent()
+    protected void AttackEvent()
     {
         if (!IsDead)
         {
