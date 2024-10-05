@@ -93,24 +93,7 @@ public class Character : MonoBehaviour, IDamageable
         
         HandleState();
     }
-
-    // ---------------- 敵状態管理 ------------------
-    private void CheckEnemiesState()
-    {
-        if (enemyCharacter == null && enemies.Count > 0)
-        {
-            RemoveInEnemies(enemyCharacter);
-            SelectNextEnemy();
-            if (enemyCharacter != null)
-            {
-                ScheduleNextAttack();
-            }
-            else
-            {
-                characterState = CharacterState.Run;
-            }
-        }
-    }
+   
     // ------------- キャラクターの状態管理 ------------------
 
     private void HandleState()
@@ -168,7 +151,7 @@ public class Character : MonoBehaviour, IDamageable
             }
 
             // 最初の敵キャラクターを攻撃対象とする
-            enemyCharacter = enemies[0];
+            SetNextEnemy();
             //敵キャラクターがいて、現在攻撃中でなければ
             if (enemyCharacter != null && characterState != CharacterState.Attack)
             {
@@ -249,7 +232,7 @@ public class Character : MonoBehaviour, IDamageable
     {
         RemoveInEnemies(enemyCharacter);
         // 次の敵キャラクターを選択する
-        SelectNextEnemy();
+        SetNextEnemy();
 
         // 敵キャラクターが存在する場合は攻撃を再開
         if (enemyCharacter != null)
@@ -274,6 +257,8 @@ public class Character : MonoBehaviour, IDamageable
     // クールタイムを待って次の攻撃を実行
     private void ScheduleNextAttack()
     {
+        //待機モーション
+        HandleIdllingState();
         DOVirtual.DelayedCall(attackCoolTime, () =>
         {
             if (!IsDead) AttackEvent();
@@ -294,9 +279,28 @@ public class Character : MonoBehaviour, IDamageable
     {
         enemies.Add(enemy);
     }
-    private void SelectNextEnemy()
+    private void SetNextEnemy()
     {
         enemyCharacter = enemies.Count > 0 ? enemies[0] : null;
+    }
+    private void CheckEnemiesState()
+    {
+        //攻撃対象がnullなら
+        if (enemyCharacter == null)
+        {
+            //リストから削除して
+            RemoveInEnemies(enemyCharacter);
+            if(enemies.Count > 0)
+            {
+                // まだ敵がいるなら攻撃対象に設定
+                SetNextEnemy();
+            }
+            // 敵がいないなら走行状態に移行
+            else
+            {
+                characterState = CharacterState.Run;
+            }
+        }
     }
     // ------------- アニメーションイベント ------------------
 
@@ -329,6 +333,8 @@ public class Character : MonoBehaviour, IDamageable
                 ScheduleNextAttack();
             }
         }
+
+        characterState = CharacterState.Idle;
     }
 
     // 死亡処理
