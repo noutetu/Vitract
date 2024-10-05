@@ -8,6 +8,7 @@ public class EnemyGenerator : MonoBehaviour
     [SerializeField] CharacterBase unit000;
     [SerializeField] CharacterBase unit001;
     [SerializeField] CharacterBase unit002;
+    [SerializeField] CharacterBase unit003;
 
     public void MakeUnit000()
     {
@@ -21,6 +22,10 @@ public class EnemyGenerator : MonoBehaviour
     public void MakeUnit002()
     {
         MakeUnit(unit002);
+    }
+    public void MakeUnit003()
+    {
+        MakeUnit(unit003);
     }
 
     private void MakeUnit(CharacterBase unit)

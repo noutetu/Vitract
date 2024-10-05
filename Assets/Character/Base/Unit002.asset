@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Unit002
   m_EditorClassIdentifier: 
   prefab: {fileID: 6960591552022030895, guid: 8a05288dd988d4cfbad5d1a12f089995, type: 3}
-  name: "\u30AB\u30A4\u30EB"
+  name: "\u4E3B\u4EBA\u516C"
   cost: 30
   maxHp: 600
   defence: 0

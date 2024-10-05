@@ -46,8 +46,8 @@ public class CharacterAnimator : MonoBehaviour
 
     public void RunAnim(float speed)
     {
-        anim.SetFloat("RunState", speed);
         anim.speed = speed * 3.5f;
+        anim.SetFloat("RunState", speed);
     }
 
     public void IdleAnim()
@@ -61,7 +61,6 @@ public class CharacterAnimator : MonoBehaviour
         anim.speed = attackSpeed;
         anim.SetTrigger("Attack");
     }
-
     
     public void SkillAttackAnim(float attackSpeed)
     {
@@ -69,18 +68,20 @@ public class CharacterAnimator : MonoBehaviour
         anim.SetFloat("AttackState", 0);
         anim.SetTrigger("Attack");
     }
+    
     public void DeadAnim()
     {
         anim.speed = 0.6f;
         anim.SetTrigger("Die");
     }
+
     public void DebuffAnim()
     {
         anim.speed = 1;
         anim.SetFloat ("RunState", 3);
     }
 
-    public void StopAnim()
+    public void StopAnimator()
     {
         anim.speed = 0;
     }

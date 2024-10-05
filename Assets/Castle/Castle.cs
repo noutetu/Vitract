@@ -18,6 +18,7 @@ public class Castle : MonoBehaviour,IDamageable
     }
     public bool TakeDamageAndCheckDead(float damage)
     {
+        if(isDead) {return true;}
         currentHp = Mathf.Max(currentHp - damage, 0);
         hpBar.UpdateHP(currentHp / hp);
 

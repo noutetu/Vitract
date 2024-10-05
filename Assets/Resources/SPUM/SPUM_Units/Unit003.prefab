@@ -1690,9 +1690,15 @@ MonoBehaviour:
   characterBase: {fileID: 11400000, guid: 8a507b4ccb836423998f62782310180a, type: 2}
   isPlayer: 0
   boxSize: {x: 0, y: 0}
-  detectionLayer:
+  enemyLayer:
     serializedVersion: 2
     m_Bits: 128
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &4731368596200748237
 GameObject:
   m_ObjectHideFlags: 0

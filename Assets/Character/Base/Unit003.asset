@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Unit003
   m_EditorClassIdentifier: 
   prefab: {fileID: 6741135070882131618, guid: 48b0abeab4be9447f99e250a49a9d7d0, type: 3}
-  name: "\u30A8\u30EA\u30AB"
+  name: "\u91D1\u9AEA"
   cost: 15
-  maxHp: 50
+  maxHp: 1000
   defence: 0
   magicDefence: 10
   canBlockCount: 1
