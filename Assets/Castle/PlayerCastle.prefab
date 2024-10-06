@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6529328174317100833}
   - component: {fileID: 2615552134593850402}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,6 +48,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &3262319165895450505
 GameObject:
   m_ObjectHideFlags: 0
@@ -61,7 +62,7 @@ GameObject:
   - component: {fileID: 228125602897161002}
   - component: {fileID: 4517326011526687718}
   - component: {fileID: 859314319635078590}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: PlayerCastle
   m_TagString: PlayerCastle
   m_Icon: {fileID: 0}
@@ -336,9 +337,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6027128084397478066, guid: ec07bd5be2c8740e2a6d3bb99a5d3621, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8655026465947736960, guid: ec07bd5be2c8740e2a6d3bb99a5d3621, type: 3}
       propertyPath: m_Name
       value: CastleHPCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 8655026465947736960, guid: ec07bd5be2c8740e2a6d3bb99a5d3621, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174691271962268145, guid: ec07bd5be2c8740e2a6d3bb99a5d3621, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -7,24 +7,25 @@ using UnityEngine;
 [RequireComponent(typeof(CharaMover))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class Character : MonoBehaviour, IDamageable
+public abstract class Character : MonoBehaviour, IDamageable
 {
     // ------------- キャラクターのステータス ------------------
 
-    private Character enemyCharacter; // 現在攻撃対象のキャラクター
-    private List<Character> enemies;  // 攻撃対象の敵リスト
+    protected Character enemyCharacter; // 現在攻撃対象のキャラクター
+    protected List<Character> enemies;  // 攻撃対象の敵リスト
     private Castle enemyCastle;       // 攻撃対象の城
 
     [SerializeField] private HPBar hpBar;               // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
 
+    bool canAttack;
     public bool isPlayer;             // プレイヤーかどうか
     private bool isDead;              // 死亡フラグ
     public bool IsDead { get => isDead; }
 
     private CharacterAnimator anim;   // アニメーション制御
     private CharaMover charaMover;    // 移動制御
-    private CharacterState characterState; // キャラクターの現在の状態
+    protected CharacterState characterState; // キャラクターの現在の状態
 
     // ------------- キャラクターのステータス ------------------
     private string name;               // キャラクターの名前
@@ -37,7 +38,7 @@ public class Character : MonoBehaviour, IDamageable
     private float attackSpeed;         // 攻撃速度
     private float attackCoolTime;      // 攻撃クールタイム
     private float speed;               // 移動速度
-    private float range;               // 射程
+    protected float range;               // 射程
     private CharacterType characterType;  // キャラクターのタイプ
 
     // ------------- プロパティ ------------------
@@ -81,17 +82,22 @@ public class Character : MonoBehaviour, IDamageable
         DOTween.Kill(this);
     }
 
-    private void Start()
+    protected virtual void Start()
     {
 
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         // 攻撃対象がすでに死んでいるかを確認
         CheckEnemiesState();
+        if(isDead){characterState = CharacterState.Die;}
         
         HandleState();
+        if(enemyCharacter != null && canAttack)
+        {
+            AttackEvent();
+        }
     }
    
     // ------------- キャラクターの状態管理 ------------------
@@ -153,7 +159,7 @@ public class Character : MonoBehaviour, IDamageable
             // 最初の敵キャラクターを攻撃対象とする
             SetNextEnemy();
             //敵キャラクターがいて、現在攻撃中でなければ
-            if (enemyCharacter != null && characterState != CharacterState.Attack)
+            if (enemyCharacter != null && canAttack)
             {
                 AttackEvent();  // 攻撃イベントの開始
             }
@@ -185,6 +191,7 @@ public class Character : MonoBehaviour, IDamageable
 
     private void AttackEvent()
     {
+        canAttack = false;
         if (!IsDead)
         {
             if (enemyCharacter != null || enemyCastle != null)
@@ -241,6 +248,7 @@ public class Character : MonoBehaviour, IDamageable
         }
         else
         {
+            canAttack = true;
             characterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
         }
     }
@@ -250,6 +258,7 @@ public class Character : MonoBehaviour, IDamageable
         enemyCastle = null;
         if (!IsDead)
         {
+            Debug.Log("sirogakowareta");
             CharacterState = CharacterState.Idle;
         }
     }
@@ -261,6 +270,7 @@ public class Character : MonoBehaviour, IDamageable
         HandleIdllingState();
         DOVirtual.DelayedCall(attackCoolTime, () =>
         {
+            canAttack = true;
             if (!IsDead) AttackEvent();
         });
     }
@@ -279,7 +289,7 @@ public class Character : MonoBehaviour, IDamageable
     {
         enemies.Add(enemy);
     }
-    private void SetNextEnemy()
+    protected void SetNextEnemy()
     {
         enemyCharacter = enemies.Count > 0 ? enemies[0] : null;
     }
@@ -295,11 +305,13 @@ public class Character : MonoBehaviour, IDamageable
                 // まだ敵がいるなら攻撃対象に設定
                 SetNextEnemy();
             }
-            // 敵がいないなら走行状態に移行
-            else
+            // 敵がいないなら走行状態に移行 TODO: これがあるせいで色々歩き続ける
+            else if(GameManager.Instance.isPlayerDefeated || GameManager.Instance.isEnemyDefeated)
             {
-                characterState = CharacterState.Run;
+                characterState = CharacterState.Idle;
+                return;
             }
+            characterState = CharacterState.Run;
         }
     }
     // ------------- アニメーションイベント ------------------
@@ -322,19 +334,16 @@ public class Character : MonoBehaviour, IDamageable
         }
 
         // 敵の城への攻撃
-        if (enemyCastle != null)
+        else if (enemyCastle != null)
         {
             if (HandleDamageAndCheckDead(enemyCastle))
             {
                 HandleCastleDestruction();
+                return;
             }
-            else
-            {
-                ScheduleNextAttack();
-            }
+            
+            ScheduleNextAttack();
         }
-
-        characterState = CharacterState.Idle;
     }
 
     // 死亡処理
@@ -380,7 +389,7 @@ public class Character : MonoBehaviour, IDamageable
         magicDeffence = characterBase.MagicDefence;
         cost = characterBase.Cost;
         characterType = characterBase.CharacterType;
-
+        canAttack = true;
         enemies = new List<Character>();
     }
 

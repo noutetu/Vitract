@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8330794194815068200}
   - component: {fileID: 561415144959662066}
   - component: {fileID: 1889592760464130589}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: EnemyCastle
   m_TagString: EnemyCastle
   m_Icon: {fileID: 0}
@@ -186,7 +186,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7300796411394627770}
   - component: {fileID: 8786243853525853274}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: EnemyGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,6 +223,7 @@ MonoBehaviour:
   unit000: {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
   unit001: {fileID: 11400000, guid: c284ade13ad3046c4a5f3848dd0367b1, type: 2}
   unit002: {fileID: 11400000, guid: b2a2e5cab263b4a248aaa15ec9c6d1b0, type: 2}
+  unit003: {fileID: 11400000, guid: 8a507b4ccb836423998f62782310180a, type: 2}
 --- !u!1001 &6880063776754429072
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -311,9 +312,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6027128084397478066, guid: ec07bd5be2c8740e2a6d3bb99a5d3621, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8655026465947736960, guid: ec07bd5be2c8740e2a6d3bb99a5d3621, type: 3}
       propertyPath: m_Name
       value: CastleHPCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 8655026465947736960, guid: ec07bd5be2c8740e2a6d3bb99a5d3621, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 9174691271962268145, guid: ec07bd5be2c8740e2a6d3bb99a5d3621, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

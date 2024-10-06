@@ -7,7 +7,7 @@ public class Magician : Character
     public LayerMask playerLayer; // 検知対象のレイヤー
     public LayerMask targetLayer; // 検知対象のレイヤー
     Vector2 detectionCenter;  // 現在の位置を中心にボックス範囲を設定
-/*
+
     protected override void Start()
     {
         // rangeを使ってboxSizeを初期化
@@ -20,7 +20,7 @@ public class Magician : Character
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-        //DetectObjects();
+        DetectObjects();
     }
 
     void DetectObjects()
@@ -32,7 +32,7 @@ public class Magician : Character
 
         foreach (var hitCollider in hitColliders)
         {
-            IDamageable detectedObject = hitCollider.GetComponent<IDamageable>();
+            Character detectedObject = hitCollider.GetComponent<Character>();
 
             if (detectedObject != null && !enemies.Contains(detectedObject))
             {
@@ -45,11 +45,11 @@ public class Magician : Character
         }
 
         // 検知した敵キャラクターを攻撃対象に設定
-        if(enemies.Count <= 0) {return;}
-        enemyCharacter = enemies[0];
+        if(enemies.Count < 0) { return; }
+        SetNextEnemy();
         if (enemyCharacter == null || IsDead) { return; }
         if (characterState == CharacterState.Attack) { return; }
-        
+        //　攻撃処理？
 
         // デバッグ用に範囲を可視化
         Debug.DrawRay(detectionCenter, Vector2.right * boxSize.x / 2, Color.red);
@@ -61,5 +61,5 @@ public class Magician : Character
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(transform.position, boxSize);
-    }*/
+    }
 }
