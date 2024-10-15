@@ -33,22 +33,27 @@ public class Magician : Character
 
         foreach (var hitCollider in hitColliders)
         {
-            Character detectedObject = hitCollider.GetComponent<Character>();
+            IDamageable detectedObject = hitCollider.GetComponent<IDamageable>();
 
-            if (detectedObject != null && !enemies.Contains(detectedObject))
+            // 敵リストに追加
+            if (detectedObject != null)
             {
-                // 敵リストに追加
-                // 検知した敵キャラクターを攻撃対象に設定
-                enemyCharacter = detectedObject;
-                enemies.Add(detectedObject);
-                Debug.Log("検知したオブジェクト: " + hitCollider.name);
+                RegisterAtEnemies(detectedObject);
             }
+            // 検知した敵キャラクターを攻撃対象に設定
+            if (enemyObject != null)
+            {
+                enemyObject = detectedObject;
+            }
+
+            Debug.Log("検知したオブジェクト: " + hitCollider.name);
+
         }
 
         // 検知した敵キャラクターを攻撃対象に設定
-        if(enemies.Count < 0) { return; }
+        if (enemies.Count < 0) { return; }
         SetNextEnemy();
-        if (enemyCharacter == null || IsDead) { return; }
+        if (enemyObject == null || IsDead) { return; }
         if (characterState == CharacterState.Attack) { return; }
         //　攻撃処理？
 
@@ -64,3 +69,4 @@ public class Magician : Character
         Gizmos.DrawWireCube(transform.position, boxSize);
     }
 }
+

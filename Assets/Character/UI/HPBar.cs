@@ -17,7 +17,10 @@ public class HPBar : MonoBehaviour
 
     public void UpdateHP(float newHP)
     {
-        health.transform.localScale = new Vector3(newHP, 1, 1);
+        if(health != null)
+        {
+            health.transform.localScale = new Vector3(newHP, 1, 1);
+        }
     }
 
     /*public IEnumerator SetHPSmooth(float newHP)

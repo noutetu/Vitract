@@ -9,9 +9,10 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
+    // TODO Magicianクラスが敵を倒した時の挙動がおかしい
     // ------------- キャラクターのステータス ------------------
 
-    protected IDamageable enemyCharacter; // 現在攻撃対象のキャラクター
+    protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
     protected List<IDamageable> enemies;  // 攻撃対象の敵リスト
 
     [SerializeField] private HPBar hpBar;               // HPバーの参照
@@ -98,7 +99,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         if(GameManager.Instance.isGameEnd) {characterState = CharacterState.Idle;}
 
         HandleState();
-        if (enemyCharacter != null && canAttack)
+        if (enemyObject != null && canAttack)
         {
             AttackEvent();
         }
@@ -155,7 +156,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             IDamageable collidedCharacter = other.gameObject.GetComponent<IDamageable>();
 
             // まだリストにない敵キャラクターを登録
-            if (collidedCharacter != null && !enemies.Contains(collidedCharacter))
+            if (collidedCharacter != null)
             {
                 RegisterAtEnemies(collidedCharacter);
             }
@@ -163,7 +164,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             // 最初の敵キャラクターを攻撃対象とする
             SetNextEnemy();
             //敵キャラクターがいて、現在攻撃中でなければ
-            if (enemyCharacter != null && canAttack)
+            if (enemyObject != null && canAttack)
             {
                 AttackEvent();  // 攻撃イベントの開始
             }
@@ -184,7 +185,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         canAttack = false;
         if (!IsDead)
         {
-            if (enemyCharacter != null)
+            if (enemyObject != null)
             {
                 HandleAttackState();
             }
@@ -227,12 +228,12 @@ public abstract class Character : MonoBehaviour, IDamageable
     // 次の敵を探し、必要であれば攻撃再開か走行状態に遷移
     private void HandleNextEnemyOrRun()
     {
-        RemoveInEnemies(enemyCharacter);
+        RemoveInEnemies(enemyObject);
         // 次の敵キャラクターを選択する
         SetNextEnemy();
 
         // 敵キャラクターが存在する場合は攻撃を再開
-        if (enemyCharacter != null)
+        if (enemyObject != null)
         {
             ScheduleNextAttack();
         }
@@ -259,28 +260,32 @@ public abstract class Character : MonoBehaviour, IDamageable
 
 
     // ------------- リスト関連 ------------------
-    private void RemoveInEnemies(IDamageable enemy)
+    protected void RemoveInEnemies(IDamageable enemy)
     {
         if (enemies.Contains(enemy))
         {
             enemies.Remove(enemy);
         }
     }
-    private void RegisterAtEnemies(IDamageable enemy)
+    protected void RegisterAtEnemies(IDamageable enemy)
     {
-        enemies.Add(enemy);
+        // まだ登録されていなければ登録
+        if(!enemies.Contains(enemy))
+        {
+            enemies.Add(enemy);
+        }
     }
     protected void SetNextEnemy()
     {
-        enemyCharacter = enemies.Count > 0 ? enemies[0] : null;
+        enemyObject = enemies.Count > 0 ? enemies[0] : null;
     }
     private void CheckEnemiesState()
     {
         //攻撃対象がnullなら
-        if (enemyCharacter == null)
+        if (enemyObject == null)
         {
             //リストから削除して
-            RemoveInEnemies(enemyCharacter);
+            RemoveInEnemies(enemyObject);
             if (enemies.Count > 0)
             {
                 // まだ敵がいるなら攻撃対象に設定
@@ -299,12 +304,11 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void HitAttack()
     {
-        if (IsDead) { return; }
         // 敵キャラクターへの攻撃
-        if (enemyCharacter != null)
+        if (enemyObject != null)
         {
             // 敵が死んだ場合
-            if (HandleDamageAndCheckDead(enemyCharacter))
+            if (HandleDamageAndCheckDead(enemyObject))
             {
                 HandleNextEnemyOrRun();
                 return;
