@@ -277,17 +277,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 228463123}
   m_CullTransparentMesh: 1
---- !u!114 &238817506 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4517326011526687718, guid: 0aeabb11bc8574bce813ff24bae39a29, type: 3}
-  m_PrefabInstance: {fileID: 262926040998153992}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9d6faef4e0f9432d8a129ff64107fdb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &328051802
 GameObject:
   m_ObjectHideFlags: 0
@@ -2034,8 +2023,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab3f10f80a77047539369fde100ad6c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerCastle: {fileID: 238817506}
-  enemyCastle: {fileID: 1925489365}
+  isGameEnd: 0
 --- !u!4 &1388459556
 Transform:
   m_ObjectHideFlags: 0
@@ -2564,17 +2552,51 @@ Transform:
   - {fileID: 1206806854}
   m_Father: {fileID: 1435250568}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1925489365 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 561415144959662066, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
-  m_PrefabInstance: {fileID: 4427256829555630585}
+--- !u!1 &1819185478
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1819185480}
+  - component: {fileID: 1819185479}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1819185479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819185478}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9d6faef4e0f9432d8a129ff64107fdb, type: 3}
+  m_Script: {fileID: 11500000, guid: ab3f10f80a77047539369fde100ad6c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isGameEnd: 0
+--- !u!4 &1819185480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819185478}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1948736795
 GameObject:
   m_ObjectHideFlags: 0
@@ -2851,6 +2873,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerCastle
       objectReference: {fileID: 0}
+    - target: {fileID: 3262319165895450505, guid: 0aeabb11bc8574bce813ff24bae39a29, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 4517326011526687718, guid: 0aeabb11bc8574bce813ff24bae39a29, type: 3}
+      propertyPath: isPlayer
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2908,6 +2938,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyCastle
       objectReference: {fileID: 0}
+    - target: {fileID: 8784810805111247809, guid: ab0610c57b9bb4a25b91d10b7ff73c8d, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2924,3 +2958,4 @@ SceneRoots:
   - {fileID: 4427256829555630585}
   - {fileID: 1477511237}
   - {fileID: 780648739}
+  - {fileID: 1819185480}

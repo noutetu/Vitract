@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// TODO 城を対象として遠距離攻撃の実装
 public class Magician : Character
 {
     public Vector2 boxSize;  // 検知するボックスのサイズ

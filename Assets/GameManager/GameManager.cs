@@ -7,10 +7,9 @@ public class GameManager : MonoBehaviour
     // シングルトンのインスタンス
     public static GameManager Instance { get; private set; }
 
-    [SerializeField] Castle playerCastle;
-    [SerializeField] Castle enemyCastle;
     public bool isPlayerDefeated { get; private set; }  // 外部からは読み取り専用にする
     public bool isEnemyDefeated { get; private set; }   // 同上
+    public bool isGameEnd;
 
     private void Awake()
     {
@@ -30,19 +29,21 @@ public class GameManager : MonoBehaviour
     {
         isPlayerDefeated = false;
         isEnemyDefeated = false;
-        playerCastle.OnDead = PlayerLost;
-        enemyCastle.OnDead = EnemyLost;
+        isGameEnd = false;
     }
 
-    public void PlayerLost()  // 他のクラスからも呼び出せるようにpublicにする
+    public void GameResult(bool isPlayer)  // 他のクラスからも呼び出せるようにpublicにする
     {
-        Debug.Log("Playerのまけ");
-        isPlayerDefeated = true;
-    }
-
-    public void EnemyLost()   // 同上
-    {
-        Debug.Log("Enemyのまけ");
-        isEnemyDefeated = true;
+        if (isPlayer)
+        {
+            Debug.Log("Playerのまけ");
+            isPlayerDefeated = true;
+        }
+        if (!isPlayer)
+        {
+            Debug.Log("Enemyのまけ");
+            isEnemyDefeated = true;
+        }
+        isGameEnd = true;
     }
 }

@@ -11,9 +11,8 @@ public abstract class Character : MonoBehaviour, IDamageable
 {
     // ------------- キャラクターのステータス ------------------
 
-    protected Character enemyCharacter; // 現在攻撃対象のキャラクター
-    protected List<Character> enemies;  // 攻撃対象の敵リスト
-    private Castle enemyCastle;       // 攻撃対象の城
+    protected IDamageable enemyCharacter; // 現在攻撃対象のキャラクター
+    protected List<IDamageable> enemies;  // 攻撃対象の敵リスト
 
     [SerializeField] private HPBar hpBar;               // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
@@ -28,6 +27,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     protected CharacterState characterState; // キャラクターの現在の状態
 
     // ------------- キャラクターのステータス ------------------
+
     private string name;               // キャラクターの名前
     private int cost;                  // コスト
     private float maxHp;               // 最大体力
@@ -40,6 +40,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     private float speed;               // 移動速度
     protected float range;               // 射程
     private CharacterType characterType;  // キャラクターのタイプ
+
 
     // ------------- プロパティ ------------------
     public CharacterState CharacterState
@@ -91,15 +92,18 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         // 攻撃対象がすでに死んでいるかを確認
         CheckEnemiesState();
-        if(isDead){characterState = CharacterState.Die;}
-        
+        // 自分が死んでいないか確認
+        if (isDead) { characterState = CharacterState.Die; }
+        // 城が破壊されていたらアイドル状態に
+        if(GameManager.Instance.isGameEnd) {characterState = CharacterState.Idle;}
+
         HandleState();
-        if(enemyCharacter != null && canAttack)
+        if (enemyCharacter != null && canAttack)
         {
             AttackEvent();
         }
     }
-   
+
     // ------------- キャラクターの状態管理 ------------------
 
     private void HandleState()
@@ -148,7 +152,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         // 敵キャラクターとの衝突処理
         if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Enemy"))
         {
-            Character collidedCharacter = other.gameObject.GetComponent<Character>();
+            IDamageable collidedCharacter = other.gameObject.GetComponent<IDamageable>();
 
             // まだリストにない敵キャラクターを登録
             if (collidedCharacter != null && !enemies.Contains(collidedCharacter))
@@ -161,20 +165,6 @@ public abstract class Character : MonoBehaviour, IDamageable
             //敵キャラクターがいて、現在攻撃中でなければ
             if (enemyCharacter != null && canAttack)
             {
-                AttackEvent();  // 攻撃イベントの開始
-            }
-        }
-
-        // 敵の城との衝突処理
-        else if (other.gameObject.CompareTag("PlayerCastle") || other.gameObject.CompareTag("EnemyCastle"))
-        {
-            Debug.Log("城との衝突");
-            enemyCastle = other.gameObject.GetComponent<Castle>();
-
-            // 城に攻撃を行う
-            if (enemyCastle != null)
-            {
-                Debug.Log("城への攻撃");
                 AttackEvent();  // 攻撃イベントの開始
             }
         }
@@ -194,7 +184,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         canAttack = false;
         if (!IsDead)
         {
-            if (enemyCharacter != null || enemyCastle != null)
+            if (enemyCharacter != null)
             {
                 HandleAttackState();
             }
@@ -233,7 +223,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     }
 
     // ------------- 攻撃関連処理 -------------
-    
+
     // 次の敵を探し、必要であれば攻撃再開か走行状態に遷移
     private void HandleNextEnemyOrRun()
     {
@@ -252,16 +242,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             characterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
         }
     }
-    // 城が破壊された場合の処理
-    private void HandleCastleDestruction()
-    {
-        enemyCastle = null;
-        if (!IsDead)
-        {
-            Debug.Log("sirogakowareta");
-            CharacterState = CharacterState.Idle;
-        }
-    }
+   
 
     // クールタイムを待って次の攻撃を実行
     private void ScheduleNextAttack()
@@ -278,14 +259,14 @@ public abstract class Character : MonoBehaviour, IDamageable
 
 
     // ------------- リスト関連 ------------------
-    private void RemoveInEnemies(Character enemy)
+    private void RemoveInEnemies(IDamageable enemy)
     {
-        if(enemies.Contains(enemy))
+        if (enemies.Contains(enemy))
         {
             enemies.Remove(enemy);
         }
     }
-    private void RegisterAtEnemies(Character enemy)
+    private void RegisterAtEnemies(IDamageable enemy)
     {
         enemies.Add(enemy);
     }
@@ -300,13 +281,13 @@ public abstract class Character : MonoBehaviour, IDamageable
         {
             //リストから削除して
             RemoveInEnemies(enemyCharacter);
-            if(enemies.Count > 0)
+            if (enemies.Count > 0)
             {
                 // まだ敵がいるなら攻撃対象に設定
                 SetNextEnemy();
             }
             // 敵がいないなら走行状態に移行 TODO: これがあるせいで色々歩き続ける
-            else if(GameManager.Instance.isPlayerDefeated || GameManager.Instance.isEnemyDefeated)
+            else if (GameManager.Instance.isPlayerDefeated || GameManager.Instance.isEnemyDefeated)
             {
                 characterState = CharacterState.Idle;
                 return;
@@ -318,6 +299,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void HitAttack()
     {
+        if (IsDead) { return; }
         // 敵キャラクターへの攻撃
         if (enemyCharacter != null)
         {
@@ -329,19 +311,6 @@ public abstract class Character : MonoBehaviour, IDamageable
             }
 
             // 敵がまだ生きている場合
-            ScheduleNextAttack();
-            return;
-        }
-
-        // 敵の城への攻撃
-        else if (enemyCastle != null)
-        {
-            if (HandleDamageAndCheckDead(enemyCastle))
-            {
-                HandleCastleDestruction();
-                return;
-            }
-            
             ScheduleNextAttack();
         }
     }
@@ -390,7 +359,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         cost = characterBase.Cost;
         characterType = characterBase.CharacterType;
         canAttack = true;
-        enemies = new List<Character>();
+        enemies = new List<IDamageable>();
     }
 
     // ------------- ログ出力 ------------------

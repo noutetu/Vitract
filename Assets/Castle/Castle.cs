@@ -8,10 +8,9 @@ public class Castle : MonoBehaviour,IDamageable
     private bool isDead;
     [SerializeField] float hp;
     [SerializeField] int cost;
+    [SerializeField] bool isPlayer;
     private float currentHp;
     [SerializeField] private HPBar hpBar;
-
-    public UnityAction OnDead;
 
     private void Start()
     {
@@ -26,7 +25,7 @@ public class Castle : MonoBehaviour,IDamageable
 
         if (currentHp <= 0)
         {
-            OnDead?.Invoke();
+            GameManager.Instance.GameResult(isPlayer);
             isDead = true;
             Destroy(gameObject);
             return true;
