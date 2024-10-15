@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public bool isPlayerDefeated { get; private set; }  // 外部からは読み取り専用にする
     public bool isEnemyDefeated { get; private set; }   // 同上
     public bool isGameEnd;
+    public float gameSpeed;
 
     private void Awake()
     {
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
         isPlayerDefeated = false;
         isEnemyDefeated = false;
         isGameEnd = false;
+        gameSpeed = 1;
     }
 
     public void GameResult(bool isPlayer)  // 他のクラスからも呼び出せるようにpublicにする

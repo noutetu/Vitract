@@ -16,7 +16,7 @@ public class CharaMover : MonoBehaviour
         if (!isMoving) { return; }
         direction = isPlayer ? Vector2.right : Vector2.left;
         // Rigidbodyを使った移動
-        rb.MovePosition(rb.position + (direction * speed * Time.deltaTime));
+        rb.MovePosition(rb.position + (direction * speed * Time.deltaTime * GameManager.Instance.gameSpeed));
     }
 
     public void Stop()

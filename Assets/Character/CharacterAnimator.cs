@@ -46,38 +46,38 @@ public class CharacterAnimator : MonoBehaviour
 
     public void RunAnim(float speed)
     {
-        anim.speed = speed * 3.5f;
+        anim.speed = speed * 3.5f * GameManager.Instance.gameSpeed;
         anim.SetFloat("RunState", speed);
     }
 
     public void IdleAnim()
     {
-        anim.speed = 1;
+        anim.speed = 1 * GameManager.Instance.gameSpeed;
         anim.SetFloat("RunState", 0f);
     }
 
     public void NormalAttackAnim(float attackSpeed)
     {
-        anim.speed = attackSpeed;
+        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
         anim.SetTrigger("Attack");
     }
     
     public void SkillAttackAnim(float attackSpeed)
     {
-        anim.speed = attackSpeed;
+        anim.speed = attackSpeed* GameManager.Instance.gameSpeed;
         anim.SetFloat("AttackState", 0);
         anim.SetTrigger("Attack");
     }
     
     public void DeadAnim()
     {
-        anim.speed = 0.6f;
+        anim.speed = 0.6f * GameManager.Instance.gameSpeed;
         anim.SetTrigger("Die");
     }
 
     public void DebuffAnim()
     {
-        anim.speed = 1;
+        anim.speed = 1* GameManager.Instance.gameSpeed;
         anim.SetFloat ("RunState", 3);
     }
 

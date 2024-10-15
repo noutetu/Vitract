@@ -249,7 +249,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         //待機モーション
         HandleIdllingState();
-        DOVirtual.DelayedCall(attackCoolTime, () =>
+        DOVirtual.DelayedCall(attackCoolTime / GameManager.Instance.gameSpeed, () =>
         {
             canAttack = true;
             if (!IsDead) AttackEvent();
