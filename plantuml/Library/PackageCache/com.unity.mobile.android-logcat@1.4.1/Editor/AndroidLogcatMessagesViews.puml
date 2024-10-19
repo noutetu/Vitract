@@ -1,0 +1,31 @@
+@startuml
+class AndroidLogcatConsoleWindow <<partial>> {
+    + GetSelectedFilteredEntries(minIndex:int, maxIndex:int) : IReadOnlyList<LogcatEntry>
+    + DoMessageView() : bool
+}
+class ScrollData {
+    + ScrollToItemWhileInDisabled : int <<set>> <<get>>
+    + PerformScrollWhileInAuto : bool <<set>> <<get>>
+    + ScrollData()
+    + Reset() : void
+}
+enum Column {
+    Icon,
+    Time,
+    ProcessId,
+    ThreadId,
+    Priority,
+    Tag,
+    Message,
+}
+class "IReadOnlyList`1"<T> {
+}
+class ContextMenuUserData {
+}
+AndroidLogcatConsoleWindow --> "FilteredEntries<LogcatEntry>" "IReadOnlyList`1"
+AndroidLogcatConsoleWindow --> "SelectedFilteredEntries<LogcatEntry>" "IReadOnlyList`1"
+AndroidLogcatConsoleWindow +-- ScrollData
+AndroidLogcatConsoleWindow +-- Column
+AndroidLogcatConsoleWindow +-- ContextMenuUserData
+ContextMenuUserData --> "TagProcessIdEntry" LogcatEntry
+@enduml

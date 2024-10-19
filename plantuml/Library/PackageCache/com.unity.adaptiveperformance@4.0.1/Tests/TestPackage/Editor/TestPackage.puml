@@ -1,0 +1,8 @@
+@startuml
+class TestPackage {
+    + TestPackage()
+    + PopulateNewSettingsInstance(obj:ScriptableObject) : bool
+}
+IAdaptivePerformancePackage <|-- TestPackage
+TestPackage --> "metadata" IAdaptivePerformancePackageMetadata
+@enduml

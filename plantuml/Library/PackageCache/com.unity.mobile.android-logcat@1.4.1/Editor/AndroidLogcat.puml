@@ -1,0 +1,23 @@
+@startuml
+class AndroidLogcat {
+    + PackagePid : int <<get>>
+    +  <<event>> FilteredLogEntriesAdded : Action<IReadOnlyList<LogcatEntry>> 
+    +  <<event>> Disconnected : Action<IAndroidLogcatDevice> 
+    +  <<event>> Connected : Action<IAndroidLogcatDevice> 
+    + GetSelectedFilteredEntries(minIndex:int, maxIndex:int) : IReadOnlyList<LogcatEntry>
+    + ClearSelectedEntries() : void
+    + SelectAllFilteredEntries() : void
+    + IsConnected : bool <<get>>
+    + AndroidLogcat(runtime:AndroidLogcatRuntimeBase, adb:AndroidBridge.ADB, device:IAndroidLogcatDevice, processId:int, priority:Priority, filterOptions:FilterOptions, tags:string[])
+    + StripRawEntriesIfNeeded() : void
+    + StripFilteredEntriesIfNeeded() : void
+}
+class "IReadOnlyList`1"<T> {
+}
+AndroidLogcat --> "Device" IAndroidLogcatDevice
+AndroidLogcat --> "MessagePriority" Priority
+AndroidLogcat --> "RawEntries<LogcatEntry>" "IReadOnlyList`1"
+AndroidLogcat --> "FilteredEntries<LogcatEntry>" "IReadOnlyList`1"
+AndroidLogcat --> "FilterOptions" FilterOptions
+AndroidLogcat --> "MessageProvider" AndroidLogcatMessageProviderBase
+@enduml

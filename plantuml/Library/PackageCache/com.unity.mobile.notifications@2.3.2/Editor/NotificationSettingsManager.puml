@@ -1,0 +1,21 @@
+@startuml
+class NotificationSettingsManager {
+    + ToolbarIndex : int = 0
+    + {static} Initialize() : NotificationSettingsManager
+    + SaveSetting(setting:NotificationSetting, target:BuildTargetGroup) : void
+    + SaveSettings(forceSave:bool) : void
+    + AddDrawableResource(id:string, image:Texture2D, type:NotificationIconType) : void
+    + RemoveDrawableResourceByIndex(index:int) : void
+    + RemoveDrawableResourceById(id:string) : void
+    + ClearDrawableResources() : void
+    + GenerateDrawableResourcesForExport() : Dictionary<string, byte[]>
+}
+class "List`1"<T> {
+}
+ScriptableObject <|-- NotificationSettingsManager
+NotificationSettingsManager --> "iOSNotificationSettings<NotificationSetting>" "List`1"
+NotificationSettingsManager --> "AndroidNotificationSettings<NotificationSetting>" "List`1"
+NotificationSettingsManager o-> "DrawableResources<DrawableResourceData>" "List`1"
+NotificationSettingsManager --> "iOSNotificationSettingsFlat<NotificationSetting>" "List`1"
+NotificationSettingsManager --> "AndroidNotificationSettingsFlat<NotificationSetting>" "List`1"
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+class AndroidLogcatTestRuntime {
+    + <<override>> CreateMessageProvider(adb:AndroidBridge.ADB, priority:Priority, packageID:int, logPrintFormat:string, device:IAndroidLogcatDevice, logCallbackAction:Action<string>) : AndroidLogcatMessageProviderBase
+}
+class AndroidLogcatRuntimeTestBase {
+}
+class AutoRuntime {
+    + AutoRuntime(parent:AndroidLogcatRuntimeTestBase, cleanup:bool)
+    + Dispose() : void
+}
+AndroidLogcatRuntimeBase <|-- AndroidLogcatTestRuntime
+AndroidLogcatRuntimeTestBase +-- AutoRuntime
+IDisposable <|-- AutoRuntime
+@enduml

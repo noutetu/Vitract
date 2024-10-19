@@ -1,0 +1,26 @@
+@startuml
+class ProviderSettingsEditor {
+    + m_ShowRuntimeSettings : bool = true
+    + m_ShowDevelopmentSettings : bool = true
+    + m_ShowIndexerSettings : bool = true
+    + m_ShowScalerSettings : bool = true
+    + OnEnable() : void
+    + DisplayBaseSettingsBegin() : bool
+    + DisplayBaseSettingsEnd() : void
+    + DisplayBaseRuntimeSettings() : void
+    + DisplayBaseIndexerSettings() : void
+    + DisplayScalerSettings() : void
+    + DisplayBaseDeveloperSettings() : void
+}
+struct ScalerSettingInformation {
+    + showScalerSettings : bool
+}
+class ScalerProfileSettingInformation {
+    + showScalerProfileSettings : bool
+}
+class "Dictionary`2"<T1,T2> {
+}
+ProviderSettingsEditor +-- ScalerSettingInformation
+ProviderSettingsEditor +-- ScalerProfileSettingInformation
+ScalerProfileSettingInformation o-> "scalerSettingsInfos<string,ScalerSettingInformation>" "Dictionary`2"
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+class AndroidBridge {
+}
+enum ExtensionState {
+    Undefined,
+    Unavalaible,
+    Available,
+}
+class ADB {
+    + GetADBPath() : string
+    + Run(command:string[], errorMsg:string) : string
+    + {static} GetInstance() : ADB
+}
+class AndroidDevice {
+    + AndroidDevice(adb:ADB, deviceId:string)
+}
+class AndroidExternalToolsSettings {
+    + {static} ndkRootPath : string <<get>> <<set>>
+    + {static} sdkRootPath : string <<get>> <<set>>
+}
+class PropertiesTable {
+}
+AndroidBridge +-- ExtensionState
+AndroidBridge +-- ADB
+AndroidBridge +-- AndroidDevice
+AndroidDevice --> "Properties" PropertiesTable
+AndroidBridge +-- AndroidExternalToolsSettings
+AndroidDevice +-- PropertiesTable
+@enduml

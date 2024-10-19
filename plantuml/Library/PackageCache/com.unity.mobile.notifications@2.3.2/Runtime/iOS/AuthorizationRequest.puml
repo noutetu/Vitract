@@ -1,0 +1,24 @@
+@startuml
+enum AuthorizationOption {
+    Badge= (1 << 0),
+    Sound= (1 << 1),
+    Alert= (1 << 2),
+    CarPlay= (1 << 3),
+    CriticalAlert= (1 << 4),
+    ProvidesAppNotificationSettings= (1 << 5),
+    Provisional= (1 << 6),
+}
+struct iOSAuthorizationRequestData {
+}
+class AuthorizationRequest {
+    + IsFinished : bool <<get>>
+    + Granted : bool <<get>>
+    + Error : string <<get>>
+    + DeviceToken : string <<get>>
+    + AuthorizationRequest(authorizationOption:AuthorizationOption, registerForRemoteNotifications:bool)
+    + {static} RegisteredForRemoteNotifications : bool <<get>>
+    + {static} UnregisterForRemoteNotifications() : void
+    + Dispose() : void
+}
+IDisposable <|-- AuthorizationRequest
+@enduml

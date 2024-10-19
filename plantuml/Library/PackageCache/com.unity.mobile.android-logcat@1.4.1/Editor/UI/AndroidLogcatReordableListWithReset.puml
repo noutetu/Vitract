@@ -1,0 +1,6 @@
+@startuml
+class AndroidLogcatReordableListWithReset {
+    + AndroidLogcatReordableListWithReset(dataSource:List<ReordableListItem>, resetList:Action)
+}
+AndroidLogcatReordableList <|-- AndroidLogcatReordableListWithReset
+@enduml

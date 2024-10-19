@@ -1,0 +1,8 @@
+@startuml
+class AdaptivePerformanceSupportedBuildTargetAttribute <<sealed>> {
+    + AdaptivePerformanceSupportedBuildTargetAttribute(buildTargetGroup:BuildTargetGroup)
+    + AdaptivePerformanceSupportedBuildTargetAttribute(buildTargetGroup:BuildTargetGroup, buildTargets:BuildTarget[])
+}
+Attribute <|-- AdaptivePerformanceSupportedBuildTargetAttribute
+AdaptivePerformanceSupportedBuildTargetAttribute --> "buildTargetGroup" BuildTargetGroup
+@enduml

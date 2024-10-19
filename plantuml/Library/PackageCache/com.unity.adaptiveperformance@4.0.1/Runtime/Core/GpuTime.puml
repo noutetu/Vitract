@@ -1,0 +1,7 @@
+@startuml
+class GpuTimeProvider {
+    + GpuTimeProvider()
+    + GpuFrameTime : float <<get>>
+    + Measure() : void
+}
+@enduml

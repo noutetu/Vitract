@@ -1,0 +1,12 @@
+@startuml
+class AndroidLogcatProjectSettingsProvider {
+    + AndroidLogcatProjectSettingsProvider(path:string, scope:SettingsScope)
+    + <<override>> OnGUI(searchContext:string) : void
+    + {static} CreateAndroidLogcatProjectSettingsProvider() : SettingsProvider
+}
+class Styles {
+}
+SettingsProvider <|-- AndroidLogcatProjectSettingsProvider
+AndroidLogcatProjectSettingsProvider +-- Styles
+Styles o-> "symbolPaths" GUIContent
+@enduml

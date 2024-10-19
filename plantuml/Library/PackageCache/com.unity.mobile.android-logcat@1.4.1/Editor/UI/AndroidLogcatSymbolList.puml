@@ -1,0 +1,6 @@
+@startuml
+class AndroidLogcatSymbolList {
+    + AndroidLogcatSymbolList(dataSource:List<ReordableListItem>)
+}
+AndroidLogcatReordableList <|-- AndroidLogcatSymbolList
+@enduml

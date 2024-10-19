@@ -1,0 +1,6 @@
+@startuml
+class AndroidReceivedNotificationMainThreadDispatcher {
+    + Update() : void
+}
+MonoBehaviour <|-- AndroidReceivedNotificationMainThreadDispatcher
+@enduml

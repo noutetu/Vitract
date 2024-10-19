@@ -1,0 +1,5 @@
+@startuml
+class SPUM_AnimationController {
+}
+MonoBehaviour <|-- SPUM_AnimationController
+@enduml

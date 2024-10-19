@@ -1,0 +1,45 @@
+@startuml
+enum NotificationStyle {
+    None= 0,
+    BigPictureStyle= 1,
+    BigTextStyle= 2,
+}
+enum GroupAlertBehaviours {
+    GroupAlertAll= 0,
+    GroupAlertSummary= 1,
+    GroupAlertChildren= 2,
+}
+struct BigPictureStyle {
+    + LargeIcon : string <<get>> <<set>>
+    + Picture : string <<get>> <<set>>
+    + ContentTitle : string <<get>> <<set>>
+    + ContentDescription : string <<get>> <<set>>
+    + SummaryText : string <<get>> <<set>>
+    + ShowWhenCollapsed : bool <<get>> <<set>>
+}
+struct AndroidNotification {
+    + Title : string <<get>> <<set>>
+    + Text : string <<get>> <<set>>
+    + SmallIcon : string <<get>> <<set>>
+    + LargeIcon : string <<get>> <<set>>
+    + Number : int <<get>> <<set>>
+    + ShouldAutoCancel : bool <<get>> <<set>>
+    + UsesStopwatch : bool <<get>> <<set>>
+    + Group : string <<get>> <<set>>
+    + GroupSummary : bool <<get>> <<set>>
+    + SortKey : string <<get>> <<set>>
+    + IntentData : string <<get>> <<set>>
+    + ShowTimestamp : bool <<get>> <<set>>
+    + ShowInForeground : bool <<get>> <<set>>
+    + AndroidNotification(title:string, text:string, fireTime:DateTime)
+    + AndroidNotification(title:string, text:string, fireTime:DateTime, repeatInterval:TimeSpan)
+    + AndroidNotification(title:string, text:string, fireTime:DateTime, repeatInterval:TimeSpan, smallIcon:string)
+}
+AndroidNotification --> "FireTime" DateTime
+AndroidNotification --> "RepeatInterval" TimeSpan
+AndroidNotification --> "Style" NotificationStyle
+AndroidNotification --> "Color" Color
+AndroidNotification --> "GroupAlertBehaviour" GroupAlertBehaviours
+AndroidNotification --> "CustomTimestamp" DateTime
+AndroidNotification --> "BigPicture" BigPictureStyle
+@enduml

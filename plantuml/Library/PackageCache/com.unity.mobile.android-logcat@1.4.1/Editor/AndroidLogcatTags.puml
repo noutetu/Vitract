@@ -1,0 +1,30 @@
+@startuml
+enum AndroidLogcatTagType {
+    AllTags= 0,
+    NoFilter= 1,
+    TagControl= 3,
+    FirstValidTag= 5,
+}
+class AndroidLogcatTags {
+    +  <<event>> TagSelectionChanged : Action 
+    + AndroidLogcatTags()
+    + Add(tag:string, isSelected:bool) : bool
+    + Remove(tagIndex:int) : bool
+    + Remove(tag:string) : bool
+    + GetSelectedTags(skipNoFilterIndex:bool) : string[]
+    + DoGUI(rect:Rect, tagButtonRect:Rect) : void
+    + TagSelected(userData:object, options:string[], selectedIndex:int) : void
+    + <<override>> ToString() : string
+}
+class AndroidLogcatTagListPopup {
+    + AndroidLogcatTagListPopup(tags:AndroidLogcatTags)
+    + <<override>> GetWindowSize() : Vector2
+    + <<override>> OnGUI(rect:Rect) : void
+    + RemoveSelected(tagIndex:int) : bool
+}
+class "List`1"<T> {
+}
+AndroidLogcatTags --> "Entries<TagInformation>" "List`1"
+PopupWindowContent <|-- AndroidLogcatTagListPopup
+AndroidLogcatTagListPopup o-> "m_ScrollPosition" Vector2
+@enduml

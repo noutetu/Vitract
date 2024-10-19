@@ -1,0 +1,5 @@
+@startuml
+class AdaptiveBatching {
+}
+AdaptivePerformanceScaler <|-- AdaptiveBatching
+@enduml

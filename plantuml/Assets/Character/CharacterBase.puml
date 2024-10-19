@@ -1,0 +1,24 @@
+@startuml
+class CharacterBase {
+    + Name : string <<get>>
+    + Cost : int <<get>>
+    + MaxHp : float <<get>>
+    + Defence : float <<get>>
+    + MagicDefence : float <<get>>
+    + CanBlockCount : int <<get>>
+    + Atk : float <<get>>
+    + AttackSpeed : float <<get>>
+    + AttackCoolTime : float <<get>>
+    + Speed : float <<get>>
+    + Range : float <<get>>
+}
+enum CharacterType {
+    SwordMan,
+    BowMan,
+    Magician,
+}
+ScriptableObject <|-- CharacterBase
+CharacterBase --> "Prefab" Character
+CharacterBase --> "CharacterType" CharacterType
+CharacterBase --> "Sprite" Sprite
+@enduml

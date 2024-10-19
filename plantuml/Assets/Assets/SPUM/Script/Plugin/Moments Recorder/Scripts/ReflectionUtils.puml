@@ -1,0 +1,12 @@
+@startuml
+class "ReflectionUtils`1"<T> {
+    + ReflectionUtils(instance:T)
+    + GetFieldName(fieldAccess:Expression<Func<T, U>>) : string
+    + GetField(fieldName:string) : FieldInfo
+    + GetAttribute(field:FieldInfo) : A
+    + ConstrainMin(fieldAccess:Expression<Func<T, U>>, value:float) : void
+    + ConstrainMin(fieldAccess:Expression<Func<T, U>>, value:int) : void
+    + ConstrainRange(fieldAccess:Expression<Func<T, U>>, value:float) : void
+    + ConstrainRange(fieldAccess:Expression<Func<T, U>>, value:int) : void
+}
+@enduml

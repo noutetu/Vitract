@@ -1,0 +1,30 @@
+@startuml
+class PlayerManager {
+    + _columnNum : int
+    + _generate : bool
+    + _screenShot : bool
+    + GetPlayerList() : void
+    + SetScreenShot() : void
+}
+class "List`1"<T> {
+}
+enum ScreenShotSize {
+    HD,
+    FHD,
+    UHD,
+}
+MonoBehaviour <|-- PlayerManager
+PlayerManager --> "_prefabObj" PlayerObj
+PlayerManager o-> "_savedUnitList<GameObject>" "List`1"
+PlayerManager --> "_startPos" Vector2
+PlayerManager --> "_addPos" Vector2
+PlayerManager --> "_playerPool" Transform
+PlayerManager o-> "_playerList<PlayerObj>" "List`1"
+PlayerManager --> "_nowObj" PlayerObj
+PlayerManager --> "_playerObjCircle" Transform
+PlayerManager --> "_goalObjCircle" Transform
+PlayerManager --> "_camera" Camera
+PlayerManager --> "_bg" GameObject
+PlayerManager o-> "_screenShotSize" ScreenShotSize
+PlayerManager +-- ScreenShotSize
+@enduml

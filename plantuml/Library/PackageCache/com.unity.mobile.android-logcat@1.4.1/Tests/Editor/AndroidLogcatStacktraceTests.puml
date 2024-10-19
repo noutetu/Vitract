@@ -1,0 +1,8 @@
+@startuml
+class AndroidLogcatStacktraceTests {
+    + CanResolveStacktracesARM64() : void
+    + CanResolveStacktracesARMv7() : void
+    + CorrectyParseStacktraceCrash() : void
+    + CanCorrectlyPickSymbol() : void
+}
+@enduml

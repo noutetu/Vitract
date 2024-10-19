@@ -1,0 +1,135 @@
+@startuml
+enum NotificationStatus {
+    Unavailable= -1,
+    Unknown= 0,
+    Scheduled= 1,
+    Delivered= 2,
+}
+struct NotificationManagerJni {
+    + KEY_BIG_LARGE_ICON : string
+    + KEY_BIG_CONTENT_TITLE : string
+    + KEY_BIG_SUMMARY_TEXT : string
+    + KEY_BIG_CONTENT_DESCRIPTION : string
+    + KEY_BIG_SHOW_WHEN_COLLAPSED : string
+    + NotificationManagerJni(clazz:AndroidJavaClass, obj:AndroidJavaObject)
+    + GetNotificationFromIntent(intent:AndroidJavaObject) : AndroidJavaObject
+    + SetNotificationIcon(builder:AndroidJavaObject, keyName:AndroidJavaObject, icon:string) : void
+    + SetNotificationColor(builder:AndroidJavaObject, color:int) : void
+    + GetNotificationColor(notification:AndroidJavaObject) : Color?
+    + SetNotificationUsesChronometer(builder:AndroidJavaObject, usesStopwatch:bool) : void
+    + SetNotificationGroupAlertBehavior(builder:AndroidJavaObject, groupAlertBehaviour:int) : void
+    + GetNotificationGroupAlertBehavior(notification:AndroidJavaObject) : int
+    + GetNotificationChannelId(notification:AndroidJavaObject) : string
+    + RegisterNotificationChannelGroup(group:AndroidNotificationChannelGroup) : void
+    + RegisterNotificationChannel(channel:AndroidNotificationChannel) : void
+    + GetNotificationChannels() : AndroidJavaObject[]
+    + DeleteNotificationChannelGroup(id:string) : void
+    + DeleteNotificationChannel(channelId:string) : void
+    + ScheduleNotification(notificationBuilder:AndroidJavaObject, customized:bool) : int
+    + CheckIfPendingNotificationIsRegistered(id:int) : bool
+    + CancelPendingNotification(id:int) : void
+    + CancelDisplayedNotification(id:int) : void
+    + CancelAllPendingNotificationIntents() : void
+    + CancelAllNotifications() : void
+    + CheckNotificationStatus(id:int) : int
+    + ShowNotificationSettings(channelId:string) : void
+    + CreateNotificationBuilder(channelId:String) : AndroidJavaObject
+    + SetupBigPictureStyle(builder:AndroidJavaObject, bigPicture:BigPictureStyle) : void
+    + CanScheduleExactAlarms() : bool
+    + AreNotificationsEnabled() : PermissionStatus
+}
+struct NotificationJni {
+    + FLAG_AUTO_CANCEL : int
+    + FLAG_GROUP_SUMMARY : int
+    + CollectJni() : void
+    + Extras(notification:AndroidJavaObject) : AndroidJavaObject
+    + Flags(notification:AndroidJavaObject) : int
+    + Number(notification:AndroidJavaObject) : int
+    + GetGroup(notification:AndroidJavaObject) : string
+    + GetSortKey(notification:AndroidJavaObject) : string
+}
+struct NotificationBuilderJni {
+    + CollectJni() : void
+    + GetExtras(builder:AndroidJavaObject) : AndroidJavaObject
+    + SetContentTitle(builder:AndroidJavaObject, title:string) : void
+    + SetContentText(builder:AndroidJavaObject, text:string) : void
+    + SetAutoCancel(builder:AndroidJavaObject, shouldAutoCancel:bool) : void
+    + SetNumber(builder:AndroidJavaObject, number:int) : void
+    + SetStyle(builder:AndroidJavaObject, style:AndroidJavaObject) : void
+    + SetWhen(builder:AndroidJavaObject, timestamp:long) : void
+    + SetGroup(builder:AndroidJavaObject, group:string) : void
+    + SetGroupSummary(builder:AndroidJavaObject, groupSummary:bool) : void
+    + SetSortKey(builder:AndroidJavaObject, sortKey:string) : void
+    + SetShowWhen(builder:AndroidJavaObject, showTimestamp:bool) : void
+}
+struct BundleJni {
+    + CollectJni() : void
+    + ContainsKey(bundle:AndroidJavaObject, key:AndroidJavaObject) : bool
+    + GetBoolean(bundle:AndroidJavaObject, key:AndroidJavaObject, defaultValue:bool) : bool
+    + GetBoolean(bundle:AndroidJavaObject, key:string, defaultValue:bool) : bool
+    + GetInt(bundle:AndroidJavaObject, key:AndroidJavaObject, defaultValue:int) : int
+    + GetLong(bundle:AndroidJavaObject, key:AndroidJavaObject, defaultValue:long) : long
+    + GetString(bundle:AndroidJavaObject, key:AndroidJavaObject) : string
+    + GetString(bundle:AndroidJavaObject, key:string) : string
+    + PutBoolean(bundle:AndroidJavaObject, key:AndroidJavaObject, value:bool) : void
+    + PutInt(bundle:AndroidJavaObject, key:AndroidJavaObject, value:int) : void
+    + PutLong(bundle:AndroidJavaObject, key:AndroidJavaObject, value:long) : void
+    + PutString(bundle:AndroidJavaObject, key:AndroidJavaObject, value:string) : void
+}
+struct JniApi {
+    + JniApi(notificationManagerClass:AndroidJavaClass, notificationManager:AndroidJavaObject)
+    + {static} FindField(clazz:AndroidJavaClass, name:string, signature:string, isStatic:bool) : JniFieldID
+    + {static} FindMethod(clazz:AndroidJavaClass, name:string, signature:string, isStatic:bool) : JniMethodID
+}
+class AndroidNotificationCenter {
+    + {static} SETTING_POST_NOTIFICATIONS_PERMISSION : string = "com.unity.androidnotifications.PostNotificationsPermission"
+    + {static}  <<event>> OnNotificationReceived : NotificationReceivedCallback 
+    + {static} Initialize() : bool
+    + {static} ShouldShowPermissionToPostRationale : bool <<get>>
+    + {static} UsingExactScheduling : bool <<get>>
+    + {static} RequestExactScheduling() : void
+    + {static} IgnoringBatteryOptimizations : bool <<get>>
+    + {static} RequestIgnoreBatteryOptimizations() : void
+    + {static} RegisterNotificationChannelGroup(group:AndroidNotificationChannelGroup) : void
+    + {static} DeleteNotificationChannelGroup(id:string) : void
+    + {static} RegisterNotificationChannel(channel:AndroidNotificationChannel) : void
+    + {static} GetNotificationChannel(channelId:string) : AndroidNotificationChannel
+    + {static} GetNotificationChannels() : AndroidNotificationChannel[]
+    + {static} DeleteNotificationChannel(channelId:string) : void
+    + {static} SendNotification(notification:AndroidNotification, channelId:string) : int
+    + {static} SendNotificationWithExplicitID(notification:AndroidNotification, channelId:string, id:int) : void
+    + {static} SendNotification(notificationBuilder:AndroidJavaObject) : void
+    + {static} SendNotification(notificationBuilder:AndroidJavaObject, id:int) : void
+    + {static} UpdateScheduledNotification(id:int, notification:AndroidNotification, channelId:string) : void
+    + {static} CancelNotification(id:int) : void
+    + {static} CancelScheduledNotification(id:int) : void
+    + {static} CancelDisplayedNotification(id:int) : void
+    + {static} CancelAllNotifications() : void
+    + {static} CancelAllScheduledNotifications() : void
+    + {static} CancelAllDisplayedNotifications() : void
+    + {static} CheckScheduledNotificationStatus(id:int) : NotificationStatus
+    + {static} GetLastNotificationIntent() : AndroidNotificationIntentData
+    + {static} OpenNotificationSettings(channelId:string) : void
+    + {static} CreateNotificationBuilder(notification:AndroidNotification, channelId:string) : AndroidJavaObject
+    + {static} CreateNotificationBuilder(id:int, notification:AndroidNotification, channelId:string) : AndroidJavaObject
+}
+NotificationManagerJni --> "KEY_FIRE_TIME" AndroidJavaObject
+NotificationManagerJni --> "KEY_ID" AndroidJavaObject
+NotificationManagerJni --> "KEY_INTENT_DATA" AndroidJavaObject
+NotificationManagerJni --> "KEY_LARGE_ICON" AndroidJavaObject
+NotificationManagerJni --> "KEY_REPEAT_INTERVAL" AndroidJavaObject
+NotificationManagerJni --> "KEY_NOTIFICATION" AndroidJavaObject
+NotificationManagerJni --> "KEY_SMALL_ICON" AndroidJavaObject
+NotificationManagerJni --> "KEY_SHOW_IN_FOREGROUND" AndroidJavaObject
+NotificationManagerJni --> "KEY_BIG_PICTURE" AndroidJavaObject
+NotificationJni --> "EXTRA_TITLE" AndroidJavaObject
+NotificationJni --> "EXTRA_TEXT" AndroidJavaObject
+NotificationJni --> "EXTRA_SHOW_CHRONOMETER" AndroidJavaObject
+NotificationJni --> "EXTRA_BIG_TEXT" AndroidJavaObject
+NotificationJni --> "EXTRA_SHOW_WHEN" AndroidJavaObject
+JniApi --> "NotificationManager" NotificationManagerJni
+JniApi --> "Notification" NotificationJni
+JniApi --> "NotificationBuilder" NotificationBuilderJni
+JniApi --> "Bundle" BundleJni
+AndroidNotificationCenter --> "UserPermissionToPost" PermissionStatus
+@enduml

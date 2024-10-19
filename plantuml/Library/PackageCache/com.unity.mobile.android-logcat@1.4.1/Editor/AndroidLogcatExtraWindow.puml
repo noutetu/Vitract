@@ -1,0 +1,11 @@
+@startuml
+enum ExtraWindow {
+    Hidden,
+    Memory,
+    Inputs,
+}
+class ExtraWindowState {
+    + Height : float
+}
+ExtraWindowState o-> "Type" ExtraWindow
+@enduml

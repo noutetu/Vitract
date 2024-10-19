@@ -1,0 +1,9 @@
+@startuml
+class Magician {
+}
+Character <|-- Magician
+Magician --> "boxSize" Vector2
+Magician --> "enemyLayer" LayerMask
+Magician --> "playerLayer" LayerMask
+Magician --> "targetLayer" LayerMask
+@enduml

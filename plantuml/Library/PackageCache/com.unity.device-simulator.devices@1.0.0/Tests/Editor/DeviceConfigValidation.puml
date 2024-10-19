@@ -1,0 +1,15 @@
+@startuml
+class DeviceConfigValidation {
+    + TestDeviceAssetCorrectness(deviceAsset:DeviceInfoAsset) : void
+    + TestScreenOverlayCanBeLoaded(deviceAsset:DeviceInfoAsset) : void
+    + TestAllOverlaysAreUsed(texturePath:string) : void
+}
+class DeviceAssetsEnumerable {
+    + GetEnumerator() : IEnumerator
+}
+class ScreenOverlayEnumerable {
+    + GetEnumerator() : IEnumerator
+}
+IEnumerable <|-- DeviceAssetsEnumerable
+IEnumerable <|-- ScreenOverlayEnumerable
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+class NotificationStyles {
+}
+NotificationStyles o-> "k_EvenRow" GUIStyle
+NotificationStyles o-> "k_OddRow" GUIStyle
+NotificationStyles o-> "k_PreviewMessageTextStyle" GUIStyle
+NotificationStyles o-> "k_PreviewLabelTextStyle" GUIStyle
+NotificationStyles o-> "k_IconHelpMessageStyle" GUIStyle
+NotificationStyles o-> "k_ToggleStyle" GUIStyle
+NotificationStyles o-> "k_DropwDownStyle" GUIStyle
+NotificationStyles o-> "k_LabelStyle" GUIStyle
+@enduml

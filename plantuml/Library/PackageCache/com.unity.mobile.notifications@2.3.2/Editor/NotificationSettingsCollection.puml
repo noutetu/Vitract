@@ -1,0 +1,6 @@
+@startuml
+class NotificationSettingsCollection {
+    + NotificationSettingsCollection()
+    + Contains(key:string) : bool
+}
+@enduml

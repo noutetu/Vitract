@@ -1,0 +1,9 @@
+@startuml
+class EditorTests {
+    + OneTimeSetUp() : void
+    + SetUp() : void
+    + TearDown() : void
+    + StandaloneLoaderCreateTest() : void
+    + StandaloneLoaderLifecycleTest() : IEnumerator
+}
+@enduml

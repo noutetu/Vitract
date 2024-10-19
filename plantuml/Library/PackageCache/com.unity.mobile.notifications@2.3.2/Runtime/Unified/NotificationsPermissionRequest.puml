@@ -1,0 +1,12 @@
+@startuml
+enum NotificationsPermissionStatus {
+    RequestPending,
+    Granted,
+    Denied,
+}
+class NotificationsPermissionRequest {
+    + <<override>> keepWaiting : bool <<get>>
+}
+CustomYieldInstruction <|-- NotificationsPermissionRequest
+NotificationsPermissionRequest --> "Status" NotificationsPermissionStatus
+@enduml

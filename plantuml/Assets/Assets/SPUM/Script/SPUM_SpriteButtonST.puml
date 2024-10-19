@@ -1,0 +1,5 @@
+@startuml
+class SPUM_SpriteButtonST {
+}
+MonoBehaviour <|-- SPUM_SpriteButtonST
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+abstract class AndroidLogcatMessageProviderBase {
+    + {abstract} Start() : void
+    + {abstract} Stop() : void
+    + {abstract} Kill() : void
+    + {abstract} HasExited : bool <<get>>
+}
+class AndroidLogcatMessageProvider {
+    + <<override>> Start() : void
+    + <<override>> Stop() : void
+    + <<override>> Kill() : void
+    + <<override>> HasExited : bool <<get>>
+}
+AndroidLogcatMessageProviderBase <|-- AndroidLogcatMessageProvider
+@enduml

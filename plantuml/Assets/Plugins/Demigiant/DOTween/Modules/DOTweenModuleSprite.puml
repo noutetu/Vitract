@@ -1,0 +1,8 @@
+@startuml
+class DOTweenModuleSprite <<static>> {
+    + {static} DOColor(target:SpriteRenderer, endValue:Color, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOFade(target:SpriteRenderer, endValue:float, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOGradientColor(target:SpriteRenderer, gradient:Gradient, duration:float) : Sequence
+    + {static} DOBlendableColor(target:SpriteRenderer, endValue:Color, duration:float) : Tweener
+}
+@enduml

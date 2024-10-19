@@ -1,0 +1,11 @@
+@startuml
+class AdaptivePerformanceGeneralSettingsPerBuildTarget {
+    + SetSettingsForBuildTarget(targetGroup:BuildTargetGroup, settings:AdaptivePerformanceGeneralSettings) : void
+    + SettingsForBuildTarget(targetGroup:BuildTargetGroup) : AdaptivePerformanceGeneralSettings
+    + OnBeforeSerialize() : void
+    + OnAfterDeserialize() : void
+    + {static} AdaptivePerformanceGeneralSettingsForBuildTarget(targetGroup:BuildTargetGroup) : AdaptivePerformanceGeneralSettings
+}
+ScriptableObject <|-- AdaptivePerformanceGeneralSettingsPerBuildTarget
+ISerializationCallbackReceiver <|-- AdaptivePerformanceGeneralSettingsPerBuildTarget
+@enduml

@@ -1,0 +1,5 @@
+@startuml
+class AndroidLogcatTestsSetup {
+    + {static} AndroidSDKAndNDKAvailable() : bool
+}
+@enduml

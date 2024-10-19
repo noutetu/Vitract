@@ -1,0 +1,8 @@
+@startuml
+class SPUM_ExporterEditor {
+    + <<override>> OnInspectorGUI() : void
+    + ExporterShot() : void
+    + ExporterReset() : void
+}
+Editor <|-- SPUM_ExporterEditor
+@enduml

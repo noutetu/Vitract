@@ -1,0 +1,9 @@
+@startuml
+class AndroidLogcatFastListViewTests {
+    + CanClearItems() : void
+    + CanAppendItems() : void
+    + CanAppendItemsNotExceedingCapacity() : void
+    + CanAppendMoreItemsThanCapacity() : void
+    + CanAppendEmptyArray() : void
+}
+@enduml

@@ -1,0 +1,5 @@
+@startuml
+class SpriteEyeSync {
+}
+MonoBehaviour <|-- SpriteEyeSync
+@enduml

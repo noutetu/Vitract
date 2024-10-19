@@ -1,0 +1,15 @@
+@startuml
+abstract class "AdaptivePerformanceBuildHelper`1"<T> {
+    + <<virtual>> callbackOrder : int <<get>>
+    + {abstract} BuildSettingsKey : string <<get>>
+    + <<virtual>> SettingsForBuildTargetGroup(buildTargetGroup:BuildTargetGroup) : UnityEngine.Object
+    + <<virtual>> OnPreprocessBuild(report:BuildReport) : void
+    + <<virtual>> OnPostprocessBuild(report:BuildReport) : void
+}
+class AdaptivePerformanceBuildUtils <<static>> {
+    + {static} UpdateBootConfigBoostSetting(path:string, bootConfigKey:string, wantedSettingValue:string) : void
+    + {static} GetWantedStartupBoostSetting(settings:UnityEngine.AdaptivePerformance.IAdaptivePerformanceSettings) : string
+}
+IPreprocessBuildWithReport <|-- "AdaptivePerformanceBuildHelper`1"
+IPostprocessBuildWithReport <|-- "AdaptivePerformanceBuildHelper`1"
+@enduml

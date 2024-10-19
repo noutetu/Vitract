@@ -1,0 +1,22 @@
+@startuml
+class MyEvent {
+}
+class PlayerObj {
+    + _charMS : float
+    + SetMovePos(pos:Vector2) : void
+}
+class "UnityEvent`1"<T> {
+}
+enum PlayerState {
+    idle,
+    run,
+    attack,
+    death,
+}
+"UnityEvent`1" "<PlayerObj.PlayerState>" <|-- MyEvent
+MonoBehaviour <|-- PlayerObj
+PlayerObj --> "_prefabs" SPUM_Prefabs
+PlayerObj --> "CurrentState" PlayerState
+PlayerObj --> "_goalPos" Vector3
+PlayerObj +-- PlayerState
+@enduml

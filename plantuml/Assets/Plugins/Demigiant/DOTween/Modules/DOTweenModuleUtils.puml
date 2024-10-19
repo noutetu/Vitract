@@ -1,0 +1,12 @@
+@startuml
+class DOTweenModuleUtils <<static>> {
+    + {static} Init() : void
+}
+class Physics <<static>> {
+    + {static} SetOrientationOnPath(options:PathOptions, t:Tween, newRot:Quaternion, trans:Transform) : void
+    + {static} HasRigidbody2D(target:Component) : bool
+    + {static} HasRigidbody(target:Component) : bool
+    + {static} CreateDOTweenPathTween(target:MonoBehaviour, tweenRigidbody:bool, isLocal:bool, path:Path, duration:float, pathMode:PathMode) : TweenerCore<Vector3, Path, PathOptions>
+}
+DOTweenModuleUtils +-- Physics
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+class AndroidNotificationSimpleTests {
+    + Setup() : void
+    + Cleanup() : void
+    + BeforeAllTests() : void
+    + AllAndroidNotificationChannelParametersAreTested() : void
+    + CreateNotificationChannel_NotificationChannelIsCreated() : void
+    + GetNotificationChannel_ReturnsTheChannel() : void
+    + GetNotificationChannel_NonExistentChannel_ReturnsNull() : void
+    + GetNotificationChannels_NoChannels_ReturnsEmptyArray() : void
+    + DeleteNotificationChannelGroup_GroupIsDeleted() : void
+    + DeleteNotificationChannel_NotificationChannelIsDeleted() : void
+    + SetNotificationFireTime_TimeIsConvertedToUnixTimeAndBack() : void
+    + SetNotificationRepeatInterval_TimeIsConvertedToUnixTimeAndBack() : void
+    + BasicSerializeDeserializeNotification_AllParameters() : void
+    + BasicSerializeDeserializeNotification_MinimumParameters() : void
+    + BasicSerializeDeserializeNotification_WorksWithBinderExtras() : void
+    + NotificationSerialization_SimpleNotification() : void
+    + NotificationSerialization_NotificationWithBinderObject() : void
+    + NotificationSerialization_BigPictureStyle() : void
+    + OldTypeSerializedNotificationCanBedeserialized() : void
+    + LegacyRecoverBuilderProducesTheSameNotification() : void
+    + CorruptedPrimarySerialization_FallsBack() : void
+    + CanDeserializeCustomSerializedNotification_v0() : void
+    + CanDeserializeCustomSerializedNotification_v1() : void
+    + CanDeserializeCustomSerializedNotification_v2() : void
+}
+IPrebuildSetup <|-- AndroidNotificationSimpleTests
+IPostBuildCleanup <|-- AndroidNotificationSimpleTests
+@enduml

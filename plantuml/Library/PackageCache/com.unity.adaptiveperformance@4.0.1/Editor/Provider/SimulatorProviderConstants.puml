@@ -1,0 +1,5 @@
+@startuml
+class SimulatorProviderConstants <<static>> {
+    + <<const>> k_SettingsKey : string = "com.unity.adaptiveperformance.simulator.provider_settings"
+}
+@enduml

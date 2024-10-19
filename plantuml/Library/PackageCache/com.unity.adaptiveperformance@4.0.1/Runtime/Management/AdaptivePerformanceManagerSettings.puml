@@ -1,0 +1,18 @@
+@startuml
+class AdaptivePerformanceManagerSettings <<sealed>> {
+    + automaticLoading : bool <<get>> <<set>>
+    + automaticRunning : bool <<get>> <<set>>
+    + isInitializationComplete : bool <<get>>
+    + ActiveLoaderAs() : T
+    + InitializeLoaderSync() : void
+    + InitializeLoader() : IEnumerator
+    + StartSubsystems() : void
+    + StopSubsystems() : void
+    + DeinitializeLoader() : void
+}
+class "List`1"<T> {
+}
+ScriptableObject <|-- AdaptivePerformanceManagerSettings
+AdaptivePerformanceManagerSettings --> "loaders<AdaptivePerformanceLoader>" "List`1"
+AdaptivePerformanceManagerSettings --> "activeLoader" AdaptivePerformanceLoader
+@enduml

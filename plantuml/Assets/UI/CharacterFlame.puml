@@ -1,0 +1,11 @@
+@startuml
+class CharacterFlame {
+    + PressButton() : void
+}
+class "UnityAction`1"<T> {
+}
+MonoBehaviour <|-- CharacterFlame
+CharacterFlame --> "OnTouch<Character>" "UnityAction`1"
+CharacterFlame --> "Base" CharacterBase
+CharacterFlame --> "icon" Image
+@enduml

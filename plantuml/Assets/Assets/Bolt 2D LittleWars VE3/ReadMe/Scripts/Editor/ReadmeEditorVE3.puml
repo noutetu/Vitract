@@ -1,0 +1,6 @@
+@startuml
+class ReadmeEditorVE3 {
+    + <<override>> OnInspectorGUI() : void
+}
+Editor <|-- ReadmeEditorVE3
+@enduml

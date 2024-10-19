@@ -1,0 +1,28 @@
+@startuml
+class AdaptivePerformanceKnownPackages {
+}
+class KnownLoaderMetadata {
+    + loaderName : string <<get>> <<set>>
+    + loaderType : string <<get>> <<set>>
+}
+class KnownPackageMetadata {
+    + packageName : string <<get>> <<set>>
+    + packageId : string <<get>> <<set>>
+    + settingsType : string <<get>> <<set>>
+    + licenseURL : string <<get>> <<set>>
+}
+class KnownPackage {
+    + PopulateNewSettingsInstance(obj:ScriptableObject) : bool
+}
+class "List`1"<T> {
+}
+AdaptivePerformanceKnownPackages +-- KnownLoaderMetadata
+IAdaptivePerformanceLoaderMetadata <|-- KnownLoaderMetadata
+KnownLoaderMetadata --> "supportedBuildTargets<BuildTargetGroup>" "List`1"
+AdaptivePerformanceKnownPackages +-- KnownPackageMetadata
+IAdaptivePerformancePackageMetadata <|-- KnownPackageMetadata
+KnownPackageMetadata --> "loaderMetadata<IAdaptivePerformanceLoaderMetadata>" "List`1"
+AdaptivePerformanceKnownPackages +-- KnownPackage
+IAdaptivePerformancePackage <|-- KnownPackage
+KnownPackage --> "metadata" IAdaptivePerformancePackageMetadata
+@enduml

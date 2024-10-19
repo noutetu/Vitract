@@ -1,0 +1,11 @@
+@startuml
+class AndroidLogcatConsoleWindow <<partial>> {
+    + AutoSelectProcess : bool <<set>> <<get>>
+    + {static} ShowInternalLog() : void
+    + AddItemsToMenu(menu:GenericMenu) : void
+    + UpdateStatusBar() : void
+    + UpdateStatusBar(message:string) : void
+}
+EditorWindow <|-- AndroidLogcatConsoleWindow
+IHasCustomMenu <|-- AndroidLogcatConsoleWindow
+@enduml

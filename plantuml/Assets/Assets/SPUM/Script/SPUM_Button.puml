@@ -1,0 +1,6 @@
+@startuml
+class SPUM_Button {
+}
+MonoBehaviour <|-- SPUM_Button
+SPUM_Button --> "_toggle" Toggle
+@enduml

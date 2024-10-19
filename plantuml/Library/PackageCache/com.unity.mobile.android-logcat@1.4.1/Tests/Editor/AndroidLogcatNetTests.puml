@@ -1,0 +1,7 @@
+@startuml
+class AndroidLogcatNetTests {
+    + EnsureDotNET35IsUsed() : void
+    + ValidateAssemblyReferences() : void
+    + ValidateUsingStatements() : void
+}
+@enduml

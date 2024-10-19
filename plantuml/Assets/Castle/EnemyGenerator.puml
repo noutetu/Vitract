@@ -1,0 +1,9 @@
+@startuml
+class EnemyGenerator {
+    + MakeUnit000() : void
+    + MakeUnit001() : void
+    + MakeUnit002() : void
+    + MakeUnit003() : void
+}
+MonoBehaviour <|-- EnemyGenerator
+@enduml

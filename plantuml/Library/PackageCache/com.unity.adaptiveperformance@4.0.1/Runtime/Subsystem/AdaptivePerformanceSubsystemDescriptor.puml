@@ -1,0 +1,18 @@
+@startuml
+class AdaptivePerformanceSubsystemRegistry <<static>> {
+    + {static} RegisterDescriptor(cinfo:AdaptivePerformanceSubsystemDescriptor.Cinfo) : AdaptivePerformanceSubsystemDescriptor
+    + {static} GetRegisteredDescriptors() : List<AdaptivePerformanceSubsystemDescriptor>
+}
+class AdaptivePerformanceSubsystemDescriptor <<sealed>> {
+    + AdaptivePerformanceSubsystemDescriptor(cinfo:Cinfo)
+    + {static} RegisterDescriptor(cinfo:Cinfo) : AdaptivePerformanceSubsystemDescriptor
+}
+class "SubsystemDescriptor`1"<T> {
+}
+struct Cinfo {
+    + id : string <<get>> <<set>>
+}
+AdaptivePerformanceSubsystemDescriptorBase <|-- AdaptivePerformanceSubsystemDescriptor
+AdaptivePerformanceSubsystemDescriptor +-- Cinfo
+Cinfo --> "subsystemImplementationType" Type
+@enduml

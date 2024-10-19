@@ -1,0 +1,6 @@
+@startuml
+class AndroidLogcatSendTrimMemoryUsage {
+    + DisplayName : string <<get>>
+    + Value : string <<get>>
+}
+@enduml

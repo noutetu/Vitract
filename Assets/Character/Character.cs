@@ -9,7 +9,7 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
-    // TODO Magicianクラスが敵を倒した時の挙動がおかしい
+    // TODO Magicianクラスが敵を倒した時の挙動がおかしい 2回リストに登録されてる？
     // ------------- キャラクターのステータス ------------------
 
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
@@ -43,12 +43,6 @@ public abstract class Character : MonoBehaviour, IDamageable
     private CharacterType characterType;  // キャラクターのタイプ
 
 
-    // ------------- プロパティ ------------------
-    public CharacterState CharacterState
-    {
-        get => characterState;
-        set => characterState = value;
-    }
 
     // ------------- Unity ライフサイクル ------------------
 
@@ -92,11 +86,15 @@ public abstract class Character : MonoBehaviour, IDamageable
     protected virtual void FixedUpdate()
     {
         // 攻撃対象がすでに死んでいるかを確認
-        CheckEnemiesState();
+        UpdateEnemies();
         // 自分が死んでいないか確認
         if (isDead) { characterState = CharacterState.Die; }
         // 城が破壊されていたらアイドル状態に
-        if(GameManager.Instance.isGameEnd) {characterState = CharacterState.Idle;}
+        if (GameManager.Instance.isGameEnd)
+        {
+            characterState = CharacterState.Idle;
+            canAttack = false;
+        }
 
         HandleState();
         if (enemyObject != null && canAttack)
@@ -109,7 +107,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void HandleState()
     {
-        switch (CharacterState)
+        switch (characterState)
         {
             case CharacterState.Run:
                 HandleRunningState();
@@ -195,8 +193,8 @@ public abstract class Character : MonoBehaviour, IDamageable
     private void HandleAttackState()
     {
         if (IsDead) return;
-
-        CharacterState = CharacterState.Attack;
+        if (enemyObject == null) { return; }
+        characterState = CharacterState.Attack;
         anim.NormalAttackAnim(attackSpeed);
     }
     // ------------- ダメージ処理と死亡判定 --------------------
@@ -217,7 +215,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (currentHp <= 0)
         {
             isDead = true;
-            CharacterState = CharacterState.Die;
+            characterState = CharacterState.Die;
             return true;
         }
         return false;
@@ -243,7 +241,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             characterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
         }
     }
-   
+
 
     // クールタイムを待って次の攻撃を実行
     private void ScheduleNextAttack()
@@ -253,7 +251,10 @@ public abstract class Character : MonoBehaviour, IDamageable
         DOVirtual.DelayedCall(attackCoolTime / GameManager.Instance.gameSpeed, () =>
         {
             canAttack = true;
-            if (!IsDead) AttackEvent();
+            if (!IsDead && anim != null)
+            {
+                AttackEvent();
+            }  
         });
     }
 
@@ -267,38 +268,38 @@ public abstract class Character : MonoBehaviour, IDamageable
             enemies.Remove(enemy);
         }
     }
-    protected void RegisterAtEnemies(IDamageable enemy)
+    protected void RegisterAtEnemies(IDamageable targetEnemy)
+{
+    // ターゲットがすでに死んでいたらreturn
+    Character character = targetEnemy as Character;
+    if (character != null)
     {
-        // まだ登録されていなければ登録
-        if(!enemies.Contains(enemy))
-        {
-            enemies.Add(enemy);
-        }
+        if(character.isDead) { return;}
     }
+
+    // enemiesリストにまだ登録されていない場合のみ登録する
+    if (!enemies.Contains(targetEnemy))
+    {
+        enemies.Add(targetEnemy);
+    }
+}
+
     protected void SetNextEnemy()
     {
         enemyObject = enemies.Count > 0 ? enemies[0] : null;
     }
-    private void CheckEnemiesState()
+    private void UpdateEnemies()
     {
-        //攻撃対象がnullなら
-        if (enemyObject == null)
+        // 破壊されたオブジェクトをリストから削除して
+        enemies.RemoveAll(enemy => enemy == null);
+        if (enemies.Count > 0)
         {
-            //リストから削除して
-            RemoveInEnemies(enemyObject);
-            if (enemies.Count > 0)
-            {
-                // まだ敵がいるなら攻撃対象に設定
-                SetNextEnemy();
-            }
-            // 敵がいないなら走行状態に移行 TODO: これがあるせいで色々歩き続ける
-            else if (GameManager.Instance.isPlayerDefeated || GameManager.Instance.isEnemyDefeated)
-            {
-                characterState = CharacterState.Idle;
-                return;
-            }
-            characterState = CharacterState.Run;
+            // まだ敵がいるなら攻撃対象に設定
+            SetNextEnemy();
+            return;
         }
+        characterState = CharacterState.Run;
+
     }
     // ------------- アニメーションイベント ------------------
 

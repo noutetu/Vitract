@@ -1,0 +1,10 @@
+@startuml
+class AndroidLogcatDispatcher {
+}
+class IntegrationTask {
+}
+class AsyncTask {
+}
+AndroidLogcatDispatcher +-- IntegrationTask
+AndroidLogcatDispatcher +-- AsyncTask
+@enduml

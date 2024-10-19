@@ -1,0 +1,7 @@
+@startuml
+class TextureAssetUtils <<static>> {
+    + {static} VerifyTextureByType(texture:Texture2D, type:NotificationIconType, errors:List<string>) : bool
+    + {static} ProcessTextureForType(sourceTexture:Texture2D, type:NotificationIconType) : Texture2D
+    + {static} ScaleTexture(sourceTexture:Texture2D, width:int, height:int) : Texture2D
+}
+@enduml

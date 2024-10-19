@@ -1,0 +1,20 @@
+@startuml
+class TestLoaderMetadata {
+    + loaderName : string <<get>> <<set>>
+    + loaderType : string <<get>> <<set>>
+}
+class TestPackageMetadata {
+    + packageName : string <<get>> <<set>>
+    + packageId : string <<get>> <<set>>
+    + settingsType : string <<get>> <<set>>
+    + licenseURL : string <<get>> <<set>>
+}
+class TestMetadata <<static>> {
+}
+class "List`1"<T> {
+}
+IAdaptivePerformanceLoaderMetadata <|-- TestLoaderMetadata
+TestLoaderMetadata --> "supportedBuildTargets<BuildTargetGroup>" "List`1"
+IAdaptivePerformancePackageMetadata <|-- TestPackageMetadata
+TestPackageMetadata --> "loaderMetadata<IAdaptivePerformanceLoaderMetadata>" "List`1"
+@enduml

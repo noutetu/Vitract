@@ -1,0 +1,14 @@
+@startuml
+class ProcessInformation {
+    + deviceId : string
+    + name : string
+    + processId : int
+    + exited : bool
+    + DisplayName : string <<get>>
+    + ProcessInformation()
+    + Reset() : void
+    + SetExited() : void
+    + SetAlive() : void
+    + IsAlive() : bool
+}
+@enduml

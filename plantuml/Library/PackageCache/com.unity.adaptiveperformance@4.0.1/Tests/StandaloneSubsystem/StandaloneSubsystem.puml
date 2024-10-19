@@ -1,0 +1,11 @@
+@startuml
+class StandaloneSubsystem {
+    + <<override>> running : bool <<get>>
+    +  <<event>> startCalled : Action 
+    +  <<event>> stopCalled : Action 
+    +  <<event>> destroyCalled : Action 
+    + <<override>> Start() : void
+    + <<override>> Stop() : void
+}
+Subsystem <|-- StandaloneSubsystem
+@enduml

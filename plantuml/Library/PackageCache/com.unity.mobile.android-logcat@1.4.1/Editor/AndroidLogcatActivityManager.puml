@@ -1,0 +1,7 @@
+@startuml
+abstract class IAndroidLogcatActivityManager {
+}
+class AndroidLogcatActivityManager {
+}
+IAndroidLogcatActivityManager <|-- AndroidLogcatActivityManager
+@enduml

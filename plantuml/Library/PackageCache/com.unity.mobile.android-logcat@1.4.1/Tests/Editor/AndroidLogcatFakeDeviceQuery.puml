@@ -1,0 +1,5 @@
+@startuml
+class AndroidLogcatFakeDeviceQuery {
+}
+AndroidLogcatDeviceQueryBase <|-- AndroidLogcatFakeDeviceQuery
+@enduml

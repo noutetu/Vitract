@@ -1,0 +1,14 @@
+@startuml
+class AndroidLogcatInitializationTests {
+    + PlayerSettingsAreSavedWhenRuntimeDestroyedLast() : void
+    + PlayerSettingsAreSavedWhenRuntimeDestroyedFirst() : void
+    + SavedSelectedDeviceIsPickedDuringRestart(restartRuntime:bool) : void
+    + SavedSelectedPackageIsPickedDuringRestart(restartRuntime:bool) : void
+}
+class AndroidLogcatTestConsoleWindow {
+    + <<new>> OnEnable() : void
+}
+AndroidLogcatRuntimeTestBase <|-- AndroidLogcatInitializationTests
+AndroidLogcatInitializationTests +-- AndroidLogcatTestConsoleWindow
+AndroidLogcatConsoleWindow <|-- AndroidLogcatTestConsoleWindow
+@enduml

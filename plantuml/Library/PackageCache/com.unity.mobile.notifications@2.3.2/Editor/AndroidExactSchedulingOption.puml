@@ -1,0 +1,8 @@
+@startuml
+enum AndroidExactSchedulingOption {
+    ExactWhenAvailable= 1,
+    AddScheduleExactPermission= 1 << 1,
+    AddUseExactAlarmPermission= 1 << 2,
+    AddRequestIgnoreBatteryOptimizationsPermission= 1 << 3,
+}
+@enduml

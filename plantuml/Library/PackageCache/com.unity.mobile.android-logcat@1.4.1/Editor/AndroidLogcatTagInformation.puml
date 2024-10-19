@@ -1,0 +1,7 @@
+@startuml
+class TagInformation {
+    + Name : string <<set>> <<get>>
+    + Selected : bool <<set>> <<get>>
+    + <<override>> ToString() : string
+}
+@enduml

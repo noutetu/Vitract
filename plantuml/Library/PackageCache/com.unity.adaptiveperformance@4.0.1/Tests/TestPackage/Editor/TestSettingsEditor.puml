@@ -1,0 +1,5 @@
+@startuml
+class TestSettingsEditor {
+    + <<override>> OnInspectorGUI() : void
+}
+@enduml

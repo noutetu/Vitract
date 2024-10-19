@@ -1,0 +1,8 @@
+@startuml
+class TemperatureTrend {
+    + TemperatureTrend(useProviderTrend:bool)
+    + Reset() : void
+    + ThermalTrend : float <<get>>
+    + Update(temperatureTrendFromProvider:float, newTemperatureLevel:float, changed:bool, newTemperatureTimestamp:float) : void
+}
+@enduml

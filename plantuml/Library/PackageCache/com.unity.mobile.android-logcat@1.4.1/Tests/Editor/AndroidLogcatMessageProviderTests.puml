@@ -1,0 +1,23 @@
+@startuml
+class AndroidLogcatFakeMessageProvider {
+    + SupplyFakeMessage(message:string) : void
+    + <<override>> Start() : void
+    + <<override>> Stop() : void
+    + <<override>> Kill() : void
+    + <<override>> HasExited : bool <<get>>
+}
+class AndroidLogcatMessagerProvideTests {
+    + FilteringTextWorks(useRegularExpressions:bool, matchCase:bool) : void
+    + FilteringTagWorks(tags:string[], expectedEntryCount:int) : void
+    + FilteringCanReuseResults() : void
+    + InvalidRegexMatchesAllMessages() : void
+    + ManualPidFilteringWorks() : void
+    + MessagesSettingsWork() : void
+    + CanApplySettingsWithNullLogcat() : void
+    + MessageSelectionWorks() : void
+    + MessageClearSelectionWorks() : void
+    + MessageSelectAllWorks() : void
+}
+AndroidLogcatMessageProviderBase <|-- AndroidLogcatFakeMessageProvider
+AndroidLogcatRuntimeTestBase <|-- AndroidLogcatMessagerProvideTests
+@enduml

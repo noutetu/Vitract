@@ -1,0 +1,18 @@
+@startuml
+class iOSNotificationCenter {
+    + {static} ApplicationBadge : int <<get>> <<set>>
+    + {static} ScheduleNotification(notification:iOSNotification) : void
+    + {static} GetScheduledNotifications() : iOSNotification[]
+    + {static} GetDeliveredNotifications() : iOSNotification[]
+    + {static} GetLastRespondedNotification() : iOSNotification
+    + {static} GetLastRespondedNotificationAction() : string
+    + {static} GetLastRespondedNotificationUserText() : string
+    + {static} RemoveScheduledNotification(identifier:string) : void
+    + {static} RemoveDeliveredNotification(identifier:string) : void
+    + {static} RemoveAllScheduledNotifications() : void
+    + {static} RemoveAllDeliveredNotifications() : void
+    + {static} GetNotificationSettings() : iOSNotificationSettings
+    + {static} SetNotificationCategories(categories:IEnumerable<iOSNotificationCategory>) : void
+    + {static} OpenNotificationSettings() : void
+}
+@enduml

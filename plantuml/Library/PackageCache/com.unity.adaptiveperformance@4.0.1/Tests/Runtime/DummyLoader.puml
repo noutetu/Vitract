@@ -1,0 +1,15 @@
+@startuml
+class DummyLoader {
+    + shouldFail : bool = false
+    + id : int
+    + DummyLoader()
+    + <<override>> GetDefaultSubsystem() : ISubsystem
+    + <<override>> GetSettings() : IAdaptivePerformanceSettings
+    + <<override>> Initialize() : bool
+    + <<override>> GetLoadedSubsystem() : T
+    + <<override>> Equals(obj:object) : bool
+    + <<override>> GetHashCode() : int
+}
+AdaptivePerformanceLoader <|-- DummyLoader
+DummyLoader o-> "supportedDeviceType" GraphicsDeviceType
+@enduml

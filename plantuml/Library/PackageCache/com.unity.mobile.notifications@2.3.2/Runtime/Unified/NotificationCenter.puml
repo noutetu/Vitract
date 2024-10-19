@@ -1,0 +1,32 @@
+@startuml
+enum NotificationPresentation {
+    Alert= 1,
+    Badge= 1 << 1,
+    Sound= 1 << 2,
+    Vibrate= 1 << 3,
+}
+enum NotificationSettingsSection {
+    Application,
+    Category,
+}
+struct NotificationCenterArgs {
+    + AndroidChannelId : string <<get>> <<set>>
+    + AndroidChannelName : string <<get>> <<set>>
+    + AndroidChannelDescription : string <<get>> <<set>>
+}
+class NotificationCenter <<static>> {
+    + {static} Initialize(args:NotificationCenterArgs) : void
+    + {static} RequestPermission() : NotificationsPermissionRequest
+    + {static} ScheduleNotification(notification:Notification, schedule:T) : int
+    + {static} ScheduleNotification(notification:Notification, category:string, schedule:T) : int
+    + {static} CancelScheduledNotification(id:int) : void
+    + {static} CancelDeliveredNotification(id:int) : void
+    + {static} CancelAllScheduledNotifications() : void
+    + {static} CancelAllDeliveredNotifications() : void
+    + {static} ClearBadge() : void
+    + {static} OpenNotificationSettings(section:NotificationSettingsSection) : void
+}
+NotificationCenterArgs --> "Default" NotificationCenterArgs
+NotificationCenterArgs --> "PresentationOptions" NotificationPresentation
+NotificationCenter --> "LastRespondedNotification" Notification
+@enduml

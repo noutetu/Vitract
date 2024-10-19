@@ -1,0 +1,15 @@
+@startuml
+class AndroidLogcatDispatcherTests {
+    + SimpleDispatchingWorks(synchronousTask:bool) : IEnumerator
+    + SchedulingHappensInCorrectOrder(synchronousTask:bool) : IEnumerator
+    + DispatcherCanSuriveExceptions(synchronousTask:bool) : IEnumerator
+}
+struct TaskInputData {
+}
+struct TaskResultData {
+}
+AndroidLogcatDispatcherTests +-- TaskInputData
+IAndroidLogcatTaskInput <|-- TaskInputData
+AndroidLogcatDispatcherTests +-- TaskResultData
+IAndroidLogcatTaskResult <|-- TaskResultData
+@enduml

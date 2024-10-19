@@ -1,0 +1,11 @@
+@startuml
+class NeuQuant {
+    + NeuQuant(thepic:byte[], len:int, sample:int)
+    + ColorMap() : byte[]
+    + Inxbuild() : void
+    + Learn() : void
+    + Map(b:int, g:int, r:int) : int
+    + Process() : byte[]
+    + Unbiasnet() : void
+}
+@enduml

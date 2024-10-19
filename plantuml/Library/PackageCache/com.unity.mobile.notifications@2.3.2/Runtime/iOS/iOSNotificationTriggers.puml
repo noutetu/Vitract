@@ -1,0 +1,46 @@
+@startuml
+enum iOSNotificationTriggerType {
+    TimeInterval= 0,
+    Calendar= 10,
+    Location= 20,
+    Push= 3,
+    Unknown= -1,
+}
+interface iOSNotificationTrigger {
+}
+struct iOSNotificationLocationTrigger {
+    + Latitude : double <<get>> <<set>>
+    + Longitude : double <<get>> <<set>>
+    + Radius : float <<get>> <<set>>
+    + NotifyOnEntry : bool <<get>> <<set>>
+    + NotifyOnExit : bool <<get>> <<set>>
+    + Repeats : bool <<get>> <<set>>
+}
+struct iOSNotificationPushTrigger {
+}
+struct iOSNotificationTimeIntervalTrigger {
+    + Repeats : bool <<get>> <<set>>
+}
+struct iOSNotificationCalendarTrigger {
+    + Year : int? <<get>> <<set>>
+    + Month : int? <<get>> <<set>>
+    + Day : int? <<get>> <<set>>
+    + Hour : int? <<get>> <<set>>
+    + Minute : int? <<get>> <<set>>
+    + Second : int? <<get>> <<set>>
+    + UtcTime : bool <<get>> <<set>>
+    + Repeats : bool <<get>> <<set>>
+    + ToUtc() : iOSNotificationCalendarTrigger
+    + ToLocal() : iOSNotificationCalendarTrigger
+}
+iOSNotificationTrigger <|-- iOSNotificationLocationTrigger
+iOSNotificationLocationTrigger --> "Type" iOSNotificationTriggerType
+iOSNotificationLocationTrigger --> "Center" Vector2
+iOSNotificationTrigger <|-- iOSNotificationPushTrigger
+iOSNotificationPushTrigger --> "Type" iOSNotificationTriggerType
+iOSNotificationTrigger <|-- iOSNotificationTimeIntervalTrigger
+iOSNotificationTimeIntervalTrigger --> "Type" iOSNotificationTriggerType
+iOSNotificationTimeIntervalTrigger --> "TimeInterval" TimeSpan
+iOSNotificationTrigger <|-- iOSNotificationCalendarTrigger
+iOSNotificationCalendarTrigger --> "Type" iOSNotificationTriggerType
+@enduml

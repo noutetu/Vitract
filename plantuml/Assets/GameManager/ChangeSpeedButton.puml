@@ -1,0 +1,6 @@
+@startuml
+class ChangeSpeedButton {
+    + ChangeGameSpeed() : void
+}
+MonoBehaviour <|-- ChangeSpeedButton
+@enduml

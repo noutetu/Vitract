@@ -1,0 +1,28 @@
+@startuml
+class AndroidLogcatUserSettings {
+    + LastSelectedDeviceId : string <<set>> <<get>>
+    + LastSelectedDeviceIdValid : bool <<get>>
+    + SelectedPackageValid : bool <<get>>
+    + GetKnownProcesses(device:IAndroidLogcatDevice) : IReadOnlyList<ProcessInformation>
+    + CleanupDeadProcessesForDevice(device:IAndroidLogcatDevice, maxExitedPackagesToShow:int) : void
+    + CreateProcessInformation(processName:string, pid:int, device:IAndroidLogcatDevice) : ProcessInformation
+}
+class InputSettings {
+}
+class VideoSettings {
+}
+class "List`1"<T> {
+}
+AndroidLogcatUserSettings --> "LastSelectedProcess" ProcessInformation
+AndroidLogcatUserSettings --> "SelectedPriority" Priority
+AndroidLogcatUserSettings --> "CaptureVideoSettings" VideoSettings
+AndroidLogcatUserSettings --> "DeviceInputSettings" InputSettings
+AndroidLogcatUserSettings --> "AutoScroll" AutoScroll
+AndroidLogcatUserSettings --> "Tags" AndroidLogcatTags
+AndroidLogcatUserSettings --> "ExtraWindowState" ExtraWindowState
+AndroidLogcatUserSettings --> "MemoryViewerState" AndroidLogcatMemoryViewerState
+AndroidLogcatUserSettings --> "FilterOptions" FilterOptions
+AndroidLogcatUserSettings --> "SymbolPaths<ReordableListItem>" "List`1"
+AndroidLogcatUserSettings +-- InputSettings
+AndroidLogcatUserSettings +-- VideoSettings
+@enduml

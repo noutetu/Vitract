@@ -1,0 +1,9 @@
+@startuml
+class Workspace {
+    + {static} IsRunningOnYamato() : bool
+    + {static} IsRunningOnKatana() : bool
+    + {static} IsRunningOnBuildServer() : bool
+    + {static} GetAndroidDeviceInfo() : string
+    + {static} GetAritfactsPath() : string
+}
+@enduml

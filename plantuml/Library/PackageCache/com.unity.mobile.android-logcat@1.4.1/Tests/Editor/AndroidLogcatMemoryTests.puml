@@ -1,0 +1,9 @@
+@startuml
+class AndroidLogcatMemoryTests {
+    + CanParseMemoryDumpFromPackage(windowsEndLines:bool) : void
+    + CanParseMemoryDumpFromPackageWithAndroid11(windowsEndLines:bool) : void
+    + CanParseMemoryDumpFromProcess(windowsEndLines:bool) : void
+    + CanParseHugeValues(windowsEndLines:bool) : void
+    + CanProvidePrettySizeText() : void
+}
+@enduml

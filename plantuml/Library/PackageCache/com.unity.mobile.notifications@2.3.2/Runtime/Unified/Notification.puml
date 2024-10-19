@@ -1,0 +1,12 @@
+@startuml
+struct Notification {
+    + Identifier : int? <<get>> <<set>>
+    + Title : string <<get>> <<set>>
+    + Text : string <<get>> <<set>>
+    + Data : string <<get>> <<set>>
+    + Badge : int <<get>> <<set>>
+    + ShowInForeground : bool <<get>> <<set>>
+    + Group : string <<get>> <<set>>
+    + IsGroupSummary : bool <<get>> <<set>>
+}
+@enduml

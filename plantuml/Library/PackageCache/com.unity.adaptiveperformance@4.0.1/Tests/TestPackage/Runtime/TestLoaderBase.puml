@@ -1,0 +1,12 @@
+@startuml
+class TestLoaderBase {
+    + <<override>> GetDefaultSubsystem() : ISubsystem
+    + <<override>> GetSettings() : IAdaptivePerformanceSettings
+    + <<override>> Initialize() : bool
+    + <<override>> Start() : bool
+    + <<override>> Stop() : bool
+    + <<override>> Deinitialize() : bool
+}
+AdaptivePerformanceLoaderHelper <|-- TestLoaderBase
+TestLoaderBase --> "inputSubsystem" StandaloneSubsystem
+@enduml

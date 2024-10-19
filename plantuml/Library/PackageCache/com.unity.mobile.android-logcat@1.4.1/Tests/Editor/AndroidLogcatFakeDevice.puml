@@ -1,0 +1,12 @@
+@startuml
+abstract class AndroidLogcatFakeDevice {
+    + <<override>> ToString() : string
+}
+class AndroidLogcatFakeDevice90 {
+}
+class AndroidLogcatFakeDevice60 {
+}
+IAndroidLogcatDevice <|-- AndroidLogcatFakeDevice
+AndroidLogcatFakeDevice <|-- AndroidLogcatFakeDevice90
+AndroidLogcatFakeDevice <|-- AndroidLogcatFakeDevice60
+@enduml

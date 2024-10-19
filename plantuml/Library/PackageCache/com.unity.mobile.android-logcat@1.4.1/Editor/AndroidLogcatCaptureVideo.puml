@@ -1,0 +1,9 @@
+@startuml
+class AndroidLogcatCaptureVideo {
+}
+enum Result {
+    Success,
+    Failure,
+}
+AndroidLogcatCaptureVideo +-- Result
+@enduml

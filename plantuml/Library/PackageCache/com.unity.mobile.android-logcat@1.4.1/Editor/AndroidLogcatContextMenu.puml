@@ -1,0 +1,44 @@
+@startuml
+enum MessagesContextMenu {
+    None,
+    Copy,
+    SelectAll,
+    SaveSelection,
+    AddTag,
+    RemoveTag,
+    FilterByProcessId,
+    SendUnixSignal,
+    CrashProcess,
+    ForceStop,
+    SendTrimMemory,
+}
+enum ToolsContextMenu {
+    None,
+    ScreenCapture,
+    OpenTerminal,
+    StacktraceUtility,
+    WindowMemory,
+    WindowInputs,
+    WindowHidden,
+}
+enum FilterContextMenu {
+    UseRegularExpressions,
+    MatchCase,
+}
+class "AndroidContextMenu`1"<T> {
+    + UserData : object <<set>> <<get>>
+    + Add(item:T, name:string, selected:bool, enabled:bool, userData:object) : void
+    + AddSplitter() : void
+    + GetItemAt(selected:int) : MenuItemData
+    + Show(mousePosition:Vector2, callback:EditorUtility.SelectMenuItemFunction) : void
+}
+class MenuItemData {
+    + Name : string <<get>>
+    + Selected : bool <<get>>
+    + Enabled : bool <<get>>
+    + UserData : object <<get>>
+    + MenuItemData(item:T, name:string, selected:bool, enabled:bool, userData:object)
+}
+"AndroidContextMenu`1" +-- MenuItemData
+MenuItemData --> "Item" T
+@enduml

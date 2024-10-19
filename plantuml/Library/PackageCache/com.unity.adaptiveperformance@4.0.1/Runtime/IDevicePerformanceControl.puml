@@ -1,0 +1,9 @@
+@startuml
+interface IDevicePerformanceControl {
+}
+enum PerformanceControlMode {
+    Automatic,
+    Manual,
+    System,
+}
+@enduml

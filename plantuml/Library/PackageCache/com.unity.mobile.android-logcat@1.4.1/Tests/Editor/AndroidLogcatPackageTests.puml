@@ -1,0 +1,6 @@
+@startuml
+class AndroidLogcatPackageTests {
+    + DeadPackagesAreCleanupCorrectly() : void
+}
+AndroidLogcatRuntimeTestBase <|-- AndroidLogcatPackageTests
+@enduml

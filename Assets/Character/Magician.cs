@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// TODO 城を対象として遠距離攻撃の実装
 public class Magician : Character
 {
     public Vector2 boxSize;  // 検知するボックスのサイズ
@@ -20,8 +19,8 @@ public class Magician : Character
 
     protected override void FixedUpdate()
     {
-        base.FixedUpdate();
         DetectObjects();
+        base.FixedUpdate();
     }
 
     void DetectObjects()
@@ -38,24 +37,12 @@ public class Magician : Character
             // 敵リストに追加
             if (detectedObject != null)
             {
+                // TODO ここが原因で二重攻撃してる。　
                 RegisterAtEnemies(detectedObject);
-            }
-            // 検知した敵キャラクターを攻撃対象に設定
-            if (enemyObject != null)
-            {
-                enemyObject = detectedObject;
             }
 
             Debug.Log("検知したオブジェクト: " + hitCollider.name);
-
         }
-
-        // 検知した敵キャラクターを攻撃対象に設定
-        if (enemies.Count < 0) { return; }
-        SetNextEnemy();
-        if (enemyObject == null || IsDead) { return; }
-        if (characterState == CharacterState.Attack) { return; }
-        //　攻撃処理？
 
         // デバッグ用に範囲を可視化
         Debug.DrawRay(detectionCenter, Vector2.right * boxSize.x / 2, Color.red);

@@ -1,0 +1,23 @@
+@startuml
+class iOSNotificationTests {
+    + Setup() : void
+    + Cleanup() : void
+    + BeforeTests() : void
+    + AfterEachTest() : void
+    + SendSimpleNotification_NotificationIsReceived() : IEnumerator
+    + SendNotificationWithUserInfo_NotificationIsReceivedWithSameUserInfo() : IEnumerator
+    + SendNotificationUsingCalendarTriggerLocalTime_NotificationIsReceived() : IEnumerator
+    + SendNotificationUsingCalendarTriggerUtcTime_NotificationIsReceived() : IEnumerator
+    + SendNotification_AllPropertiesRoundtrip() : IEnumerator
+    + iOSNotificationCalendarTrigger_ToUtc_DoesNotConvertUtcTrigger() : void
+    + iOSNotificationCalendarTrigger_ToUtc_ConvertsLocalTrigger() : void
+    + iOSNotificationCalendarTrigger_ToLocal_DoesNotConvertLocalTrigger() : void
+    + iOSNotificationCalendarTrigger_ToLocal_ConvertsUtcTrigger() : void
+    + iOSNotificationCalendarTrigger_AssignDateTimeComponents_OnlyChangesNonNullFields() : void
+    + iOSNotificationCalendarTrigger_AssignNonEmptyComponents_Works() : void
+    + iOSNotification_CalendarTrigger_ReturnsSameKindDateTime() : void
+    + iOSNotificationCalendarTrigger_HandlesMissingUtcField() : void
+}
+IPrebuildSetup <|-- iOSNotificationTests
+IPostBuildCleanup <|-- iOSNotificationTests
+@enduml

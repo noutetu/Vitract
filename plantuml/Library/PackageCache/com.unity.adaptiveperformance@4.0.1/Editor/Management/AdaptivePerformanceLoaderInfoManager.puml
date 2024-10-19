@@ -1,0 +1,14 @@
+@startuml
+class AdaptivePerformanceLoaderInfoManager {
+    + OnEnable() : void
+    + ShouldReload : bool <<get>> <<set>>
+    + OnDisable() : void
+    + ReloadData() : void
+}
+class AssetCallbacks {
+}
+IAdaptivePerformanceLoaderOrderManager <|-- AdaptivePerformanceLoaderInfoManager
+AdaptivePerformanceLoaderInfoManager --> "SerializedObjectData" SerializedObject
+AdaptivePerformanceLoaderInfoManager +-- AssetCallbacks
+AssetPostprocessor <|-- AssetCallbacks
+@enduml

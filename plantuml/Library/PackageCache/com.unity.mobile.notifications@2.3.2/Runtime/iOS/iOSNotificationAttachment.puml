@@ -1,0 +1,6 @@
+@startuml
+struct iOSNotificationAttachment {
+    + Id : string <<get>> <<set>>
+    + Url : string <<get>> <<set>>
+}
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+enum NotificationRepeatInterval {
+    OneTime= 0,
+    Daily= 1,
+}
+interface NotificationSchedule {
+}
+struct NotificationIntervalSchedule {
+    + Repeats : bool <<get>> <<set>>
+    + NotificationIntervalSchedule(interval:TimeSpan, repeats:bool)
+}
+struct NotificationDateTimeSchedule {
+    + NotificationDateTimeSchedule(fireTime:DateTime, repeatInterval:NotificationRepeatInterval)
+}
+NotificationSchedule <|-- NotificationIntervalSchedule
+NotificationIntervalSchedule --> "Interval" TimeSpan
+NotificationSchedule <|-- NotificationDateTimeSchedule
+NotificationDateTimeSchedule --> "FireTime" DateTime
+NotificationDateTimeSchedule --> "RepeatInterval" NotificationRepeatInterval
+@enduml

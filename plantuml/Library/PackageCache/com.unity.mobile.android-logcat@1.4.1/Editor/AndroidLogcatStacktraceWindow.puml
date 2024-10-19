@@ -1,0 +1,17 @@
+@startuml
+class AndroidLogcatStacktraceWindow {
+    + {static} ShowStacktraceWindow() : void
+}
+class UnresolvedAddresses {
+}
+enum WindowMode {
+    OriginalLog,
+    ResolvedLog,
+}
+struct AddressKey {
+}
+EditorWindow <|-- AndroidLogcatStacktraceWindow
+AndroidLogcatStacktraceWindow +-- UnresolvedAddresses
+AndroidLogcatStacktraceWindow +-- WindowMode
+UnresolvedAddresses +-- AddressKey
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+enum iOSNotificationActionOptions {
+    None= 0,
+    Required= (1 << 0),
+    Destructive= (1 << 1),
+    Foreground= (1 << 2),
+}
+enum iOSNotificationActionIconType {
+    None= 0,
+    SystemImageName= 1,
+    TemplateImageName= 2,
+}
+class iOSNotificationAction {
+    + Id : string <<get>> <<set>>
+    + Title : string <<get>> <<set>>
+    + SystemImageName : string <<get>> <<set>>
+    + TemplateImageName : string <<get>> <<set>>
+    + iOSNotificationAction(id:string, title:string)
+    + iOSNotificationAction(id:string, title:string, options:iOSNotificationActionOptions)
+}
+class iOSTextInputNotificationAction {
+    + TextInputButtonTitle : string <<get>> <<set>>
+    + TextInputPlaceholder : string <<get>> <<set>>
+    + iOSTextInputNotificationAction(id:string, title:string, buttonTitle:string)
+    + iOSTextInputNotificationAction(id:string, title:string, options:iOSNotificationActionOptions, buttonTitle:string)
+}
+iOSNotificationAction --> "Options" iOSNotificationActionOptions
+iOSNotificationAction <|-- iOSTextInputNotificationAction
+@enduml

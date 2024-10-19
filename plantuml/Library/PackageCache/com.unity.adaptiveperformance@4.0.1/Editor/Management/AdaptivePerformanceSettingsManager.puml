@@ -1,0 +1,16 @@
+@startuml
+class AdaptivePerformanceSettingsManager {
+    + <<override>> OnActivate(searchContext:string, rootElement:VisualElement) : void
+    + <<override>> OnDeactivate() : void
+    + <<override>> OnGUI(searchContext:string) : void
+}
+struct Content {
+}
+SettingsProvider <|-- AdaptivePerformanceSettingsManager
+AdaptivePerformanceSettingsManager +-- Content
+Content o-> "k_InitializeOnStart" GUIContent
+Content o-> "k_DocText" GUIContent
+Content o-> "k_DocUri" Uri
+Content o-> "k_ExplanatoryText" GUIContent
+Content o-> "k_FrameTimingExplanatoryText" GUIContent
+@enduml

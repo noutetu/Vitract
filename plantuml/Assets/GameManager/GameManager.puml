@@ -1,0 +1,11 @@
+@startuml
+class GameManager {
+    + isPlayerDefeated : bool <<get>>
+    + isEnemyDefeated : bool <<get>>
+    + isGameEnd : bool
+    + gameSpeed : float
+    + GameResult(isPlayer:bool) : void
+}
+MonoBehaviour <|-- GameManager
+GameManager --> "Instance" GameManager
+@enduml

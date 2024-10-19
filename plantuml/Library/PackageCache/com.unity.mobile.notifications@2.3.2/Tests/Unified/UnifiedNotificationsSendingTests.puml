@@ -1,0 +1,16 @@
+@startuml
+class UnifiedNotificationsSendingTests {
+    + BeforeTests() : void
+    + AfterAllTests() : void
+    + BeforeEachTest() : void
+    + SendNotificationAllOptionsRoundtrip() : IEnumerator
+    + ScheduleNotificationAtSpecificTime() : IEnumerator
+    + ScheduleAndCancelNotification_DoesNotArrive() : IEnumerator
+    + ScheduleNotification_WithExplicitCategory_UsesAndroidChannel() : IEnumerator
+    + ScheduleNotification_WithExplicitCategory_UsesiOSCategory() : IEnumerator
+    + ScheduleNotification_WithExplicitCategory(category:string) : IEnumerator
+    + ScheduleNotification_WithoutCategory_UsesNoiOSCategory() : IEnumerator
+    + ScheduleWithSameID_ReplacesNotification() : IEnumerator
+    + ScheduleWithoutIDTwice_DeliversTwo() : IEnumerator
+}
+@enduml

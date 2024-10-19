@@ -1,0 +1,24 @@
+@startuml
+class AndroidLogcatMemoryViewerState {
+    + MemoryWindowWidth : float
+    + AutoCapture : bool = true
+}
+class AndroidLogcatMemoryViewer {
+    + AndroidLogcatMemoryViewer(parent:EditorWindow, runtime:AndroidLogcatRuntimeBase)
+}
+enum SplitterDragging {
+    None,
+    Horizontal,
+    Vertical,
+}
+class AndroidLogcatQueryMemoryInput {
+}
+class AndroidLogcatQueryMemoryResult {
+}
+AndroidLogcatMemoryViewerState o-> "MemoryGroup" MemoryGroup
+AndroidLogcatMemoryViewer +-- SplitterDragging
+AndroidLogcatMemoryViewer +-- AndroidLogcatQueryMemoryInput
+IAndroidLogcatTaskInput <|-- AndroidLogcatQueryMemoryInput
+AndroidLogcatMemoryViewer +-- AndroidLogcatQueryMemoryResult
+IAndroidLogcatTaskResult <|-- AndroidLogcatQueryMemoryResult
+@enduml

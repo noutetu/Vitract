@@ -1,0 +1,7 @@
+@startuml
+class SPUM_Manager {
+    + ColorToStr(color:Color) : string
+    + StrToColor(str:string) : Color
+}
+MonoBehaviour <|-- SPUM_Manager
+@enduml

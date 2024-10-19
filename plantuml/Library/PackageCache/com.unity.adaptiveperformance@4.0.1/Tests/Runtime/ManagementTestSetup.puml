@@ -1,0 +1,7 @@
+@startuml
+abstract class ManagementTestSetup {
+    + {static} SetupTest() : void
+    + <<virtual>> TearDownTest() : void
+    + {static} GetAssetPathForComponents(pathComponents:string[], root:string) : string
+}
+@enduml

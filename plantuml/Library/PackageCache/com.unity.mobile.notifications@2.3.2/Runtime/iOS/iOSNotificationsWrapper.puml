@@ -1,0 +1,31 @@
+@startuml
+struct iOSNotificationWithUserInfo {
+}
+class iOSNotificationsWrapper {
+    + {static} RegisterAuthorizationRequestCallback() : void
+    + {static} RegisterOnReceivedRemoteNotificationCallback() : void
+    + {static} RegisterOnReceivedCallback() : void
+    + {static} AuthorizationRequestReceived(request:IntPtr, data:iOSAuthorizationRequestData) : void
+    + {static} RemoteNotificationReceived(data:iOSNotificationData) : void
+    + {static} NotificationReceived(data:iOSNotificationData) : void
+    + {static} RequestAuthorization(request:IntPtr, options:int, registerRemote:bool) : void
+    + {static} RegisteredForRemoteNotifications() : bool
+    + {static} UnregisterForRemoteNotifications() : void
+    + {static} GetNotificationSettings() : iOSNotificationSettings
+    + {static} ScheduleLocalNotification(data:iOSNotificationWithUserInfo) : void
+    + {static} GetDeliveredNotificationData() : iOSNotificationWithUserInfo[]
+    + {static} GetLastRespondedNotificationAction() : string
+    + {static} GetLastRespondedNotificationUserText() : string
+    + {static} GetScheduledNotificationData() : iOSNotificationWithUserInfo[]
+    + {static} CsDictionaryToObjC(userInfo:Dictionary<string, string>) : IntPtr
+    + {static} CsAttachmentsToObjc(attachments:List<iOSNotificationAttachment>) : IntPtr
+    + {static} NSDictionaryToCs(dict:IntPtr) : Dictionary<string, string>
+    + {static} AttachmentsNSArrayToCs(array:IntPtr) : List<iOSNotificationAttachment>
+    + {static} SetApplicationBadge(badge:int) : void
+    + {static} GetApplicationBadge() : int
+    + {static} GetAppOpenedUsingNotification() : bool
+    + {static} GetLastNotificationData() : iOSNotificationWithUserInfo?
+    + {static} SetNotificationCategories(categories:IEnumerable<iOSNotificationCategory>) : void
+}
+MonoBehaviour <|-- iOSNotificationsWrapper
+@enduml

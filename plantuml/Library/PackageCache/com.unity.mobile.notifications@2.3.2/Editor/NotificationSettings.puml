@@ -1,0 +1,26 @@
+@startuml
+class NotificationSettings {
+}
+class AndroidSettings <<static>> {
+    + {static} RescheduleOnDeviceRestart : bool <<get>> <<set>>
+    + {static} UseCustomActivity : bool <<get>> <<set>>
+    + {static} CustomActivityString : string <<get>> <<set>>
+    + {static} AddDrawableResource(id:string, image:Texture2D, type:NotificationIconType) : void
+    + {static} RemoveDrawableResource(index:int) : void
+    + {static} RemoveDrawableResource(id:string) : void
+    + {static} ClearDrawableResources() : void
+}
+class iOSSettings <<static>> {
+    + {static} RequestAuthorizationOnAppLaunch : bool <<get>> <<set>>
+    + {static} AddRemoteNotificationCapability : bool <<get>> <<set>>
+    + {static} NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch : bool <<get>> <<set>>
+    + {static} UseAPSReleaseEnvironment : bool <<get>> <<set>>
+    + {static} UseLocationNotificationTrigger : bool <<get>> <<set>>
+    + {static} AddTimeSensitiveEntitlement : bool <<get>> <<set>>
+}
+NotificationSettings +-- AndroidSettings
+AndroidSettings --> "ExactSchedulingOption" AndroidExactSchedulingOption
+NotificationSettings +-- iOSSettings
+iOSSettings --> "DefaultAuthorizationOptions" AuthorizationOption
+iOSSettings --> "RemoteNotificationForegroundPresentationOptions" PresentationOption
+@enduml

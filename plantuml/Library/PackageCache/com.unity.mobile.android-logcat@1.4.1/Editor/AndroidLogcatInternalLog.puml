@@ -1,0 +1,9 @@
+@startuml
+class AndroidLogcatInternalLog {
+    + {static} ShowLog(immediate:bool) : void
+    + {static} Log(message:string, args:object[]) : void
+    + {static} Log(message:string) : void
+    + OnEnable() : void
+}
+EditorWindow <|-- AndroidLogcatInternalLog
+@enduml

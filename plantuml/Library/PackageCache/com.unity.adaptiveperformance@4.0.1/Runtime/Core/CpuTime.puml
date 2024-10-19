@@ -1,0 +1,20 @@
+@startuml
+class RenderThreadCpuTime {
+    + RenderThreadCpuTime()
+    + Reset() : void
+    + Measure() : void
+    + GetLatestResult() : float
+}
+class MainThreadCpuTime {
+    + GetLatestResult() : float
+    + Measure() : void
+    + MainThreadCpuTime()
+}
+class CpuTimeProvider {
+    + CpuFrameTime : float <<get>>
+    + CpuTimeProvider()
+    + Reset() : void
+    + LateUpdate() : void
+    + EndOfFrame() : void
+}
+@enduml

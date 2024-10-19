@@ -1,0 +1,22 @@
+@startuml
+enum MemoryGroup {
+    ResidentSetSize,
+    ProportionalSetSize,
+    HeapAlloc,
+    HeapSize,
+}
+enum MemoryType {
+    Unknown= -1,
+    NativeHeap= 0,
+    JavaHeap= 1,
+    Code= 2,
+    Stack= 3,
+    Graphics= 4,
+    PrivateOther= 5,
+    System= 6,
+    Total= 7,
+    TotalSwapPss= 8,
+}
+class AndroidMemoryStatistics {
+}
+@enduml

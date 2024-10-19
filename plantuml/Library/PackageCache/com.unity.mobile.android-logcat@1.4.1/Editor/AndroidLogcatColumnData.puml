@@ -1,0 +1,11 @@
+@startuml
+class ColumnData {
+    + width : float
+    + splitterDragging : bool
+    + splitterDragStartMouseValue : float
+    + splitterDragStartWidthValue : float
+    + enabled : bool = true
+}
+ColumnData --> "content" GUIContent
+ColumnData o-> "itemSize" Rect
+@enduml

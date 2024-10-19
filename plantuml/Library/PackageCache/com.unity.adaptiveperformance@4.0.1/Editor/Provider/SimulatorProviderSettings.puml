@@ -1,0 +1,6 @@
+@startuml
+class SimulatorProviderSettings {
+    + {static} GetSettings() : SimulatorProviderSettings
+}
+IAdaptivePerformanceSettings <|-- SimulatorProviderSettings
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+class AndroidLogcatScreenCaptureWindow {
+    + {static} ShowWindow() : void
+}
+class Styles {
+}
+enum Mode {
+    Screenshot,
+    Video,
+}
+EditorWindow <|-- AndroidLogcatScreenCaptureWindow
+AndroidLogcatScreenCaptureWindow +-- Styles
+Styles o-> "TimeLimit" GUIContent
+Styles o-> "VideoSize" GUIContent
+Styles o-> "BitRate" GUIContent
+Styles o-> "DisplayId" GUIContent
+Styles o-> "ShowInfo" GUIContent
+Styles o-> "Open" GUIContent
+Styles o-> "SaveAs" GUIContent
+Styles o-> "CaptureScreenshot" GUIContent
+Styles o-> "CaptureVideo" GUIContent
+Styles o-> "StopVideo" GUIContent
+AndroidLogcatScreenCaptureWindow +-- Mode
+@enduml

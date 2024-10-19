@@ -1,0 +1,8 @@
+@startuml
+class SPUM_HorseSpriteList {
+}
+class "List`1"<T> {
+}
+MonoBehaviour <|-- SPUM_HorseSpriteList
+SPUM_HorseSpriteList o-> "_spList<SpriteRenderer>" "List`1"
+@enduml

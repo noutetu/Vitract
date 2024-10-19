@@ -1,0 +1,6 @@
+@startuml
+class APLog <<static>> {
+    + {static} enabled : bool = false
+    + {static} Debug(format:string, args:object[]) : void
+}
+@enduml

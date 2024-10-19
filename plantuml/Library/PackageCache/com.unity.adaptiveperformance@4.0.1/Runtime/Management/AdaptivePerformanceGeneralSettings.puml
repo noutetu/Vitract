@@ -1,0 +1,10 @@
+@startuml
+class AdaptivePerformanceGeneralSettings {
+    + {static} k_SettingsKey : string = "com.unity.adaptiveperformance.loader_settings"
+    + InitManagerOnStart : bool <<get>>
+}
+ScriptableObject <|-- AdaptivePerformanceGeneralSettings
+AdaptivePerformanceGeneralSettings --> "Manager" AdaptivePerformanceManagerSettings
+AdaptivePerformanceGeneralSettings --> "Instance" AdaptivePerformanceGeneralSettings
+AdaptivePerformanceGeneralSettings --> "AssignedSettings" AdaptivePerformanceManagerSettings
+@enduml

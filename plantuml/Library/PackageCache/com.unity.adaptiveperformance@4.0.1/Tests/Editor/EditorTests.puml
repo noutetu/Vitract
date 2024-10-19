@@ -1,0 +1,6 @@
+@startuml
+class AdaptivePerformanceGeneralSettingsTests {
+    + SetupTest() : void
+    + TearDownTest() : void
+}
+@enduml

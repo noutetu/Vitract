@@ -1,0 +1,8 @@
+@startuml
+class NotificationSettingsProvider {
+    + <<override>> OnActivate(searchContext:string, rootElement:VisualElement) : void
+    + <<override>> OnDeactivate() : void
+    + <<override>> OnGUI(searchContext:string) : void
+}
+SettingsProvider <|-- NotificationSettingsProvider
+@enduml

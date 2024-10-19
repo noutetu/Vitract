@@ -1,0 +1,10 @@
+@startuml
+class SkillBase {
+}
+enum Target {
+    Self,
+    TeamMate,
+    Enemy,
+}
+ScriptableObject <|-- SkillBase
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+class EditorWorkQueueBase {
+}
+class "EditorWorkQueue`1"<T> {
+    + QueueName : string <<get>> <<set>>
+    + HasWorkItems : bool <<get>>
+    + StartQueue() : void
+    + QueueWorkItem(workItem:T) : void
+}
+struct Queue {
+}
+class "Action`1"<T> {
+}
+class "List`1"<T> {
+}
+EditorWorkQueueBase <|-- "EditorWorkQueue`1"
+"EditorWorkQueue`1" --> "Instance<T>" "EditorWorkQueue`1"
+"EditorWorkQueue`1" --> "ProcessItemCallback<T>" "Action`1"
+"EditorWorkQueue`1" +-- Queue
+Queue --> "workItems<T>" "List`1"
+@enduml

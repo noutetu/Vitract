@@ -1,0 +1,7 @@
+@startuml
+class AndroidLogcatGeneralTests {
+    + ParseVersionTests() : void
+    + ParsePIDNameTests() : void
+    + CanSetGetTagPriorities() : void
+}
+@enduml

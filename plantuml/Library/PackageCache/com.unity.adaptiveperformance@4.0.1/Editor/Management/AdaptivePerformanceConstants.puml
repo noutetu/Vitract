@@ -1,0 +1,5 @@
+@startuml
+class AdaptivePerformanceConstants <<static>> {
+    + {static} <<readonly>> kAdaptivePerformanceProviderManagement : string = "Adaptive Performance"
+}
+@enduml

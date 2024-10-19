@@ -1,0 +1,15 @@
+@startuml
+class Constants <<static>> {
+    + <<const>> MinTemperatureLevel : float = 0.0f
+    + <<const>> MaxTemperatureLevel : float = 1.0f
+    + <<const>> MinCpuPerformanceLevel : int = 0
+    + <<const>> MinGpuPerformanceLevel : int = 0
+    + <<const>> UnknownPerformanceLevel : int
+    + <<const>> DefaultAverageFrameCount : int = 100
+}
+interface IAdaptivePerformance {
+}
+class Holder <<static>> {
+}
+Holder --> "Instance" IAdaptivePerformance
+@enduml

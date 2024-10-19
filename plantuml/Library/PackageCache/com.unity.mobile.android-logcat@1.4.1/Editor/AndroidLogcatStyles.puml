@@ -1,0 +1,51 @@
+@startuml
+class AndroidLogcatStyles <<static>> {
+    + <<const>> kFontSize : int = 10
+    + <<const>> kFixedHeight : int
+    + {static} kLogEntryFontSize : int = 11
+    + {static} kLogEntryFixedHeight : int
+    + <<const>> kStatusBarFontSize : int = 13
+    + <<const>> kLStatusBarFixedHeight : int
+    + <<const>> kTagEntryFontSize : int = 11
+    + <<const>> kTagEntryFixedHeight : int
+    + <<const>> ktagToggleFixedWidth : int = 10
+    + {static} GetFont() : Font
+    + {static} LoadIcon(name:string) : Texture2D
+}
+class StatusWheel {
+    + StatusWheel()
+    + GetContent(index:int) : GUIContent
+    + GetMaxIndex() : int
+}
+AndroidLogcatStyles o-> "toolbar" GUIStyle
+AndroidLogcatStyles o-> "toolbarButton" GUIStyle
+AndroidLogcatStyles o-> "toolbarPopup" GUIStyle
+AndroidLogcatStyles o-> "toolbarPopupCenter" GUIStyle
+AndroidLogcatStyles o-> "toolbarLabelLeft" GUIStyle
+AndroidLogcatStyles o-> "columnHeader" GUIStyle
+AndroidLogcatStyles o-> "background" GUIStyle
+AndroidLogcatStyles o-> "backgroundOdd" GUIStyle
+AndroidLogcatStyles o-> "backgroundEven" GUIStyle
+AndroidLogcatStyles o-> "kSmallIconSize" Vector2
+AndroidLogcatStyles o-> "infoSmallStyle" GUIStyle
+AndroidLogcatStyles o-> "warningSmallStyle" GUIStyle
+AndroidLogcatStyles o-> "errorSmallStyle" GUIStyle
+AndroidLogcatStyles o-> "priorityDefaultStyle" GUIStyle
+AndroidLogcatStyles o-> "statusBarBackground" GUIStyle
+AndroidLogcatStyles o-> "statusLabel" GUIStyle
+AndroidLogcatStyles o-> "tagEntryBackground" GUIStyle
+AndroidLogcatStyles o-> "tagEntryBackgroundOdd" GUIStyle
+AndroidLogcatStyles o-> "tagEntryBackgroundEven" GUIStyle
+AndroidLogcatStyles o-> "tagEntryStyle" GUIStyle
+AndroidLogcatStyles o-> "tagToggleStyle" GUIStyle
+AndroidLogcatStyles o-> "tagButtonStyle" GUIStyle
+AndroidLogcatStyles o-> "removeTextStyle" GUIStyle
+AndroidLogcatStyles o-> "kSeriesLabel" GUIStyle
+AndroidLogcatStyles o-> "stacktraceStyle" GUIStyle
+AndroidLogcatStyles o-> "resolvedStacktraceStyle" GUIStyle
+AndroidLogcatStyles o-> "infoStyle" GUIStyle
+AndroidLogcatStyles o-> "errorStyle" GUIStyle
+AndroidLogcatStyles o-> "internalLogStyle" GUIStyle
+AndroidLogcatStyles o-> "StatusIcon" GUIStyle
+AndroidLogcatStyles +-- StatusWheel
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+class MetadataTests {
+    + Setup() : void
+    + Teardown() : void
+    + CreateSettingsAndLoaders() : IEnumerator
+    + FilteringMetadataByBuildTargetGroup(buildTargetGroup:BuildTargetGroup, expectedType:string) : void
+    + AccessSettings() : IEnumerator
+}
+@enduml

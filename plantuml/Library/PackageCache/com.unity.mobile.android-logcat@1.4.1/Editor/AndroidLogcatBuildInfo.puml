@@ -1,0 +1,7 @@
+@startuml
+struct BuildInfo {
+    + buildType : string
+    + scriptingImplementation : string
+    + cpu : string
+}
+@enduml

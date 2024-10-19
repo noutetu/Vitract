@@ -1,0 +1,7 @@
+@startuml
+class NotificationSettingsTests {
+    + ResetSettings() : void
+    + SetAndroidNotifcationSettings_Works() : void
+    + SetiOSNotifcationSettings_Works() : void
+}
+@enduml

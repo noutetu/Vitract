@@ -1,0 +1,16 @@
+@startuml
+class CharacterAnimator {
+    + RunAnim(speed:float) : void
+    + IdleAnim() : void
+    + NormalAttackAnim(attackSpeed:float) : void
+    + SkillAttackAnim(attackSpeed:float) : void
+    + DeadAnim() : void
+    + DebuffAnim() : void
+    + StopAnimator() : void
+    + TriggerAttackEvent() : void
+    + TriggerDeadAction() : void
+}
+MonoBehaviour <|-- CharacterAnimator
+CharacterAnimator --> "OnAttack" UnityAction
+CharacterAnimator --> "OnDead" UnityAction
+@enduml

@@ -1,0 +1,92 @@
+@startuml
+enum PresentationOption {
+    None= 0,
+    Badge= 1 << 0,
+    Sound= 1 << 1,
+    Alert= 1 << 2,
+    List= 1 << 3,
+    Banner= 1 << 4,
+}
+enum NotificationSoundType {
+    Default= 0,
+    Critical= 1,
+    Ringtone= 2,
+    None= 4,
+}
+enum NotificationInterruptionLevel {
+    Active= 0,
+    Critical= 1,
+    Passive= 2,
+    TimeSensitive= 3,
+}
+struct TimeTriggerData {
+}
+struct CalendarTriggerData {
+}
+struct LocationTriggerData {
+    + latitude : double
+    + longitude : double
+    + radius : float
+}
+struct TriggerData {
+}
+struct iOSNotificationData {
+    + identifier : string
+    + title : string
+    + body : string
+    + subtitle : string
+    + categoryIdentifier : string
+    + threadIdentifier : string
+    + soundVolume : float
+    + soundName : string
+    + relevanceScore : double
+}
+class iOSNotification {
+    + Identifier : string <<get>> <<set>>
+    + CategoryIdentifier : string <<get>> <<set>>
+    + ThreadIdentifier : string <<get>> <<set>>
+    + Title : string <<get>> <<set>>
+    + Subtitle : string <<get>> <<set>>
+    + Body : string <<get>> <<set>>
+    + ShowInForeground : bool <<get>> <<set>>
+    + Badge : int <<get>> <<set>>
+    + SoundName : string <<get>> <<set>>
+    + SoundVolume : float? <<get>> <<set>>
+    + RelevanceScore : double <<get>> <<set>>
+    + Data : string <<get>> <<set>>
+    + iOSNotification()
+    + iOSNotification(identifier:string)
+}
+class "Dictionary`2"<T1,T2> {
+}
+class "List`1"<T> {
+}
+TimeTriggerData --> "interval" Int32
+TimeTriggerData --> "repeats" Byte
+CalendarTriggerData --> "year" Int32
+CalendarTriggerData --> "month" Int32
+CalendarTriggerData --> "day" Int32
+CalendarTriggerData --> "hour" Int32
+CalendarTriggerData --> "minute" Int32
+CalendarTriggerData --> "second" Int32
+CalendarTriggerData --> "repeats" Byte
+LocationTriggerData --> "notifyOnEntry" Byte
+LocationTriggerData --> "notifyOnExit" Byte
+LocationTriggerData --> "repeats" Byte
+TriggerData --> "timeInterval" TimeTriggerData
+TriggerData --> "calendar" CalendarTriggerData
+TriggerData --> "location" LocationTriggerData
+iOSNotificationData --> "badge" Int32
+iOSNotificationData --> "soundType" Int32
+iOSNotificationData --> "interruptionLevel" Int32
+iOSNotificationData --> "userInfo" IntPtr
+iOSNotificationData --> "attachments" IntPtr
+iOSNotificationData --> "triggerType" Int32
+iOSNotificationData --> "trigger" TriggerData
+iOSNotification --> "ForegroundPresentationOption" PresentationOption
+iOSNotification --> "SoundType" NotificationSoundType
+iOSNotification --> "InterruptionLevel" NotificationInterruptionLevel
+iOSNotification --> "UserInfo<string,string>" "Dictionary`2"
+iOSNotification --> "Attachments<iOSNotificationAttachment>" "List`1"
+iOSNotification --> "Trigger" iOSNotificationTrigger
+@enduml

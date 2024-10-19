@@ -1,0 +1,51 @@
+@startuml
+enum Feature {
+    None= 0,
+    WarningLevel= 0x1,
+    TemperatureLevel= 0x2,
+    TemperatureTrend= 0x4,
+    CpuPerformanceLevel= 0x8,
+    GpuPerformanceLevel= 0x10,
+    PerformanceLevelControl= 0x20,
+    GpuFrameTime= 0x40,
+    CpuFrameTime= 0x80,
+    OverallFrameTime= 0x100,
+    CpuPerformanceBoost= 0x200,
+    GpuPerformanceBoost= 0x400,
+    ClusterInfo= 0x800,
+}
+struct PerformanceDataRecord {
+    + TemperatureLevel : float <<get>> <<set>>
+    + TemperatureTrend : float <<get>> <<set>>
+    + CpuPerformanceLevel : int <<get>> <<set>>
+    + GpuPerformanceLevel : int <<get>> <<set>>
+    + PerformanceLevelControlAvailable : bool <<get>> <<set>>
+    + CpuFrameTime : float <<get>> <<set>>
+    + GpuFrameTime : float <<get>> <<set>>
+    + OverallFrameTime : float <<get>> <<set>>
+    + CpuPerformanceBoost : bool <<get>> <<set>>
+    + GpuPerformanceBoost : bool <<get>> <<set>>
+}
+interface IApplicationLifecycle {
+}
+interface IDevicePerformanceLevelControl {
+}
+abstract class AdaptivePerformanceSubsystem {
+    + {abstract} Update() : PerformanceDataRecord
+    + <<virtual>> Stats : string <<get>>
+}
+abstract class AdaptivePerformanceSubsystemBase {
+    <<override>> + running : bool <<get>>
+    + initialized : bool <<get>> <<protected set>>
+}
+class "Subsystem`1"<T> {
+}
+PerformanceDataRecord --> "ChangeFlags" Feature
+PerformanceDataRecord --> "WarningLevel" WarningLevel
+PerformanceDataRecord --> "ClusterInfo" ClusterInfo
+AdaptivePerformanceSubsystemBase <|-- AdaptivePerformanceSubsystem
+AdaptivePerformanceSubsystem --> "Capabilities" Feature
+AdaptivePerformanceSubsystem --> "ApplicationLifecycle" IApplicationLifecycle
+AdaptivePerformanceSubsystem --> "PerformanceLevelControl" IDevicePerformanceLevelControl
+AdaptivePerformanceSubsystem --> "Version" Version
+@enduml

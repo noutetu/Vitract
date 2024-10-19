@@ -1,0 +1,5 @@
+@startuml
+class SPUM_PreviewItem {
+}
+MonoBehaviour <|-- SPUM_PreviewItem
+@enduml

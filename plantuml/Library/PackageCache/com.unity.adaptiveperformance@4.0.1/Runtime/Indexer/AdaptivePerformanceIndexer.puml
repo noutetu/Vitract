@@ -1,0 +1,32 @@
+@startuml
+enum StateAction {
+    Stale,
+    Increase,
+    Decrease,
+    FastDecrease,
+}
+class ThermalStateTracker {
+    + ThermalStateTracker()
+    + Update() : StateAction
+}
+class PerformanceStateTracker {
+    + Trend : float <<get>> <<set>>
+    + PerformanceStateTracker(sampleCapacity:int)
+    + Update() : StateAction
+}
+class AdaptivePerformanceScalerEfficiencyTracker {
+    + IsRunning : bool <<get>>
+    + Start(scaler:AdaptivePerformanceScaler, isApply:bool) : void
+    + Stop() : void
+}
+class AdaptivePerformanceIndexer {
+    + TimeUntilNextAction : float <<get>>
+    + GetAppliedScalers(scalers:List<AdaptivePerformanceScaler>) : void
+    + GetUnappliedScalers(scalers:List<AdaptivePerformanceScaler>) : void
+    + GetDisabledScalers(scalers:List<AdaptivePerformanceScaler>) : void
+    + GetAllRegisteredScalers(scalers:List<AdaptivePerformanceScaler>) : void
+    + UnapplyAllScalers() : void
+}
+AdaptivePerformanceIndexer --> "ThermalAction" StateAction
+AdaptivePerformanceIndexer --> "PerformanceAction" StateAction
+@enduml

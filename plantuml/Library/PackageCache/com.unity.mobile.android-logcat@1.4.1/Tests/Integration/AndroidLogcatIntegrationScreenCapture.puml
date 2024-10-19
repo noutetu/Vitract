@@ -1,0 +1,9 @@
+@startuml
+class AndroidLogcatRuntimeIntegrationScreenCapture {
+    + CanGetScreenshot() : IEnumerator
+    + CanGetVideo() : IEnumerator
+    + CanGetVideoWithTimeLimit() : IEnumerator
+    + CaptureVideoHandlesErrors() : IEnumerator
+}
+AndroidLogcatIntegrationTestBase <|-- AndroidLogcatRuntimeIntegrationScreenCapture
+@enduml

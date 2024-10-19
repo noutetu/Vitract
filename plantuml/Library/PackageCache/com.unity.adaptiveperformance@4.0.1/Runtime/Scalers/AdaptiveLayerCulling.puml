@@ -1,0 +1,5 @@
+@startuml
+class AdaptiveLayerCulling {
+}
+AdaptivePerformanceScaler <|-- AdaptiveLayerCulling
+@enduml

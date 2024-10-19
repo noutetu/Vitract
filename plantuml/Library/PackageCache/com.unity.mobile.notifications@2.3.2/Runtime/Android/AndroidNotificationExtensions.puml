@@ -1,0 +1,14 @@
+@startuml
+class AndroidNotificationExtensions <<static>> {
+    + {static} ToImportance(importance:int) : Importance
+    + {static} ToLockScreenVisibility(lockscreenVisibility:int) : LockScreenVisibility
+    + {static} ToNotificationStyle(notificationStyle:int) : NotificationStyle
+    + {static} ToGroupAlertBehaviours(groupAlertBehaviour:int) : GroupAlertBehaviours
+    + {static} ToColor(color:int) : Color
+    + {static} ToInt(color:Color?) : int
+    + {static} ToLong(dateTime:DateTime) : long
+    + {static} ToDatetime(dateTime:long) : DateTime
+    + {static} ToLong(timeSpan:TimeSpan?) : long
+    + {static} ToTimeSpan(timeSpan:long) : TimeSpan
+}
+@enduml

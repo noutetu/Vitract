@@ -1,0 +1,19 @@
+@startuml
+class AndroidLogcatCaptureScreenshot {
+    + IsCapturing : bool <<get>>
+    + Error : string <<get>>
+    + GetImagePath(device:IAndroidLogcatDevice) : string
+    + QueueScreenCapture(device:IAndroidLogcatDevice, onCompleted:Action) : void
+    + LoadImage(imagePath:string) : void
+    + DoGUI(rc:Rect) : void
+}
+class AndroidLogcatCaptureScreenCaptureInput {
+}
+class AndroidLogcatCaptureScreenCaptureResult {
+}
+AndroidLogcatCaptureScreenshot --> "ImageTexture" Texture2D
+AndroidLogcatCaptureScreenshot +-- AndroidLogcatCaptureScreenCaptureInput
+IAndroidLogcatTaskInput <|-- AndroidLogcatCaptureScreenCaptureInput
+AndroidLogcatCaptureScreenshot +-- AndroidLogcatCaptureScreenCaptureResult
+IAndroidLogcatTaskResult <|-- AndroidLogcatCaptureScreenCaptureResult
+@enduml

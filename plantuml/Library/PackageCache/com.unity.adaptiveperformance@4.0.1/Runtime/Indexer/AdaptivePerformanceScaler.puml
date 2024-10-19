@@ -1,0 +1,31 @@
+@startuml
+enum ScalerVisualImpact {
+    Low,
+    Medium,
+    High,
+}
+enum ScalerTarget {
+    CPU= 0x1,
+    GPU= 0x2,
+    FillRate= 0x4,
+}
+abstract class AdaptivePerformanceScaler {
+    + <<virtual>> Name : string <<get>> <<set>>
+    + <<virtual>> Enabled : bool <<get>> <<set>>
+    + <<virtual>> Scale : float <<get>> <<set>>
+    + <<virtual>> MaxLevel : int <<get>> <<set>>
+    + <<virtual>> MinBound : float <<get>> <<set>>
+    + <<virtual>> MaxBound : float <<get>> <<set>>
+    + CurrentLevel : int <<get>>
+    + IsMaxLevel : bool <<get>>
+    + NotLeveled : bool <<get>>
+    + GpuImpact : int <<get>> <<internal set>>
+    + CpuImpact : int <<get>> <<internal set>>
+    + OverrideLevel : int <<get>> <<set>>
+    + CalculateCost() : int
+    + ApplyDefaultSetting(defaultSetting:AdaptivePerformanceScalerSettingsBase) : void
+}
+ScriptableObject <|-- AdaptivePerformanceScaler
+AdaptivePerformanceScaler --> "VisualImpact" ScalerVisualImpact
+AdaptivePerformanceScaler --> "Target" ScalerTarget
+@enduml

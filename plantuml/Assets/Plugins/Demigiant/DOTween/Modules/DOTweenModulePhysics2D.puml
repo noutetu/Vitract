@@ -1,0 +1,11 @@
+@startuml
+class DOTweenModulePhysics2D <<static>> {
+    + {static} DOMove(target:Rigidbody2D, endValue:Vector2, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOMoveX(target:Rigidbody2D, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOMoveY(target:Rigidbody2D, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DORotate(target:Rigidbody2D, endValue:float, duration:float) : TweenerCore<float, float, FloatOptions>
+    + {static} DOJump(target:Rigidbody2D, endValue:Vector2, jumpPower:float, numJumps:int, duration:float, snapping:bool) : Sequence
+    + {static} DOPath(target:Rigidbody2D, path:Vector2[], duration:float, pathType:PathType, pathMode:PathMode, resolution:int, gizmoColor:Color?) : TweenerCore<Vector3, Path, PathOptions>
+    + {static} DOLocalPath(target:Rigidbody2D, path:Vector2[], duration:float, pathType:PathType, pathMode:PathMode, resolution:int, gizmoColor:Color?) : TweenerCore<Vector3, Path, PathOptions>
+}
+@enduml

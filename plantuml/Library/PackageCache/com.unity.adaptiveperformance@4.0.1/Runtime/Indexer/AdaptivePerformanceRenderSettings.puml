@@ -1,0 +1,15 @@
+@startuml
+class AdaptivePerformanceRenderSettings <<static>> {
+    + {static} MainLightShadowmapResolutionMultiplier : float <<get>> <<set>>
+    + {static} DecalsDrawDistance : float <<get>> <<set>>
+    + {static} MainLightShadowCascadesCountBias : int <<get>> <<set>>
+    + {static} ShadowQualityBias : int <<get>> <<set>>
+    + {static} LutBias : float <<get>> <<set>>
+    + {static} MaxShadowDistanceMultiplier : float <<get>> <<set>>
+    + {static} RenderScaleMultiplier : float <<get>> <<set>>
+    + {static} AntiAliasingQualityBias : int <<get>> <<set>>
+    + {static} SkipDynamicBatching : bool <<get>> <<set>>
+    + {static} SkipFrontToBackSorting : bool <<get>> <<set>>
+    + {static} SkipTransparentObjects : bool <<get>> <<set>>
+}
+@enduml

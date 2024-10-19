@@ -1,0 +1,5 @@
+@startuml
+class SPUM_SpriteEditManager {
+}
+MonoBehaviour <|-- SPUM_SpriteEditManager
+@enduml

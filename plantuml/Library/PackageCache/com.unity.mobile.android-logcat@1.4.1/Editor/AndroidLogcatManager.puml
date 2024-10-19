@@ -1,0 +1,7 @@
+@startuml
+class AndroidLogcatManager {
+}
+class "ScriptableSingleton`1"<T> {
+}
+"ScriptableSingleton`1" "<AndroidLogcatManager>" <|-- AndroidLogcatManager
+@enduml

@@ -1,0 +1,8 @@
+@startuml
+class EnterNamePopup {
+    + EnterNamePopup(profiles:SerializedProperty, cb:EnterDelegate)
+    + <<override>> GetWindowSize() : Vector2
+    + <<override>> OnGUI(windowRect:Rect) : void
+}
+PopupWindowContent <|-- EnterNamePopup
+@enduml

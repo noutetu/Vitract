@@ -1,0 +1,5 @@
+@startuml
+class AdaptiveShadowmapResolution {
+}
+AdaptivePerformanceScaler <|-- AdaptiveShadowmapResolution
+@enduml

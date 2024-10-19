@@ -1,0 +1,12 @@
+@startuml
+class DrawableResourceData {
+    + Id : string
+    + IsValid : bool <<get>>
+    + GetPreviewTexture(update:bool) : Texture2D
+    + Clean() : void
+    + Verify() : bool
+    + GenerateErrorString() : string
+}
+DrawableResourceData --> "Type" NotificationIconType
+DrawableResourceData --> "Asset" Texture2D
+@enduml

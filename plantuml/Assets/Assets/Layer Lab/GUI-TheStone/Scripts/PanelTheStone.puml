@@ -1,0 +1,7 @@
+@startuml
+class PanelTheStone {
+    + OnEnable() : void
+    + OnDisable() : void
+}
+MonoBehaviour <|-- PanelTheStone
+@enduml

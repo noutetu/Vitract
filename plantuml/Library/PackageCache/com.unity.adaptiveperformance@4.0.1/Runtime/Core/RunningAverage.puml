@@ -1,0 +1,11 @@
+@startuml
+class RunningAverage {
+    + RunningAverage(sampleWindowSize:int)
+    + GetNumValues() : int
+    + GetSampleWindowSize() : int
+    + GetAverageOr(defaultValue:float) : float
+    + GetMostRecentValueOr(defaultValue:float) : float
+    + AddValue(NewValue:float) : void
+    + Reset() : void
+}
+@enduml

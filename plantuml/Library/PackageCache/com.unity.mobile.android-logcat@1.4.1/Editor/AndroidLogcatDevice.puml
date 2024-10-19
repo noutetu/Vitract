@@ -1,0 +1,19 @@
+@startuml
+abstract class IAndroidLogcatDevice {
+}
+class AndroidLogcatDevice {
+}
+enum DeviceConnectionType {
+    USB,
+    Network,
+}
+enum DeviceState {
+    Connected,
+    Disconnected,
+    Unauthorized,
+    Unknown,
+}
+IAndroidLogcatDevice <|-- AndroidLogcatDevice
+IAndroidLogcatDevice +-- DeviceConnectionType
+IAndroidLogcatDevice +-- DeviceState
+@enduml

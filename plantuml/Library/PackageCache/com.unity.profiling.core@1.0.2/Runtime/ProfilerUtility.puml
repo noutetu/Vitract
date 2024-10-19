@@ -1,0 +1,5 @@
+@startuml
+struct ProfilerUtility {
+    + {static} GetProfilerMarkerDataType() : byte
+}
+@enduml

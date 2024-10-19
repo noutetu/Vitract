@@ -1,0 +1,46 @@
+@startuml
+struct PerformanceBottleneckChangeEventArgs {
+}
+struct PerformanceBoostChangeEventArgs {
+    + CpuBoost : bool <<get>> <<set>>
+    + GpuBoost : bool <<get>> <<set>>
+}
+struct PerformanceLevelChangeEventArgs {
+    + CpuLevel : int <<get>> <<set>>
+    + CpuLevelDelta : int <<get>> <<set>>
+    + GpuLevel : int <<get>> <<set>>
+    + GpuLevelDelta : int <<get>> <<set>>
+    + ManualOverride : bool <<get>> <<set>>
+}
+interface IPerformanceStatus {
+}
+struct PerformanceMetrics {
+    + CurrentCpuLevel : int <<get>> <<set>>
+    + CurrentGpuLevel : int <<get>> <<set>>
+    + CpuPerformanceBoost : bool <<get>> <<set>>
+    + GpuPerformanceBoost : bool <<get>> <<set>>
+}
+struct FrameTiming {
+    + CurrentFrameTime : float <<get>> <<set>>
+    + AverageFrameTime : float <<get>> <<set>>
+    + CurrentGpuFrameTime : float <<get>> <<set>>
+    + AverageGpuFrameTime : float <<get>> <<set>>
+    + CurrentCpuFrameTime : float <<get>> <<set>>
+    + AverageCpuFrameTime : float <<get>> <<set>>
+}
+enum PerformanceBottleneck {
+    Unknown,
+    CPU,
+    GPU,
+    TargetFrameRate,
+}
+struct ClusterInfo {
+    + BigCore : int <<get>> <<set>>
+    + MediumCore : int <<get>> <<set>>
+    + LittleCore : int <<get>> <<set>>
+}
+PerformanceBottleneckChangeEventArgs --> "PerformanceBottleneck" PerformanceBottleneck
+PerformanceLevelChangeEventArgs --> "PerformanceControlMode" PerformanceControlMode
+PerformanceMetrics --> "PerformanceBottleneck" PerformanceBottleneck
+PerformanceMetrics --> "ClusterInfo" ClusterInfo
+@enduml

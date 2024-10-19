@@ -1,0 +1,9 @@
+@startuml
+class AndroidNotificationIntentData {
+    + Id : int <<get>>
+    + Channel : string <<get>>
+    + AndroidNotificationIntentData(id:int, channelId:string, notification:AndroidNotification)
+}
+AndroidNotificationIntentData --> "Notification" AndroidNotification
+AndroidNotificationIntentData --> "NativeNotification" AndroidJavaObject
+@enduml

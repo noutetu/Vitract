@@ -19,7 +19,7 @@ MonoBehaviour:
   defence: 0
   magicDefence: 10
   canBlockCount: 1
-  atk: 50
+  atk: 100
   attackSpeed: 0.6
   attackCoolTime: 1.5
   speed: 0.35

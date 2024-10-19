@@ -1,0 +1,6 @@
+@startuml
+class SPUM_PrefabEditor {
+    + <<override>> OnInspectorGUI() : void
+}
+Editor <|-- SPUM_PrefabEditor
+@enduml

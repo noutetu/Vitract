@@ -1,0 +1,6 @@
+@startuml
+class LzwEncoder {
+    + LzwEncoder(width:int, height:int, pixels:byte[], color_depth:int)
+    + Encode(os:Stream) : void
+}
+@enduml

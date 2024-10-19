@@ -1,0 +1,9 @@
+@startuml
+class AndroidLogcatDeviceSelection {
+    + AndroidLogcatDeviceSelection(runtime:AndroidLogcatRuntimeBase, onNewDeviceSelected:Action<IAndroidLogcatDevice>)
+    + Dispose() : void
+    + DoGUI() : void
+}
+IDisposable <|-- AndroidLogcatDeviceSelection
+AndroidLogcatDeviceSelection --> "SelectedDevice" IAndroidLogcatDevice
+@enduml

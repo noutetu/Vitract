@@ -1,0 +1,6 @@
+@startuml
+class ApiTestsiOS {
+    + TimeIntervalTrigger_MeasuredInSeconds() : void
+    + TimeIntervalTrigger_RejectsLessThanSecond() : void
+}
+@enduml

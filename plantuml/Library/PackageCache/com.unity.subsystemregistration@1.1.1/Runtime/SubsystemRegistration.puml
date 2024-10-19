@@ -1,0 +1,5 @@
+@startuml
+class SubsystemRegistration <<static>> {
+    + {static} CreateDescriptor(descriptor:SubsystemDescriptor) : bool
+}
+@enduml

@@ -1,0 +1,26 @@
+@startuml
+enum RecorderState {
+    Recording,
+    Paused,
+    PreProcessing,
+}
+class Recorder <<sealed>> {
+    + SaveFolder : string <<get>> <<set>>
+    + EstimatedMemoryUse : float <<get>>
+    + Setup(autoAspect:bool, width:int, height:int, fps:int, bufferSize:float, repeat:int, quality:int) : void
+    + Pause() : void
+    + Record() : void
+    + FlushMemory() : void
+    + Save() : void
+    + Save(filename:string) : void
+    + ComputeHeight() : void
+}
+class "Action`2"<T1,T2> {
+}
+MonoBehaviour <|-- Recorder
+Recorder --> "State" RecorderState
+Recorder o-> "WorkerPriority" ThreadPriority
+Recorder --> "OnPreProcessingDone" Action
+Recorder --> "OnFileSaveProgress<int,float>" "Action`2"
+Recorder --> "OnFileSaved<int,string>" "Action`2"
+@enduml

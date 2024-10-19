@@ -1,0 +1,8 @@
+@startuml
+class NotificationCallback {
+    + NotificationCallback()
+    + <<override>> Invoke(methodName:string, args:AndroidJavaObject[]) : AndroidJavaObject
+    + onSentNotification(notification:AndroidJavaObject) : void
+}
+AndroidJavaProxy <|-- NotificationCallback
+@enduml

@@ -1,0 +1,64 @@
+@startuml
+interface IAdaptivePerformanceLoaderMetadata {
+}
+interface IAdaptivePerformancePackageMetadata {
+}
+class AdaptivePerformancePackageMetadataStore {
+    + {static} AssignLoader(settings:AdaptivePerformanceManagerSettings, loaderTypeName:string, buildTargetGroup:BuildTargetGroup) : bool
+    + {static} RemoveLoader(settings:AdaptivePerformanceManagerSettings, loaderTypeName:string, buildTargetGroup:BuildTargetGroup) : bool
+}
+struct KnownPackageInfo {
+    + packageId : string
+    + verifiedVersion : string
+}
+struct CachedMDStoreInformation {
+    + hasAlreadyRequestedData : bool
+}
+enum InstallationState {
+    New,
+    RebuildInstalledCache,
+    StartInstallation,
+    Installing,
+    Assigning,
+    Complete,
+    Uninstalling,
+    Log,
+}
+enum LogLevel {
+    Info,
+    Warning,
+    Error,
+}
+struct LoaderAssignmentRequest {
+    + packageId : string
+    + loaderType : string
+    + needsAddRequest : bool
+    + timeOut : float
+    + logMessage : string
+}
+struct LoaderAssignmentRequests {
+}
+struct LoaderBuildTargetQueryResult {
+    + packageName : string
+    + packageId : string
+    + loaderName : string
+    + loaderType : string
+    + licenseURL : string
+}
+class "List`1"<T> {
+}
+AdaptivePerformancePackageMetadataStore +-- KnownPackageInfo
+AdaptivePerformancePackageMetadataStore +-- CachedMDStoreInformation
+AdaptivePerformancePackageMetadataStore +-- InstallationState
+AdaptivePerformancePackageMetadataStore +-- LogLevel
+AdaptivePerformancePackageMetadataStore +-- LoaderAssignmentRequest
+LoaderAssignmentRequest --> "buildTargetGroup" BuildTargetGroup
+LoaderAssignmentRequest --> "packageListRequest" ListRequest
+LoaderAssignmentRequest --> "packageAddRequest" AddRequest
+LoaderAssignmentRequest --> "packageRemoveRequest" RemoveRequest
+LoaderAssignmentRequest --> "installationState" InstallationState
+LoaderAssignmentRequest --> "logLevel" LogLevel
+AdaptivePerformancePackageMetadataStore +-- LoaderAssignmentRequests
+LoaderAssignmentRequests --> "activeRequests<LoaderAssignmentRequest>" "List`1"
+AdaptivePerformancePackageMetadataStore +-- LoaderBuildTargetQueryResult
+@enduml

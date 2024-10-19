@@ -1,0 +1,8 @@
+@startuml
+class AdaptivePerformanceManagerSpawner {
+}
+class AdaptivePerformanceInitializer <<static>> {
+}
+ScriptableObject <|-- AdaptivePerformanceManagerSpawner
+AdaptivePerformanceManagerSpawner --> "m_ManagerGameObject" GameObject
+@enduml

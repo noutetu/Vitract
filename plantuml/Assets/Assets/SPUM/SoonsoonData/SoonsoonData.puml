@@ -1,0 +1,22 @@
+@startuml
+class SoonsoonData {
+    + _gifAlphaTrigger : bool
+    + SaveData() : void
+    + LoadData() : IEnumerator
+    + LoadProcess() : void
+    + SavePackageData() : void
+    + LoadPackageData() : void
+}
+class SoonData {
+}
+class "List`1"<T> {
+}
+SoonsoonData --> "Instance" SoonsoonData
+SoonsoonData o-> "_soonData2" SoonData
+SoonsoonData --> "_spumManager" SPUM_Manager
+SoonsoonData --> "_gifBasicColor" Color
+SoonsoonData --> "_alphaColor" Color
+SoonsoonData +-- SoonData
+SoonData o-> "packageList<Dictionary<string,bool>>" "List`1"
+SoonData o-> "_savedColorList<string>" "List`1"
+@enduml

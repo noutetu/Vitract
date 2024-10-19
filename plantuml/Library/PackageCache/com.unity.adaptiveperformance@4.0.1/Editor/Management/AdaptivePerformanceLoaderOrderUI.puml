@@ -1,0 +1,25 @@
+@startuml
+interface IAdaptivePerformanceLoaderOrderManager {
+}
+class AdaptivePerformanceLoaderOrderUI {
+}
+struct LoaderInformation {
+    + packageName : string
+    + packageId : string
+    + loaderName : string
+    + loaderType : string
+    + licenseURL : string
+    + toggled : bool
+    + stateChanged : bool
+}
+struct Content {
+    + {static} <<readonly>> k_AtNoLoaderInstance : string
+    + {static} <<readonly>> k_LicenseText : string
+}
+AdaptivePerformanceLoaderOrderUI --> "CurrentBuildTargetGroup" BuildTargetGroup
+AdaptivePerformanceLoaderOrderUI +-- LoaderInformation
+AdaptivePerformanceLoaderOrderUI +-- Content
+Content o-> "k_LicenseViewText" GUIContent
+Content o-> "k_LoaderUITitle" GUIContent
+Content o-> "k_HelpContent" GUIContent
+@enduml

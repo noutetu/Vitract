@@ -1,0 +1,15 @@
+@startuml
+class SPUM_Prefabs {
+    + _version : float
+    + EditChk : bool
+    + _code : string
+    + _horse : bool
+    + isRideHorse : bool <<get>> <<set>>
+    + _horseString : string
+    + PlayAnimation(name:string) : void
+}
+MonoBehaviour <|-- SPUM_Prefabs
+SPUM_Prefabs --> "_spriteOBj" SPUM_SpriteList
+SPUM_Prefabs --> "_anim" Animator
+SPUM_Prefabs o-> "UnitTypeChanged" UnityEvent
+@enduml

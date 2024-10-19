@@ -1,0 +1,32 @@
+@startuml
+enum Importance {
+    None= 0,
+    Low= 2,
+    Default= 3,
+    High= 4,
+}
+enum LockScreenVisibility {
+    Secret= -1,
+    Private= 0,
+    Public= 1,
+}
+struct AndroidNotificationChannel {
+    + Id : string <<get>> <<set>>
+    + Name : string <<get>> <<set>>
+    + Description : string <<get>> <<set>>
+    + Group : string <<get>> <<set>>
+    + CanBypassDnd : bool <<get>> <<set>>
+    + CanShowBadge : bool <<get>> <<set>>
+    + EnableLights : bool <<get>> <<set>>
+    + EnableVibration : bool <<get>> <<set>>
+    + Enabled : bool <<get>>
+    + AndroidNotificationChannel(id:string, name:string, description:string, importance:Importance)
+}
+struct AndroidNotificationChannelGroup {
+    + Id : string <<get>> <<set>>
+    + Name : string <<get>> <<set>>
+    + Description : string <<get>> <<set>>
+}
+AndroidNotificationChannel --> "Importance" Importance
+AndroidNotificationChannel --> "LockScreenVisibility" LockScreenVisibility
+@enduml

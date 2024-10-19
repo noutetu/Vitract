@@ -1,0 +1,14 @@
+@startuml
+struct ThermalMetrics {
+    + TemperatureLevel : float <<get>> <<set>>
+    + TemperatureTrend : float <<get>> <<set>>
+}
+interface IThermalStatus {
+}
+enum WarningLevel {
+    NoWarning,
+    ThrottlingImminent,
+    Throttling,
+}
+ThermalMetrics --> "WarningLevel" WarningLevel
+@enduml

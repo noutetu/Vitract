@@ -1,0 +1,23 @@
+@startuml
+abstract class AndroidLogcatRuntimeBase {
+    + {abstract} CreateMessageProvider(adb:AndroidBridge.ADB, priority:Priority, processId:int, logPrintFormat:string, device:IAndroidLogcatDevice, logCallbackAction:Action<string>) : AndroidLogcatMessageProviderBase
+    + <<virtual>> Initialize() : void
+    + <<virtual>> Shutdown() : void
+    + OnUpdate() : void
+    +  <<event>> Update : Action 
+    +  <<event>> Closing : Action 
+}
+class AndroidLogcatRuntime {
+    + <<override>> CreateMessageProvider(adb:AndroidBridge.ADB, priority:Priority, processId:int, logPrintFormat:string, device:IAndroidLogcatDevice, logCallbackAction:Action<string>) : AndroidLogcatMessageProviderBase
+    + <<override>> Initialize() : void
+    + <<override>> Shutdown() : void
+}
+AndroidLogcatRuntimeBase --> "Dispatcher" AndroidLogcatDispatcher
+AndroidLogcatRuntimeBase --> "Settings" AndroidLogcatSettings
+AndroidLogcatRuntimeBase --> "UserSettings" AndroidLogcatUserSettings
+AndroidLogcatRuntimeBase --> "Tools" AndroidTools
+AndroidLogcatRuntimeBase --> "DeviceQuery" AndroidLogcatDeviceQueryBase
+AndroidLogcatRuntimeBase --> "CaptureVideo" AndroidLogcatCaptureVideo
+AndroidLogcatRuntimeBase --> "CaptureScreenshot" AndroidLogcatCaptureScreenshot
+AndroidLogcatRuntimeBase <|-- AndroidLogcatRuntime
+@enduml

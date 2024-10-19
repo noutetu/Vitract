@@ -1,0 +1,5 @@
+@startuml
+class SPUM_PackageButton {
+}
+MonoBehaviour <|-- SPUM_PackageButton
+@enduml

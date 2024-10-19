@@ -1,0 +1,8 @@
+@startuml
+class AndroidLogcatIPWindow {
+    + {static} Show(runtime:AndroidLogcatRuntimeBase, screenRect:Rect) : void
+    + ConnectDevice(ip:string, port:string) : void
+    + SetTCPIPAndConnectDevice(deviceId:string, ip:string, port:string) : void
+}
+EditorWindow <|-- AndroidLogcatIPWindow
+@enduml

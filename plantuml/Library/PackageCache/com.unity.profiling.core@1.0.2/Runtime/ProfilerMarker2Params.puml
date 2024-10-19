@@ -1,0 +1,14 @@
+@startuml
+struct "ProfilerMarker`2"<TP1,TP2> {
+    + ProfilerMarker(name:string, param1Name:string, param2Name:string)
+    + ProfilerMarker(category:ProfilerCategory, name:string, param1Name:string, param2Name:string)
+    + <<unsafe>> Begin(p1:TP1, p2:TP2) : void
+    + End() : void
+    + Auto(p1:TP1, p2:TP2) : AutoScope
+}
+struct AutoScope {
+    + Dispose() : void
+}
+"ProfilerMarker`2" +-- AutoScope
+IDisposable <|-- AutoScope
+@enduml

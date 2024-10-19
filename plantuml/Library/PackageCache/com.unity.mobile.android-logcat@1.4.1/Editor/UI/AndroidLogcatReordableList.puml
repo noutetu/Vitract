@@ -1,0 +1,11 @@
+@startuml
+class ReordableListItem {
+}
+class AndroidLogcatReordableList {
+    + AndroidLogcatReordableList(dataSource:List<ReordableListItem>)
+    + CurrentItemName : string <<get>> <<set>>
+    + OnGUI(height:float) : void
+    + RemoveSelected(index:int) : bool
+}
+AndroidLogcatReordableList o-> "m_ScrollPosition" Vector2
+@enduml

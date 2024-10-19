@@ -1,0 +1,6 @@
+@startuml
+enum NotificationIconType {
+    Small= 0,
+    Large= 1,
+}
+@enduml

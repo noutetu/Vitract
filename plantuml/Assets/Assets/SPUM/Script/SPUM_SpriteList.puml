@@ -1,0 +1,33 @@
+@startuml
+class SPUM_SpriteList {
+    + _spHorseString : string
+    + _bodyString : string
+    + Reset() : void
+    + LoadSpriteSting() : void
+    + LoadSpriteStingProcess(SpList:List<SpriteRenderer>, StringList:List<string>) : void
+    + LoadSprite(data:SPUM_SpriteList) : void
+    + SetSpriteList(tList:List<SpriteRenderer>, tData:List<SpriteRenderer>) : void
+    + ResyncData() : void
+    + SyncPath(_objList:List<SpriteRenderer>, _pathList:List<string>) : void
+}
+class "List`1"<T> {
+}
+MonoBehaviour <|-- SPUM_SpriteList
+SPUM_SpriteList o-> "_itemList<SpriteRenderer>" "List`1"
+SPUM_SpriteList o-> "_eyeList<SpriteRenderer>" "List`1"
+SPUM_SpriteList o-> "_hairList<SpriteRenderer>" "List`1"
+SPUM_SpriteList o-> "_bodyList<SpriteRenderer>" "List`1"
+SPUM_SpriteList o-> "_clothList<SpriteRenderer>" "List`1"
+SPUM_SpriteList o-> "_armorList<SpriteRenderer>" "List`1"
+SPUM_SpriteList o-> "_pantList<SpriteRenderer>" "List`1"
+SPUM_SpriteList o-> "_weaponList<SpriteRenderer>" "List`1"
+SPUM_SpriteList o-> "_backList<SpriteRenderer>" "List`1"
+SPUM_SpriteList --> "_spHorseSPList" SPUM_HorseSpriteList
+SPUM_SpriteList --> "_bodyTexture" Texture2D
+SPUM_SpriteList o-> "_hairListString<string>" "List`1"
+SPUM_SpriteList o-> "_clothListString<string>" "List`1"
+SPUM_SpriteList o-> "_armorListString<string>" "List`1"
+SPUM_SpriteList o-> "_pantListString<string>" "List`1"
+SPUM_SpriteList o-> "_weaponListString<string>" "List`1"
+SPUM_SpriteList o-> "_backListString<string>" "List`1"
+@enduml

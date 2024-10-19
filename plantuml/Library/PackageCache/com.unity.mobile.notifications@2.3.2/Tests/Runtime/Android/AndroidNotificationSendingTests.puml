@@ -1,0 +1,31 @@
+@startuml
+class AndroidNotificationSendingTests {
+    + BeforeAllTests() : void
+    + AfterAllTests() : void
+    + BeforeEachTest() : void
+    + AfterEachTest() : void
+    + SendNotificationExplicitID_NotificationIsReceived() : IEnumerator
+    + SendNotification_NotificationIsReceived() : IEnumerator
+    + SendNotificationAndCancelNotification_NotificationIsNotReceived() : IEnumerator
+    + ScheduleRepeatableNotification_NotificationsAreReceived() : IEnumerator
+    + NotificationIsScheduled_NotificationStatusIsCorrectlyReported() : IEnumerator
+    + ArrivedAndUserDismissedNotification_DoesNotReportStatusAsScheduled() : IEnumerator
+    + ArrivedAndUserDismissedScheduledNotification_DoesNotReportStatusAsScheduled() : IEnumerator
+    + DismissedNotification_DoesNotReportStatusAsScheduled(n:AndroidNotification) : IEnumerator
+    + CreateNotificationChannelWithInitializedSettings_ChannelSettingsAreSaved() : void
+    + SendNotification_NotificationIsReceived_CallMainThread() : IEnumerator
+    + SendNotification_CanAccessNativeBuilder() : IEnumerator
+    + SendNotification_CanReschedule() : IEnumerator
+    + RescheduleNotification_ExpiredMomentAgo_SendsNotification() : IEnumerator
+    + RescheduleNotification_ExpiredNotification_DoesNotReschedule() : void
+    + SendNotificationNotShownInForeground_IsDeliveredButNotShown() : IEnumerator
+    + SendBigPictureNotification_Roundtrip() : IEnumerator
+    + SendAndReplaceNotification() : IEnumerator
+}
+class NotificationReceivedHandler {
+    + receivedNotificationCount : int = 0
+    + OnReceiveNotification(data:AndroidNotificationIntentData) : void
+}
+AndroidNotificationSendingTests +-- NotificationReceivedHandler
+NotificationReceivedHandler --> "lastNotification" AndroidNotificationIntentData
+@enduml

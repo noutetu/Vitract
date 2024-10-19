@@ -1,0 +1,16 @@
+@startuml
+class AndroidLogcatRetrieveDeviceIdsInput {
+}
+class AndroidLogcatRetrieveDeviceIdsResult {
+}
+abstract class AndroidLogcatDeviceQueryBase {
+}
+class AndroidLogcatDeviceQuery {
+}
+struct DeviceInfo {
+}
+IAndroidLogcatTaskInput <|-- AndroidLogcatRetrieveDeviceIdsInput
+IAndroidLogcatTaskResult <|-- AndroidLogcatRetrieveDeviceIdsResult
+AndroidLogcatDeviceQueryBase <|-- AndroidLogcatDeviceQuery
+AndroidLogcatRetrieveDeviceIdsResult +-- DeviceInfo
+@enduml

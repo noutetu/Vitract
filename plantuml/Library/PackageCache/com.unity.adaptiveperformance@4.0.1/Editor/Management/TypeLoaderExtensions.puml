@@ -1,0 +1,8 @@
+@startuml
+class TypeLoaderExtensions <<static>> {
+    + {static} GetTypesWithInterface(asm:Assembly) : TypeCache.TypeCollection
+    + {static} GetAllTypesWithInterface() : TypeCache.TypeCollection
+    + {static} GetTypesWithAttribute(asm:Assembly) : TypeCache.TypeCollection
+    + {static} GetAllTypesWithAttribute() : TypeCache.TypeCollection
+}
+@enduml

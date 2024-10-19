@@ -1,0 +1,7 @@
+@startuml
+class CharaMover {
+    + Move(speed:float, isPlayer:bool) : void
+    + Stop() : void
+}
+MonoBehaviour <|-- CharaMover
+@enduml

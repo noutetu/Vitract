@@ -1,0 +1,8 @@
+@startuml
+class AndroidLogcatStatusBar {
+    + Message : string <<set>> <<get>>
+    + Connected : bool <<set>> <<get>>
+    + AndroidLogcatStatusBar()
+    + DoGUI() : void
+}
+@enduml

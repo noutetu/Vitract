@@ -1,0 +1,17 @@
+@startuml
+class FilterOptions {
+    + FilterOptions()
+    + FilterOptions(options:FilterOptions)
+    + Filter : string <<set>> <<get>>
+    + UseRegularExpressions : bool <<set>> <<get>>
+    + MatchCase : bool <<set>> <<get>>
+    + <<virtual>> IsValid : bool <<get>>
+}
+class LogcatFilterOptions {
+    + LogcatFilterOptions(options:FilterOptions)
+    + Matches(message:string) : bool
+    + <<override>> IsValid : bool <<get>>
+}
+FilterOptions --> "OnFilterChanged" Action
+FilterOptions <|-- LogcatFilterOptions
+@enduml

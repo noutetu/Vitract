@@ -1,0 +1,16 @@
+@startuml
+class AutoPerformanceLevelController {
+    + TargetFrameTime : float <<get>> <<set>>
+    + AllowedCpuActiveTimeRatio : float <<get>> <<set>>
+    + AllowedGpuActiveTimeRatio : float <<get>> <<set>>
+    + GpuLevelBounceAvoidanceThreshold : float <<get>> <<set>>
+    + CpuLevelBounceAvoidanceThreshold : float <<get>> <<set>>
+    + UpdateInterval : float <<get>> <<set>>
+    + MinTargetFrameRateHitTime : float <<get>> <<set>>
+    + MaxTemperatureLevel : float <<get>> <<set>>
+    + AutoPerformanceLevelController(perfControl:IDevicePerformanceControl, perfStat:IPerformanceStatus, thermalStat:IThermalStatus)
+    + Enabled : bool <<get>> <<set>>
+    + Update() : void
+    + Override(requestedCpuLevel:int, requestedGpuLevel:int) : void
+}
+@enduml

@@ -1,0 +1,5 @@
+@startuml
+class TestLoaderThree {
+}
+TestLoaderBase <|-- TestLoaderThree
+@enduml

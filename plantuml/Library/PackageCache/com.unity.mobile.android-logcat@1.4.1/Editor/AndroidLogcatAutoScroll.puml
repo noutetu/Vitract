@@ -1,0 +1,7 @@
+@startuml
+enum AutoScroll {
+    Disabled,
+    ScrollToEnd,
+    Auto,
+}
+@enduml

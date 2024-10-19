@@ -1,0 +1,18 @@
+@startuml
+struct ProfilerCategory {
+}
+ProfilerCategory --> "Render" ProfilerCategory
+ProfilerCategory --> "Scripts" ProfilerCategory
+ProfilerCategory --> "GUI" ProfilerCategory
+ProfilerCategory --> "Physics" ProfilerCategory
+ProfilerCategory --> "Animation" ProfilerCategory
+ProfilerCategory --> "Ai" ProfilerCategory
+ProfilerCategory --> "Audio" ProfilerCategory
+ProfilerCategory --> "Video" ProfilerCategory
+ProfilerCategory --> "Particles" ProfilerCategory
+ProfilerCategory --> "Lighting" ProfilerCategory
+ProfilerCategory --> "Network" ProfilerCategory
+ProfilerCategory --> "Loading" ProfilerCategory
+ProfilerCategory --> "Vr" ProfilerCategory
+ProfilerCategory --> "Input" ProfilerCategory
+@enduml

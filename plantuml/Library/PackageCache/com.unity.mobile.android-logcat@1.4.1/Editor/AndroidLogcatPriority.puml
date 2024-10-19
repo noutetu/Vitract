@@ -1,0 +1,10 @@
+@startuml
+enum Priority {
+    Verbose,
+    Debug,
+    Info,
+    Warn,
+    Error,
+    Fatal,
+}
+@enduml

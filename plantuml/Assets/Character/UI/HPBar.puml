@@ -1,0 +1,7 @@
+@startuml
+class HPBar {
+    + SetHP(HP:float) : void
+    + UpdateHP(newHP:float) : void
+}
+MonoBehaviour <|-- HPBar
+@enduml

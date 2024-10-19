@@ -1,0 +1,7 @@
+@startuml
+class AndroidLogcatIntegrationTestBase {
+    + GetTicks() : int
+}
+AndroidLogcatIntegrationTestBase --> "Runtime" AndroidLogcatRuntimeBase
+AndroidLogcatIntegrationTestBase --> "Device" IAndroidLogcatDevice
+@enduml

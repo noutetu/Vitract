@@ -1,0 +1,6 @@
+@startuml
+struct "ProfilerCounter`1"<T> {
+    + ProfilerCounter(category:ProfilerCategory, name:string, dataUnit:ProfilerMarkerDataUnit)
+    + Sample(value:T) : void
+}
+@enduml

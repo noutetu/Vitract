@@ -1,0 +1,9 @@
+@startuml
+class AndroidLogcatFastListView {
+}
+class Entry {
+    + Selected : bool <<get>> <<set>>
+    + Value : string <<get>> <<set>>
+}
+AndroidLogcatFastListView +-- Entry
+@enduml

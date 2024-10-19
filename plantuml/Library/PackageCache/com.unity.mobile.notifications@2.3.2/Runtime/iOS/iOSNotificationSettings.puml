@@ -1,0 +1,35 @@
+@startuml
+enum AuthorizationStatus {
+    NotDetermined= 0,
+    Denied= 1,
+    Authorized= 2,
+    Provisional= 3,
+    Ephemeral= 4,
+}
+enum AlertStyle {
+    None= 0,
+    Banner= 1,
+    Alert= 2,
+}
+enum ShowPreviewsSetting {
+    Always= 0,
+    WhenAuthenticated= 1,
+    Never= 2,
+}
+enum NotificationSetting {
+    NotSupported= 0,
+    Disabled,
+    Enabled,
+}
+struct iOSNotificationSettings {
+}
+iOSNotificationSettings --> "AuthorizationStatus" AuthorizationStatus
+iOSNotificationSettings --> "NotificationCenterSetting" NotificationSetting
+iOSNotificationSettings --> "LockScreenSetting" NotificationSetting
+iOSNotificationSettings --> "CarPlaySetting" NotificationSetting
+iOSNotificationSettings --> "AlertSetting" NotificationSetting
+iOSNotificationSettings --> "BadgeSetting" NotificationSetting
+iOSNotificationSettings --> "SoundSetting" NotificationSetting
+iOSNotificationSettings --> "AlertStyle" AlertStyle
+iOSNotificationSettings --> "ShowPreviewsSetting" ShowPreviewsSetting
+@enduml

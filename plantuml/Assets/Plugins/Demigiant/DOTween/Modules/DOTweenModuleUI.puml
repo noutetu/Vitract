@@ -1,0 +1,50 @@
+@startuml
+class DOTweenModuleUI <<static>> {
+    + {static} DOFade(target:CanvasGroup, endValue:float, duration:float) : TweenerCore<float, float, FloatOptions>
+    + {static} DOColor(target:Graphic, endValue:Color, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOFade(target:Graphic, endValue:float, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOColor(target:Image, endValue:Color, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOFade(target:Image, endValue:float, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOFillAmount(target:Image, endValue:float, duration:float) : TweenerCore<float, float, FloatOptions>
+    + {static} DOGradientColor(target:Image, gradient:Gradient, duration:float) : Sequence
+    + {static} DOFlexibleSize(target:LayoutElement, endValue:Vector2, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOMinSize(target:LayoutElement, endValue:Vector2, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOPreferredSize(target:LayoutElement, endValue:Vector2, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOColor(target:Outline, endValue:Color, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOFade(target:Outline, endValue:float, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOScale(target:Outline, endValue:Vector2, duration:float) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOAnchorPos(target:RectTransform, endValue:Vector2, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOAnchorPosX(target:RectTransform, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOAnchorPosY(target:RectTransform, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOAnchorPos3D(target:RectTransform, endValue:Vector3, duration:float, snapping:bool) : TweenerCore<Vector3, Vector3, VectorOptions>
+    + {static} DOAnchorPos3DX(target:RectTransform, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector3, Vector3, VectorOptions>
+    + {static} DOAnchorPos3DY(target:RectTransform, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector3, Vector3, VectorOptions>
+    + {static} DOAnchorPos3DZ(target:RectTransform, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector3, Vector3, VectorOptions>
+    + {static} DOAnchorMax(target:RectTransform, endValue:Vector2, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOAnchorMin(target:RectTransform, endValue:Vector2, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOPivot(target:RectTransform, endValue:Vector2, duration:float) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOPivotX(target:RectTransform, endValue:float, duration:float) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOPivotY(target:RectTransform, endValue:float, duration:float) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOSizeDelta(target:RectTransform, endValue:Vector2, duration:float, snapping:bool) : TweenerCore<Vector2, Vector2, VectorOptions>
+    + {static} DOPunchAnchorPos(target:RectTransform, punch:Vector2, duration:float, vibrato:int, elasticity:float, snapping:bool) : Tweener
+    + {static} DOShakeAnchorPos(target:RectTransform, duration:float, strength:float, vibrato:int, randomness:float, snapping:bool, fadeOut:bool, randomnessMode:ShakeRandomnessMode) : Tweener
+    + {static} DOShakeAnchorPos(target:RectTransform, duration:float, strength:Vector2, vibrato:int, randomness:float, snapping:bool, fadeOut:bool, randomnessMode:ShakeRandomnessMode) : Tweener
+    + {static} DOJumpAnchorPos(target:RectTransform, endValue:Vector2, jumpPower:float, numJumps:int, duration:float, snapping:bool) : Sequence
+    + {static} DONormalizedPos(target:ScrollRect, endValue:Vector2, duration:float, snapping:bool) : Tweener
+    + {static} DOHorizontalNormalizedPos(target:ScrollRect, endValue:float, duration:float, snapping:bool) : Tweener
+    + {static} DOVerticalNormalizedPos(target:ScrollRect, endValue:float, duration:float, snapping:bool) : Tweener
+    + {static} DOValue(target:Slider, endValue:float, duration:float, snapping:bool) : TweenerCore<float, float, FloatOptions>
+    + {static} DOColor(target:Text, endValue:Color, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOCounter(target:Text, fromValue:int, endValue:int, duration:float, addThousandsSeparator:bool, culture:CultureInfo) : TweenerCore<int, int, NoOptions>
+    + {static} DOFade(target:Text, endValue:float, duration:float) : TweenerCore<Color, Color, ColorOptions>
+    + {static} DOText(target:Text, endValue:string, duration:float, richTextEnabled:bool, scrambleMode:ScrambleMode, scrambleChars:string) : TweenerCore<string, string, StringOptions>
+    + {static} DOBlendableColor(target:Graphic, endValue:Color, duration:float) : Tweener
+    + {static} DOBlendableColor(target:Image, endValue:Color, duration:float) : Tweener
+    + {static} DOBlendableColor(target:Text, endValue:Color, duration:float) : Tweener
+    + {static} DOShapeCircle(target:RectTransform, center:Vector2, endValueDegrees:float, duration:float, relativeCenter:bool, snapping:bool) : TweenerCore<Vector2, Vector2, CircleOptions>
+}
+class Utils <<static>> {
+    + {static} SwitchToRectTransform(from:RectTransform, to:RectTransform) : Vector2
+}
+DOTweenModuleUI +-- Utils
+@enduml

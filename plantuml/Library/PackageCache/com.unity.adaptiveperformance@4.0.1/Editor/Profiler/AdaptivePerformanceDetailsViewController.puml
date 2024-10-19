@@ -1,0 +1,7 @@
+@startuml
+class AdaptivePerformanceDetailsViewController {
+    + AdaptivePerformanceDetailsViewController(profilerWindow:ProfilerWindow)
+    + {static} GetScalerFromProfilerStream(frame:int) : AdaptivePerformanceProfilerStats.ScalerInfo[]
+}
+ProfilerModuleViewController <|-- AdaptivePerformanceDetailsViewController
+@enduml

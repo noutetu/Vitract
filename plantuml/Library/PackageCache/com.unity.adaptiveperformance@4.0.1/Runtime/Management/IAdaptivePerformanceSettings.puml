@@ -1,0 +1,54 @@
+@startuml
+class AdaptivePerformanceIndexerSettings {
+    + active : bool <<get>> <<set>>
+    + thermalActionDelay : float <<get>> <<set>>
+    + performanceActionDelay : float <<get>> <<set>>
+}
+class AdaptivePerformanceScalerProfile {
+    + Name : string <<get>> <<set>>
+}
+class AdaptivePerformanceScalerSettings {
+    + ApplySettings(settings:AdaptivePerformanceScalerSettings) : void
+}
+class AdaptivePerformanceScalerSettingsBase {
+    + name : string <<get>> <<set>>
+    + enabled : bool <<get>> <<set>>
+    + scale : float <<get>> <<set>>
+    + maxLevel : int <<get>> <<set>>
+    + minBound : float <<get>> <<set>>
+    + maxBound : float <<get>> <<set>>
+}
+class IAdaptivePerformanceSettings {
+    + logging : bool <<get>> <<set>>
+    + automaticPerformanceMode : bool <<get>> <<set>>
+    + enableBoostOnStartup : bool <<get>> <<set>>
+    + statsLoggingFrequencyInFrames : int <<get>> <<set>>
+    + LoadScalerProfile(scalerProfileName:string) : void
+    + GetAvailableScalerProfiles() : string[]
+    + defaultScalerProfilerIndex : int <<get>> <<set>>
+    + OnEnable() : void
+}
+AdaptivePerformanceScalerSettings <|-- AdaptivePerformanceScalerProfile
+AdaptivePerformanceScalerSettings --> "AdaptiveFramerate" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveResolution" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveBatching" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveLOD" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveLut" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveMSAA" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveShadowCascades" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveShadowCascade" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveShadowDistance" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveShadowmapResolution" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveShadowQuality" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveSorting" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveTransparency" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveViewDistance" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptivePhysics" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveDecals" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettings --> "AdaptiveLayerCulling" AdaptivePerformanceScalerSettingsBase
+AdaptivePerformanceScalerSettingsBase --> "visualImpact" ScalerVisualImpact
+AdaptivePerformanceScalerSettingsBase --> "target" ScalerTarget
+ScriptableObject <|-- IAdaptivePerformanceSettings
+IAdaptivePerformanceSettings --> "indexerSettings" AdaptivePerformanceIndexerSettings
+IAdaptivePerformanceSettings --> "scalerSettings" AdaptivePerformanceScalerSettings
+@enduml

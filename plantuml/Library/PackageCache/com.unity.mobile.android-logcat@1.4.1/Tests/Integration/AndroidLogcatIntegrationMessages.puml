@@ -1,0 +1,6 @@
+@startuml
+class AndroidLogcatRuntimeIntegrationMessages {
+    + CanGetMessagesFromDevice() : IEnumerator
+}
+AndroidLogcatIntegrationTestBase <|-- AndroidLogcatRuntimeIntegrationMessages
+@enduml

@@ -1,0 +1,8 @@
+@startuml
+class ShellStartInfo {
+}
+class ShellReturnInfo {
+}
+class Shell <<static>> {
+}
+@enduml

@@ -1,0 +1,11 @@
+@startuml
+class PackageManagementTests {
+    + SetUp() : void
+    + Teardown() : void
+    + TestLoaderAssignment() : IEnumerator
+    + TestLoaderAssignmentSerializes() : void
+    + TestLoaderRemoval() : void
+    + TestInvalidPackageErrorsOut() : IEnumerator
+    + TestNoPackageIdErrorsOut() : IEnumerator
+}
+@enduml

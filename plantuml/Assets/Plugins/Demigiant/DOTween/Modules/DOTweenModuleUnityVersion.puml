@@ -1,0 +1,50 @@
+@startuml
+class DOTweenModuleUnityVersion <<static>> {
+    + {static} DOGradientColor(target:Material, gradient:Gradient, duration:float) : Sequence
+    + {static} DOGradientColor(target:Material, gradient:Gradient, property:string, duration:float) : Sequence
+    + {static} WaitForCompletion(t:Tween, returnCustomYieldInstruction:bool) : CustomYieldInstruction
+    + {static} WaitForRewind(t:Tween, returnCustomYieldInstruction:bool) : CustomYieldInstruction
+    + {static} WaitForKill(t:Tween, returnCustomYieldInstruction:bool) : CustomYieldInstruction
+    + {static} WaitForElapsedLoops(t:Tween, elapsedLoops:int, returnCustomYieldInstruction:bool) : CustomYieldInstruction
+    + {static} WaitForPosition(t:Tween, position:float, returnCustomYieldInstruction:bool) : CustomYieldInstruction
+    + {static} WaitForStart(t:Tween, returnCustomYieldInstruction:bool) : CustomYieldInstruction
+}
+class DOTweenCYInstruction <<static>> {
+}
+class WaitForCompletion {
+    + <<override>> keepWaiting : bool <<get>>
+    + WaitForCompletion(tween:Tween)
+}
+class WaitForRewind {
+    + <<override>> keepWaiting : bool <<get>>
+    + WaitForRewind(tween:Tween)
+}
+class WaitForKill {
+    + <<override>> keepWaiting : bool <<get>>
+    + WaitForKill(tween:Tween)
+}
+class WaitForElapsedLoops {
+    + <<override>> keepWaiting : bool <<get>>
+    + WaitForElapsedLoops(tween:Tween, elapsedLoops:int)
+}
+class WaitForPosition {
+    + <<override>> keepWaiting : bool <<get>>
+    + WaitForPosition(tween:Tween, position:float)
+}
+class WaitForStart {
+    + <<override>> keepWaiting : bool <<get>>
+    + WaitForStart(tween:Tween)
+}
+DOTweenCYInstruction +-- WaitForCompletion
+CustomYieldInstruction <|-- WaitForCompletion
+DOTweenCYInstruction +-- WaitForRewind
+CustomYieldInstruction <|-- WaitForRewind
+DOTweenCYInstruction +-- WaitForKill
+CustomYieldInstruction <|-- WaitForKill
+DOTweenCYInstruction +-- WaitForElapsedLoops
+CustomYieldInstruction <|-- WaitForElapsedLoops
+DOTweenCYInstruction +-- WaitForPosition
+CustomYieldInstruction <|-- WaitForPosition
+DOTweenCYInstruction +-- WaitForStart
+CustomYieldInstruction <|-- WaitForStart
+@enduml

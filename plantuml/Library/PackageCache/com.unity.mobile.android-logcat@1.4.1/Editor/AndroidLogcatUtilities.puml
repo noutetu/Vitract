@@ -1,0 +1,18 @@
+@startuml
+class AndroidLogcatUtilities <<static>> {
+    + {static} CaptureScreen(adb:AndroidBridge.ADB, deviceId:string, imagePathOnHost:string, error:string) : bool
+    + {static} GetTemporaryPath(device:IAndroidLogcatDevice, name:string, extension:string) : string
+    + {static} GetTopActivityInfo(adb:AndroidBridge.ADB, device:IAndroidLogcatDevice, packageName:string, packagePid:int) : bool
+    + {static} GetPidFromPackageName(adb:AndroidBridge.ADB, device:IAndroidLogcatDevice, packageName:string) : int
+    + {static} KillProcesss(adb:AndroidBridge.ADB, device:IAndroidLogcatDevice, pid:int) : bool
+    + {static} GetProcessNameFromPid(adb:AndroidBridge.ADB, device:IAndroidLogcatDevice, processId:int) : string
+    + {static} GetProcessNameFromPid(adb:AndroidBridge.ADB, deviceId:string, processId:int) : string
+    + {static} RetrieveDeviceDetails(device:AndroidLogcatDevice, deviceId:string) : string
+    + {static} ParsePidInfo(packageName:string, commandOutput:string) : int
+    + {static} ParseTopActivityPackageInfo(commandOutput:string, packageName:string) : int
+    + {static} OpenTerminal(workingDirectory:string) : void
+    + {static} ParseVersionLegacy(versionString:string) : Version
+    + {static} ParseVersion(versionString:string) : Version
+    + {static} ParseBuildInfo(msg:string) : BuildInfo
+}
+@enduml

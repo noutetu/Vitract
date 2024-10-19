@@ -1,0 +1,13 @@
+@startuml
+class AdaptivePerformanceLoaderInfo {
+    + assetName : string
+    + <<override>> Equals(obj:object) : bool
+    + <<override>> GetHashCode() : int
+    + Equals(other:AdaptivePerformanceLoaderInfo) : bool
+}
+class "IEquatable`1"<T> {
+}
+"IEquatable`1" "<AdaptivePerformanceLoaderInfo>" <|-- AdaptivePerformanceLoaderInfo
+AdaptivePerformanceLoaderInfo --> "loaderType" Type
+AdaptivePerformanceLoaderInfo --> "instance" AdaptivePerformanceLoader
+@enduml

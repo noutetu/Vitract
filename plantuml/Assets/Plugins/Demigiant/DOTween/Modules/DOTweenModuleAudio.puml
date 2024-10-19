@@ -1,0 +1,19 @@
+@startuml
+class DOTweenModuleAudio <<static>> {
+    + {static} DOFade(target:AudioSource, endValue:float, duration:float) : TweenerCore<float, float, FloatOptions>
+    + {static} DOPitch(target:AudioSource, endValue:float, duration:float) : TweenerCore<float, float, FloatOptions>
+    + {static} DOSetFloat(target:AudioMixer, floatName:string, endValue:float, duration:float) : TweenerCore<float, float, FloatOptions>
+    + {static} DOComplete(target:AudioMixer, withCallbacks:bool) : int
+    + {static} DOKill(target:AudioMixer, complete:bool) : int
+    + {static} DOFlip(target:AudioMixer) : int
+    + {static} DOGoto(target:AudioMixer, to:float, andPlay:bool) : int
+    + {static} DOPause(target:AudioMixer) : int
+    + {static} DOPlay(target:AudioMixer) : int
+    + {static} DOPlayBackwards(target:AudioMixer) : int
+    + {static} DOPlayForward(target:AudioMixer) : int
+    + {static} DORestart(target:AudioMixer) : int
+    + {static} DORewind(target:AudioMixer) : int
+    + {static} DOSmoothRewind(target:AudioMixer) : int
+    + {static} DOTogglePause(target:AudioMixer) : int
+}
+@enduml

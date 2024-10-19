@@ -1,0 +1,9 @@
+@startuml
+class AdaptivePerformanceConfigurationProvider {
+    + AdaptivePerformanceConfigurationProvider(path:string, buildSettingsKey:string, buildDataType:Type, scopes:SettingsScope)
+    + <<override>> OnActivate(searchContext:string, rootElement:VisualElement) : void
+    + <<override>> OnDeactivate() : void
+    + <<override>> OnGUI(searchContext:string) : void
+}
+SettingsProvider <|-- AdaptivePerformanceConfigurationProvider
+@enduml

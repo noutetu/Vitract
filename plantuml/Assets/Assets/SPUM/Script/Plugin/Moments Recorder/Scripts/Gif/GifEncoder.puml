@@ -1,0 +1,13 @@
+@startuml
+class GifEncoder {
+    + GifEncoder()
+    + GifEncoder(repeat:int, quality:int)
+    + SetDelay(ms:int) : void
+    + SetFrameRate(fps:float) : void
+    + AddFrame(frame:GifFrame) : void
+    + Start(os:FileStream) : void
+    + Start(file:String) : void
+    + Finish() : void
+    + SetAlphaValue(chk:bool, c:Color) : void
+}
+@enduml

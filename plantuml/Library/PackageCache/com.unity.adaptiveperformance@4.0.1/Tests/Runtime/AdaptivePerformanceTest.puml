@@ -1,0 +1,29 @@
+@startuml
+class AdaptivePerformanceSimulation {
+    + SetupAdaptivePerformanceManagerTest() : void
+    + TeardownAdaptivePerformanceManagerTest() : void
+    + Applies_Cpu_Level() : IEnumerator
+    + Applies_Gpu_Level() : IEnumerator
+    + Unknown_GpuLevel_In_Throttling_State() : IEnumerator
+    + Unknown_CpuLevel_In_Throttling_State() : IEnumerator
+    + Ignores_Invalid_Cpu_Level() : IEnumerator
+    + Ignores_Invalid_Gpu_Level() : IEnumerator
+    + TemperatureChangeEvent_Values_Are_Applied() : IEnumerator
+    + WarningLevel_Is_Applied() : IEnumerator
+    + Provider_FrameTimes_Work() : IEnumerator
+    + GpuBound_When_GpuTime_Is_High() : IEnumerator
+    + CpuBound_When_CpuTime_Is_High() : IEnumerator
+    + Unknown_Bottleneck_When_GpuTime_And_CpuTime_Are_Equal() : IEnumerator
+    + Bottleneck_TargetFrameRate_Works() : IEnumerator
+    + PerformanceBottleneckChangeEvent_Works() : IEnumerator
+    + PerformanceLevelChangeEvent_Works() : IEnumerator
+    + ThermalEvent_Works() : IEnumerator
+    + PerformanceLevels_Are_Reapplied_After_Timeout() : IEnumerator
+    + PerformanceBoostChangeEvent_Works() : IEnumerator
+    + PerformanceBoost_Disables_PerformanceLevels() : IEnumerator
+    + PerformanceBoost_Is_Off_After_Timeout() : IEnumerator
+    + Feature_ClusterInfo_Is_Supported() : IEnumerator
+    + All_Scalers_Available() : IEnumerator
+}
+ManagementTestSetup <|-- AdaptivePerformanceSimulation
+@enduml

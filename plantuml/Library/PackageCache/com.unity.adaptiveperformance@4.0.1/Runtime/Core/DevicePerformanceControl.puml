@@ -1,0 +1,17 @@
+@startuml
+class DevicePerformanceControlImpl {
+    + DevicePerformanceControlImpl(performanceLevelControl:Provider.IDevicePerformanceLevelControl)
+    + Update(changeArgs:PerformanceLevelChangeEventArgs) : bool
+    + AutomaticPerformanceControl : bool <<get>> <<set>>
+    + MaxCpuPerformanceLevel : int <<get>>
+    + MaxGpuPerformanceLevel : int <<get>>
+    + CpuLevel : int <<get>> <<set>>
+    + GpuLevel : int <<get>> <<set>>
+    + CurrentCpuLevel : int <<get>> <<set>>
+    + CurrentGpuLevel : int <<get>> <<set>>
+    + CpuPerformanceBoost : bool <<get>> <<set>>
+    + GpuPerformanceBoost : bool <<get>> <<set>>
+}
+IDevicePerformanceControl <|-- DevicePerformanceControlImpl
+DevicePerformanceControlImpl --> "PerformanceControlMode" PerformanceControlMode
+@enduml

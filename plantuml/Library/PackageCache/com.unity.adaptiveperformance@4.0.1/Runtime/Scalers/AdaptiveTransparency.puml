@@ -1,0 +1,5 @@
+@startuml
+class AdaptiveTransparency {
+}
+AdaptivePerformanceScaler <|-- AdaptiveTransparency
+@enduml

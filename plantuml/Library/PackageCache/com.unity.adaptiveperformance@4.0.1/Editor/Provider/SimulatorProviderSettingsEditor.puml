@@ -1,0 +1,6 @@
+@startuml
+class SimulatorProviderSettingsEditor {
+    + <<override>> OnInspectorGUI() : void
+}
+ProviderSettingsEditor <|-- SimulatorProviderSettingsEditor
+@enduml

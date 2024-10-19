@@ -1,0 +1,23 @@
+@startuml
+class LogcatEntry {
+    + <<const>> kTimeFormatWithYear : string = "yyyy/MM/dd HH:mm:ss.fff"
+    + <<const>> kTimeFormatWithoutYear : string = "MM/dd HH:mm:ss.fff"
+    + {static} s_TimeFormat : string
+    + Selected : bool <<set>> <<get>>
+    + LogcatEntry(msg:string)
+    + LogcatEntry(dateTime:DateTime, processId:int, threadId:int, priority:Priority, tag:string, message:string)
+    + processId : int
+    + threadId : int
+    + tag : string
+    + message : string
+    + <<override>> ToString() : string
+    + {static} SetTimeFormat(timeFormat:string) : void
+}
+enum Flags {
+    None,
+    Selected,
+}
+LogcatEntry --> "dateTime" DateTime
+LogcatEntry --> "priority" Priority
+LogcatEntry +-- Flags
+@enduml

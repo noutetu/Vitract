@@ -1,0 +1,13 @@
+@startuml
+class DOTweenModulePhysics <<static>> {
+    + {static} DOMove(target:Rigidbody, endValue:Vector3, duration:float, snapping:bool) : TweenerCore<Vector3, Vector3, VectorOptions>
+    + {static} DOMoveX(target:Rigidbody, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector3, Vector3, VectorOptions>
+    + {static} DOMoveY(target:Rigidbody, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector3, Vector3, VectorOptions>
+    + {static} DOMoveZ(target:Rigidbody, endValue:float, duration:float, snapping:bool) : TweenerCore<Vector3, Vector3, VectorOptions>
+    + {static} DORotate(target:Rigidbody, endValue:Vector3, duration:float, mode:RotateMode) : TweenerCore<Quaternion, Vector3, QuaternionOptions>
+    + {static} DOLookAt(target:Rigidbody, towards:Vector3, duration:float, axisConstraint:AxisConstraint, up:Vector3?) : TweenerCore<Quaternion, Vector3, QuaternionOptions>
+    + {static} DOJump(target:Rigidbody, endValue:Vector3, jumpPower:float, numJumps:int, duration:float, snapping:bool) : Sequence
+    + {static} DOPath(target:Rigidbody, path:Vector3[], duration:float, pathType:PathType, pathMode:PathMode, resolution:int, gizmoColor:Color?) : TweenerCore<Vector3, Path, PathOptions>
+    + {static} DOLocalPath(target:Rigidbody, path:Vector3[], duration:float, pathType:PathType, pathMode:PathMode, resolution:int, gizmoColor:Color?) : TweenerCore<Vector3, Path, PathOptions>
+}
+@enduml

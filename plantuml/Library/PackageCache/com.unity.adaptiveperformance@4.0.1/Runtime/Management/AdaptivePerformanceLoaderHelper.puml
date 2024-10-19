@@ -1,0 +1,7 @@
+@startuml
+abstract class AdaptivePerformanceLoaderHelper {
+    + <<override>> GetLoadedSubsystem() : T
+    + <<override>> Deinitialize() : bool
+}
+AdaptivePerformanceLoader <|-- AdaptivePerformanceLoaderHelper
+@enduml

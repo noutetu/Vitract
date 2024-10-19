@@ -1,0 +1,5 @@
+@startuml
+class ColorSelect {
+}
+MonoBehaviour <|-- ColorSelect
+@enduml

@@ -1,0 +1,61 @@
+@startuml
+class SPUM_Exporter {
+    + _imageName : string
+    + _separated : bool = false
+    + _sepaName : string = ""
+    + _scaleFactor : float = 1
+    + _frameRate : int = 8
+    + _frameNumber : int = 0
+    + _advanced : bool
+    + StartExport() : void
+    + CheckObjNow() : void
+    + MakeObjNow() : void
+    + frameNowNumber : int
+    + _animNum : int
+    + timer : float
+    + timerForSave : float
+    + useTimer : bool
+    + _netAnimClip : bool
+    + animNum : int
+    + _gifExportUse : bool
+    + _gifUseTransparancy : bool
+    + _gifDelay : float = 0.1f
+    + _gifQuality : int = 10
+    + _gifRepeatNum : int = 0
+    + TakeHiResShot() : void
+    + SetScreenShot() : void
+    + MakeScreenShotFile() : void
+    + MakeGifAnimation() : void
+    + PrintEndMessage() : void
+    + {static} FillColorAlpha(tex2D:Texture2D, fillColor:Color32?) : Texture2D
+}
+enum UnitType {
+    SwordMan,
+    BowMan,
+    Magician,
+}
+class "List`1"<T> {
+}
+class "Action`2"<T1,T2> {
+}
+MonoBehaviour <|-- SPUM_Exporter
+SPUM_Exporter --> "_unitPrefab" GameObject
+SPUM_Exporter o-> "_unitType" UnitType
+SPUM_Exporter o-> "_imageSize" Vector2
+SPUM_Exporter o-> "_fullSize" Vector2
+SPUM_Exporter --> "_camera" Camera
+SPUM_Exporter --> "_anim" Animator
+SPUM_Exporter --> "_objectPivot" Transform
+SPUM_Exporter --> "_objectNow" GameObject
+SPUM_Exporter --> "_imgBG" RectTransform
+SPUM_Exporter --> "_bgSet" GameObject
+SPUM_Exporter o-> "_animNameList<string>" "List`1"
+SPUM_Exporter o-> "_animNameNow<string>" "List`1"
+SPUM_Exporter o-> "_textSaveList<Texture2D>" "List`1"
+SPUM_Exporter o-> "WorkerPriority" ThreadPriority
+SPUM_Exporter --> "OnFileSaved<int,string>" "Action`2"
+SPUM_Exporter --> "OnFileSaveProgress<int,float>" "Action`2"
+SPUM_Exporter o-> "_gifBGColor" Color
+SPUM_Exporter o-> "_gifAlphaBGColor" Color
+SPUM_Exporter +-- UnitType
+@enduml

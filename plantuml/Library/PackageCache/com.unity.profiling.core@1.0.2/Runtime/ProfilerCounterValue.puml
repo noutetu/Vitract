@@ -1,0 +1,11 @@
+@startuml
+struct "ProfilerCounterValue`1"<T> {
+    + ProfilerCounterValue(name:string)
+    + ProfilerCounterValue(name:string, dataUnit:ProfilerMarkerDataUnit)
+    + ProfilerCounterValue(name:string, dataUnit:ProfilerMarkerDataUnit, counterOptions:ProfilerCounterOptions)
+    + ProfilerCounterValue(category:ProfilerCategory, name:string, dataUnit:ProfilerMarkerDataUnit)
+    + ProfilerCounterValue(category:ProfilerCategory, name:string, dataUnit:ProfilerMarkerDataUnit, counterOptions:ProfilerCounterOptions)
+    + Value : T <<get>> <<set>>
+    + Sample() : void
+}
+@enduml

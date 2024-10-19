@@ -1,0 +1,8 @@
+@startuml
+class OnLoad {
+}
+class RequiresAndroidDeviceAttribute {
+    + RequiresAndroidDeviceAttribute()
+}
+ConditionalIgnoreAttribute <|-- RequiresAndroidDeviceAttribute
+@enduml

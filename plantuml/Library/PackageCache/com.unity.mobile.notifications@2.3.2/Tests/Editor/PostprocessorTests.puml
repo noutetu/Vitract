@@ -1,0 +1,5 @@
+@startuml
+class PostprocessorTests {
+    + DummmyTest() : void
+}
+@enduml

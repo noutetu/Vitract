@@ -1,0 +1,20 @@
+@startuml
+class AndroidLogcatRegexTests {
+    + LogMessageRegexMatchesForThreadTimeFormat() : void
+    + LogMessageRegexMatchesForYearFormat() : void
+    + WhitespacesArePreservedInMessage() : void
+    + CorrectlyParsePidsWithWindowsEndlines() : void
+    + CorrectlyParsePidsWithUnixEndlines() : void
+    + CorrectlyParseTopActivityWithWindowsEndlines() : void
+    + CorrectlyParseTopActivityWithUnixEndlines() : void
+    + CorrectlyParseTopActivitiesWithInvalidData() : void
+    + CorrectlyParseSleepingTopActivities() : void
+    + ParseBuildInfo() : void
+    + ParseIPAddress() : void
+    + ParseDeviceInfo() : void
+    + SplitStringForSendTextTests() : void
+}
+struct LogcatMessage {
+}
+AndroidLogcatRegexTests +-- LogcatMessage
+@enduml

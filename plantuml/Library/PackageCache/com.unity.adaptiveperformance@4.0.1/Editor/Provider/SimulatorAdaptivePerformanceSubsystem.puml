@@ -1,0 +1,34 @@
+@startuml
+class SimulatorAdaptivePerformanceSubsystem {
+    + TemperatureLevel : float <<get>> <<set>>
+    + TemperatureTrend : float <<get>> <<set>>
+    + CpuPerformanceLevel : int <<get>> <<set>>
+    + GpuPerformanceLevel : int <<get>> <<set>>
+    + CpuPerformanceBoost : bool <<get>> <<set>>
+    + GpuPerformanceBoost : bool <<get>> <<set>>
+    + NextGpuFrameTime : float <<get>> <<set>>
+    + NextCpuFrameTime : float <<get>> <<set>>
+    + NextOverallFrameTime : float <<get>> <<set>>
+    + AcceptsPerformanceLevel : bool <<get>> <<set>>
+    + SetClusterInfo(clusterInfo:ClusterInfo) : void
+    + MaxCpuPerformanceLevel : int <<get>>
+    + MaxGpuPerformanceLevel : int <<get>>
+    + SimulatorAdaptivePerformanceSubsystem()
+    + <<override>> Start() : void
+    + <<override>> Stop() : void
+    + <<override>> Update() : PerformanceDataRecord
+    + ApplicationPause() : void
+    + ApplicationResume() : void
+    + SetPerformanceLevel(cpuLevel:int, gpuLevel:int) : bool
+    + EnableCpuBoost() : bool
+    + EnableGpuBoost() : bool
+}
+AdaptivePerformanceSubsystem <|-- SimulatorAdaptivePerformanceSubsystem
+IApplicationLifecycle <|-- SimulatorAdaptivePerformanceSubsystem
+IDevicePerformanceLevelControl <|-- SimulatorAdaptivePerformanceSubsystem
+SimulatorAdaptivePerformanceSubsystem --> "ChangeFlags" Feature
+SimulatorAdaptivePerformanceSubsystem --> "WarningLevel" WarningLevel
+SimulatorAdaptivePerformanceSubsystem --> "Version" Version
+SimulatorAdaptivePerformanceSubsystem --> "ApplicationLifecycle" IApplicationLifecycle
+SimulatorAdaptivePerformanceSubsystem --> "PerformanceLevelControl" IDevicePerformanceLevelControl
+@enduml

@@ -1,0 +1,7 @@
+@startuml
+class Castle {
+    + TakeDamageAndCheckDead(damage:float) : bool
+}
+MonoBehaviour <|-- Castle
+IDamageable <|-- Castle
+@enduml

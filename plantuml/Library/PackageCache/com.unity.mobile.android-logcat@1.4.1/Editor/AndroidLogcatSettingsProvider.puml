@@ -1,0 +1,19 @@
+@startuml
+class AndroidLogcatSettingsProvider {
+    + AndroidLogcatSettingsProvider(path:string, scope:SettingsScope)
+    + <<override>> OnGUI(searchContext:string) : void
+    + {static} CreateAndroidLogcatSettingsProvider() : SettingsProvider
+}
+class Styles {
+}
+SettingsProvider <|-- AndroidLogcatSettingsProvider
+AndroidLogcatSettingsProvider +-- Styles
+Styles o-> "maxCachedMessageCount" GUIContent
+Styles o-> "maxDisplayedMessageCount" GUIContent
+Styles o-> "font" GUIContent
+Styles o-> "fontSize" GUIContent
+Styles o-> "stactraceRegex" GUIContent
+Styles o-> "symbolExtensions" GUIContent
+Styles o-> "requestIntervalMS" GUIContent
+Styles o-> "maxExitedPackageToShow" GUIContent
+@enduml

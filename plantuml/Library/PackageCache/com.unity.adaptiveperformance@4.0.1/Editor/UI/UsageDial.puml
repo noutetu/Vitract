@@ -1,0 +1,22 @@
+@startuml
+class UsageDial {
+    + Value : int <<get>> <<set>>
+    + ShowLabel : bool <<get>> <<set>>
+    + UsageDial()
+    + SetThresholds(yellowPercentage:int, redPercentage:int, force:bool) : void
+}
+class UxmlFactory <<new>> {
+}
+class UxmlTraits <<new>> {
+    + <<override>> Init(ve:VisualElement, bag:IUxmlAttributes, cc:CreationContext) : void
+}
+class "UxmlFactory`2"<T1,T2> {
+}
+class "IEnumerable`1"<T> {
+}
+VisualElement <|-- UsageDial
+UsageDial +-- UxmlFactory
+"UxmlFactory`2" "<UsageDial,UxmlTraits>" <|-- UxmlFactory
+UsageDial +-- UxmlTraits
+UxmlTraits --> "uxmlChildElementsDescription<UxmlChildElementDescription>" "IEnumerable`1"
+@enduml

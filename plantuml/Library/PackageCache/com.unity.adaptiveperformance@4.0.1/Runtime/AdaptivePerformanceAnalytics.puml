@@ -1,0 +1,12 @@
+@startuml
+class AdaptivePerformanceAnalytics <<static>> {
+    + {static} RegisterFeature(feature:string, status:bool) : void
+    + {static} SendAdaptiveStartupEvent(subsystem:Provider.AdaptivePerformanceSubsystem) : void
+    + {static} SendAdaptiveFeatureUpdateEvent(feature:string, status:bool) : void
+    + {static} SendAdaptivePerformanceThermalEvent(thermalMetrics:ThermalMetrics) : void
+}
+class AnalyticsLog <<static>> {
+    + {static} Debug(format:string, args:object[]) : void
+}
+AdaptivePerformanceAnalytics +-- AnalyticsLog
+@enduml

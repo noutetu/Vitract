@@ -1,0 +1,10 @@
+@startuml
+class AndroidLogcatConnectToDeviceInput {
+}
+class AndroidLogcatConnectToDeviceResult {
+}
+class AndroidLogcatConnectToDeviceTask {
+}
+IAndroidLogcatTaskInput <|-- AndroidLogcatConnectToDeviceInput
+IAndroidLogcatTaskResult <|-- AndroidLogcatConnectToDeviceResult
+@enduml

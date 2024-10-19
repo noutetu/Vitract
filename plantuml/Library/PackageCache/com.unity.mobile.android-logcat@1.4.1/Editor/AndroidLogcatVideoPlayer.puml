@@ -1,0 +1,10 @@
+@startuml
+class AndroidLogcatVideoPlayer {
+    + Dispose() : void
+    + Play(path:string) : void
+    + IsPlaying() : bool
+    + GetVideoRect(windowRect:Rect) : Rect
+    + DoGUI(windowRect:Rect) : void
+}
+IDisposable <|-- AndroidLogcatVideoPlayer
+@enduml

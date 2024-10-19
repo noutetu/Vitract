@@ -1,0 +1,23 @@
+@startuml
+abstract class Character {
+    + isPlayer : bool
+    + IsDead : bool <<get>>
+    + TakeDamageAndCheckDead(damage:float) : bool
+    + Dead() : void
+    + SmoothAppear() : void
+    + DisplayLogCharacterInfo() : void
+}
+interface IDamageable {
+}
+enum CharacterState {
+    Run,
+    Attack,
+    SkillAttack,
+    Die,
+    Debuff,
+    Idle,
+}
+MonoBehaviour <|-- Character
+IDamageable <|-- Character
+Character --> "CharacterState" CharacterState
+@enduml

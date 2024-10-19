@@ -1,0 +1,5 @@
+@startuml
+class BottleneckUtil {
+    + {static} DetermineBottleneck(prevBottleneck:PerformanceBottleneck, averageCpuFrameTime:float, averageGpuFrametime:float, averageOverallFrametime:float, targetFrameTime:float) : PerformanceBottleneck
+}
+@enduml

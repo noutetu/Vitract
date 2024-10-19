@@ -1,0 +1,5 @@
+@startuml
+class CharacterGenerator {
+}
+MonoBehaviour <|-- CharacterGenerator
+@enduml

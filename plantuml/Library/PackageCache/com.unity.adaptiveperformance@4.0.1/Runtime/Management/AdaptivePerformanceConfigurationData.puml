@@ -1,0 +1,8 @@
+@startuml
+class AdaptivePerformanceConfigurationDataAttribute <<sealed>> {
+    + displayName : string <<get>> <<set>>
+    + buildSettingsKey : string <<get>> <<set>>
+    + AdaptivePerformanceConfigurationDataAttribute(displayName:string, buildSettingsKey:string)
+}
+Attribute <|-- AdaptivePerformanceConfigurationDataAttribute
+@enduml

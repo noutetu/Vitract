@@ -1,0 +1,33 @@
+@startuml
+class AdaptivePerformanceProfilerStats <<static>> {
+    + {static} <<readonly>> kScalerDataTag : int = 0
+    + {static} EmitScalerDataToProfilerStream(scalerName:string, enabled:bool, overrideLevel:int, currentLevel:int, scale:float, applied:bool, maxLevel:int) : void
+    + {static} FlushScalerDataToProfilerStream() : void
+}
+class "ProfilerCounter`1"<T> {
+}
+struct ScalerInfo {
+    + <<fixed>> scalerName : byte
+    + enabled : uint
+    + overrideLevel : int
+    + currentLevel : int
+    + maxLevel : int
+    + scale : float
+    + applied : uint
+}
+AdaptivePerformanceProfilerStats o-> "AdaptivePerformanceProfilerCategory" ProfilerCategory
+AdaptivePerformanceProfilerStats o-> "CurrentCPUCounter<float>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "AvgCPUCounter<float>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "CurrentGPUCounter<float>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "AvgGPUCounter<float>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "CurrentCPULevelCounter<int>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "CurrentGPULevelCounter<int>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "CurrentFrametimeCounter<float>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "AvgFrametimeCounter<float>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "WarningLevelCounter<int>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "TemperatureLevelCounter<float>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "TemperatureTrendCounter<float>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "BottleneckCounter<int>" "ProfilerCounter`1"
+AdaptivePerformanceProfilerStats o-> "kAdaptivePerformanceProfilerModuleGuid" Guid
+AdaptivePerformanceProfilerStats +-- ScalerInfo
+@enduml

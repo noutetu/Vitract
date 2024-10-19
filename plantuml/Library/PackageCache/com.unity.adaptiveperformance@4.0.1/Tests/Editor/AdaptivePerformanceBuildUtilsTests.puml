@@ -1,0 +1,9 @@
+@startuml
+class AdaptivePerformanceBuildUtilsTests {
+    + SetUp() : void
+    + TearDown() : void
+    + UpdateBootConfigBoostSetting_WithoutSetting_AddsSetting() : void
+    + UpdateBootConfigBoostSetting_WithCorrectSetting_DoesntChangeFile() : void
+    + UpdateBootConfigBoostSetting_WithInorrectSetting_ReplacesSetting() : void
+}
+@enduml

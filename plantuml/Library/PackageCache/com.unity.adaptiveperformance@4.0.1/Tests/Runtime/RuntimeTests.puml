@@ -1,0 +1,8 @@
+@startuml
+class ManualLifetimeTests {
+    + ManualLifetimeTests(loaderCount:int, loaderIndexToWin:int)
+    + SetupAdaptivePerformanceManagerTest() : void
+    + TeardownAdaptivePerformanceManagerTest() : void
+    + CheckActivatedLoader() : IEnumerator
+}
+@enduml

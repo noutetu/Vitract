@@ -1,0 +1,7 @@
+@startuml
+class PanelControlTheStone {
+    + Click_Prev() : void
+    + Click_Next() : void
+}
+MonoBehaviour <|-- PanelControlTheStone
+@enduml

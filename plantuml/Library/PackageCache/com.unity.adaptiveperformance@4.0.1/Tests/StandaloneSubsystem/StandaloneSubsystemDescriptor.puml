@@ -1,0 +1,13 @@
+@startuml
+class StandaloneSubsystemParams {
+    + id : string <<get>> <<set>>
+    + StandaloneSubsystemParams(id:string, subsystemImplType:System.Type)
+}
+class StandaloneSubsystemDescriptor {
+    + {static} Create(parms:Providing.StandaloneSubsystemParams) : void
+    + StandaloneSubsystemDescriptor(id:string, subsystemImplType:System.Type)
+}
+class "SubsystemDescriptor`1"<T> {
+}
+"SubsystemDescriptor`1" "<StandaloneSubsystem>" <|-- StandaloneSubsystemDescriptor
+@enduml

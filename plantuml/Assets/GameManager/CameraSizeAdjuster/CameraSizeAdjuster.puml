@@ -1,0 +1,6 @@
+@startuml
+class CameraSizeAdjuster {
+    + GetBaseAspectViewportRect() : Rect
+}
+MonoBehaviour <|-- CameraSizeAdjuster
+@enduml

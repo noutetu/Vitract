@@ -1,0 +1,33 @@
+@startuml
+class StandaloneSubsystemTestFixture {
+    + UseSubsystemTest() : void
+    + RegisterSubsystemTest() : void
+}
+class TestSubsystemDescriptor {
+    + holdsThings : bool <<get>> <<set>>
+}
+abstract class TestSubsystem {
+    + StartCalled : bool <<get>> <<set>>
+    + StopCalled : bool <<get>> <<set>>
+    + DestroyCalled : bool <<get>> <<set>>
+    + IsRunning : bool <<get>> <<set>>
+    + {abstract} GetNumThings() : int
+}
+class ConcreteTestSubsystem {
+    + <<override>> Destroy() : void
+    + <<override>> Start() : void
+    + <<override>> Stop() : void
+    + running : bool <<get>>
+    + <<override>> GetNumThings() : int
+}
+class "SubsystemDescriptor`1"<T> {
+}
+class "Subsystem`1"<T> {
+}
+StandaloneSubsystemTestFixture +-- TestSubsystemDescriptor
+"SubsystemDescriptor`1" "<TestSubsystem>" <|-- TestSubsystemDescriptor
+StandaloneSubsystemTestFixture +-- TestSubsystem
+"Subsystem`1" "<TestSubsystemDescriptor>" <|-- TestSubsystem
+StandaloneSubsystemTestFixture +-- ConcreteTestSubsystem
+TestSubsystem <|-- ConcreteTestSubsystem
+@enduml

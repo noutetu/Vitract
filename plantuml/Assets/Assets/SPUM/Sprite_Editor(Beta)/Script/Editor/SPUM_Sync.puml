@@ -1,0 +1,6 @@
+@startuml
+class SPUM_Sync {
+    + <<override>> OnInspectorGUI() : void
+}
+Editor <|-- SPUM_Sync
+@enduml

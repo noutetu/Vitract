@@ -1,0 +1,8 @@
+@startuml
+class SPUM_EyeSet {
+}
+class "List`1"<T> {
+}
+MonoBehaviour <|-- SPUM_EyeSet
+SPUM_EyeSet o-> "_SpList<SpriteRenderer>" "List`1"
+@enduml

@@ -1,0 +1,41 @@
+@startuml
+class AdaptivePerformanceManager {
+    +  <<event>> ThermalEvent : ThermalEventHandler 
+    +  <<event>> PerformanceBottleneckChangeEvent : PerformanceBottleneckChangeHandler 
+    +  <<event>> PerformanceLevelChangeEvent : PerformanceLevelChangeHandler 
+    +  <<event>> PerformanceBoostChangeEvent : PerformanceBoostChangeHandler 
+    + Logging : bool <<get>> <<set>>
+    + LoggingFrequencyInFrames : int <<get>> <<set>>
+    + Active : bool <<get>>
+    + MaxCpuPerformanceLevel : int <<get>>
+    + MaxGpuPerformanceLevel : int <<get>>
+    + AutomaticPerformanceControl : bool <<get>> <<set>>
+    + CpuLevel : int <<get>> <<set>>
+    + GpuLevel : int <<get>> <<set>>
+    + CpuPerformanceBoost : bool <<get>> <<set>>
+    + GpuPerformanceBoost : bool <<get>> <<set>>
+    + SupportedFeature(feature:Provider.Feature) : bool
+    + Awake() : void
+    + LateUpdate() : void
+    + Update() : void
+    + {static} EffectiveTargetFrameRate() : float
+    + OnDestroy() : void
+    + OnApplicationPause(pause:bool) : void
+}
+MonoBehaviour <|-- AdaptivePerformanceManager
+IAdaptivePerformance <|-- AdaptivePerformanceManager
+IThermalStatus <|-- AdaptivePerformanceManager
+IPerformanceStatus <|-- AdaptivePerformanceManager
+IDevicePerformanceControl <|-- AdaptivePerformanceManager
+IDevelopmentSettings <|-- AdaptivePerformanceManager
+AdaptivePerformanceManager --> "ThermalMetrics" ThermalMetrics
+AdaptivePerformanceManager --> "PerformanceMetrics" PerformanceMetrics
+AdaptivePerformanceManager --> "FrameTiming" FrameTiming
+AdaptivePerformanceManager --> "PerformanceControlMode" PerformanceControlMode
+AdaptivePerformanceManager --> "DevelopmentSettings" IDevelopmentSettings
+AdaptivePerformanceManager --> "ThermalStatus" IThermalStatus
+AdaptivePerformanceManager --> "PerformanceStatus" IPerformanceStatus
+AdaptivePerformanceManager --> "DevicePerformanceControl" IDevicePerformanceControl
+AdaptivePerformanceManager --> "Indexer" AdaptivePerformanceIndexer
+AdaptivePerformanceManager --> "Settings" IAdaptivePerformanceSettings
+@enduml

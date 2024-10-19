@@ -1,0 +1,13 @@
+@startuml
+interface IAndroidLogcatTaskInput {
+}
+class "AndroidLogcatTaskInput`1"<T> {
+}
+class "AndroidLogcatTaskInput`2"<T1,T2> {
+}
+class "AndroidLogcatTaskInput`3"<T1,T2,T3> {
+}
+IAndroidLogcatTaskInput <|-- "AndroidLogcatTaskInput`1"
+IAndroidLogcatTaskInput <|-- "AndroidLogcatTaskInput`2"
+IAndroidLogcatTaskInput <|-- "AndroidLogcatTaskInput`3"
+@enduml

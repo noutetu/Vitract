@@ -1,0 +1,5 @@
+@startuml
+struct Constants {
+    + <<const>> k_SettingsKey : string = "TestPackageSettings"
+}
+@enduml

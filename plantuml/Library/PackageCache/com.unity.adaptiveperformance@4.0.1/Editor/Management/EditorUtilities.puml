@@ -1,0 +1,4 @@
+@startuml
+class EditorUtilities <<static>> {
+}
+@enduml

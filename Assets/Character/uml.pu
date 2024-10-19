@@ -1,0 +1,11 @@
+@startuml
+class Enemy {
+    + string type
+    ~ string name
+    # void SayHello()
+    - void Attack()
+}
+@enduml
+
+// command+shift+P
+// PlantUML: Preview CurrentDiagram

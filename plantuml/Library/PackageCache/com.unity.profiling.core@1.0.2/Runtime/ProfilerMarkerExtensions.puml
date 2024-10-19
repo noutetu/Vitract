@@ -1,0 +1,11 @@
+@startuml
+class ProfilerMarkerExtension <<static>> {
+    + {static} <<unsafe>> Begin(marker:ProfilerMarker, metadata:int) : void
+    + {static} <<unsafe>> Begin(marker:ProfilerMarker, metadata:uint) : void
+    + {static} <<unsafe>> Begin(marker:ProfilerMarker, metadata:long) : void
+    + {static} <<unsafe>> Begin(marker:ProfilerMarker, metadata:ulong) : void
+    + {static} <<unsafe>> Begin(marker:ProfilerMarker, metadata:float) : void
+    + {static} <<unsafe>> Begin(marker:ProfilerMarker, metadata:double) : void
+    + {static} <<unsafe>> Begin(marker:ProfilerMarker, metadata:string) : void
+}
+@enduml

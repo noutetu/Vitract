@@ -1,0 +1,7 @@
+@startuml
+class AdaptivePerformanceProfilerModule {
+    + <<override>> CreateDetailsViewController() : ProfilerModuleViewController
+    + AdaptivePerformanceProfilerModule()
+}
+ProfilerModule <|-- AdaptivePerformanceProfilerModule
+@enduml

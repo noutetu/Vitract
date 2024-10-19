@@ -1,0 +1,12 @@
+@startuml
+abstract class AdaptivePerformanceLoader {
+    + <<virtual>> Initialize() : bool
+    + <<virtual>> Start() : bool
+    + <<virtual>> Stop() : bool
+    + <<virtual>> Deinitialize() : bool
+    + {abstract} GetLoadedSubsystem() : T
+    + {abstract} GetDefaultSubsystem() : ISubsystem
+    + {abstract} GetSettings() : IAdaptivePerformanceSettings
+}
+ScriptableObject <|-- AdaptivePerformanceLoader
+@enduml

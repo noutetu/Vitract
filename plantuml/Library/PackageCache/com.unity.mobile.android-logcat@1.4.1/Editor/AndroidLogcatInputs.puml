@@ -1,0 +1,8 @@
+@startuml
+class AndroidLogcatInputs {
+}
+class KeyResult {
+}
+AndroidLogcatInputs +-- KeyResult
+KeyResult o-> "Empty" KeyResult
+@enduml

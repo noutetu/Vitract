@@ -1,0 +1,15 @@
+@startuml
+class ReadmeVE3 {
+    + title : string
+    + loadedLayout : bool
+}
+class Section {
+    + heading : string
+    + text : string
+    + linkText : string
+    + url : string
+}
+ScriptableObject <|-- ReadmeVE3
+ReadmeVE3 --> "icon" Texture2D
+ReadmeVE3 +-- Section
+@enduml

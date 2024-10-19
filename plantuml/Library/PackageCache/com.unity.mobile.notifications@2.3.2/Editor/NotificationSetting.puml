@@ -1,0 +1,13 @@
+@startuml
+class NotificationSetting {
+    + Key : string
+    + Label : string
+    + Tooltip : string
+    + Value : object
+    + WriteToPlist : bool
+    + NotificationSetting(key:string, label:string, tooltip:string, value:object, writeToPlist:bool, dependencies:List<NotificationSetting>)
+}
+class "List`1"<T> {
+}
+NotificationSetting --> "Dependencies<NotificationSetting>" "List`1"
+@enduml
