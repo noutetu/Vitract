@@ -1,18 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using DG.Tweening;
+using UniRx;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(TargetList))]
+[RequireComponent(typeof(CharacterMotionFacade))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
-[RequireComponent(typeof(CharacterMotionFacade))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
+    // TODO  二体以上同時リストに登録されると移動しなくなる。
     // ------------- キャラクターのステータス ------------------
 
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
-    protected List<IDamageable> enemies;  // 攻撃対象の敵リスト
 
     [SerializeField] private HPBar hpBar;               // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
@@ -22,16 +23,17 @@ public abstract class Character : MonoBehaviour, IDamageable
     private bool isDead;              // 死亡フラグ
     public bool IsDead { get => isDead; }
 
-    protected CharacterState characterState; // キャラクターの現在の状態
     // ------------- コンポーネント ------------------
     private CharacterMotionFacade MotionFacade;
+    protected CharacterState characterState; // キャラクターの現在の状態
+    protected TargetList targetList;
 
     // ------------- キャラクターのステータス ------------------
 
     private string name;               // キャラクターの名前
     private int cost;                  // コスト
     private float maxHp;               // 最大体力
-    private float currentHp;           // 現在の体力
+    public ReactiveProperty<float> currentHp = new ReactiveProperty<float>();           // 現在の体力
     private float deffence;            //防御力
     private float magicDeffence;       //魔法防御力
     private float atk;                 // 攻撃力
@@ -48,7 +50,23 @@ public abstract class Character : MonoBehaviour, IDamageable
     private void Awake()
     {
         MotionFacade = GetComponent<CharacterMotionFacade>();
-        MotionFacade.Initialize(HitAttack,Dead);
+        MotionFacade.Initialize(HitAttack, Dead);
+        targetList = GetComponent<TargetList>();
+        // 敵リストに変更があった場合に通知を受けるようにする
+        targetList.enemies.ObserveCountChanged()
+            .Subscribe(count =>
+            {
+                if (count > 0)
+                {
+                    enemyObject = targetList.SetNextEnemy();
+                }
+                else
+                {
+                    characterState = CharacterState.Run;
+                    enemyObject = null;
+                }
+            })
+            .AddTo(this);
     }
 
     private void OnEnable()
@@ -56,13 +74,13 @@ public abstract class Character : MonoBehaviour, IDamageable
         // キャラクターの初期化
         InitCharacter();
         // HPバーの初期化
-        hpBar.SetHP(currentHp / maxHp);
+        hpBar.SetHP(currentHp.Value / maxHp);
     }
 
     private void OnDisable()
     {
         // イベントの登録解除
-        MotionFacade.DeInitialize(HitAttack,Dead);
+        MotionFacade.DeInitialize(HitAttack, Dead);
     }
 
     private void OnDestroy()
@@ -78,8 +96,6 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     protected virtual void FixedUpdate()
     {
-        // 攻撃対象がすでに死んでいるかを確認
-        UpdateEnemies();
         // 自分が死んでいないか確認
         if (isDead) { characterState = CharacterState.Die; }
         // 城が破壊されていたらアイドル状態に
@@ -103,7 +119,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         switch (characterState)
         {
             case CharacterState.Run:
-                MotionFacade.RunMotion(speed,isPlayer);
+                MotionFacade.RunMotion(speed, isPlayer);
                 break;
             case CharacterState.Die:
                 MotionFacade.DeathMotion();
@@ -113,13 +129,6 @@ public abstract class Character : MonoBehaviour, IDamageable
                 break;
         }
     }
-
-    
-
-    
-
-    
-
     // ------------- 衝突イベント処理 ------------------
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -135,11 +144,11 @@ public abstract class Character : MonoBehaviour, IDamageable
             // まだリストにない敵キャラクターを登録
             if (collidedCharacter != null)
             {
-                RegisterAtEnemies(collidedCharacter);
+                targetList.RegisterAtEnemies(collidedCharacter);
             }
 
             // 最初の敵キャラクターを攻撃対象とする
-            SetNextEnemy();
+            enemyObject = targetList.SetNextEnemy();
             //敵キャラクターがいて、現在攻撃中でなければ
             if (enemyObject != null && canAttack)
             {
@@ -188,10 +197,10 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         if (isDead) return true;  // 既に死亡している場合はすぐに終了
 
-        currentHp = Mathf.Max(currentHp - damage, 0);
-        hpBar.UpdateHP(currentHp / maxHp);
+        currentHp.Value = Mathf.Max(currentHp.Value - damage, 0);
+        hpBar.UpdateHP(currentHp.Value / maxHp);
 
-        if (currentHp <= 0)
+        if (currentHp.Value <= 0)
         {
             isDead = true;
             characterState = CharacterState.Die;
@@ -205,10 +214,6 @@ public abstract class Character : MonoBehaviour, IDamageable
     // 次の敵を探し、必要であれば攻撃再開か走行状態に遷移
     private void HandleNextEnemyOrRun()
     {
-        RemoveInEnemies(enemyObject);
-        // 次の敵キャラクターを選択する
-        SetNextEnemy();
-
         // 敵キャラクターが存在する場合は攻撃を再開
         if (enemyObject != null)
         {
@@ -227,59 +232,22 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         //待機モーション
         MotionFacade.IdleMotion();
-        DOVirtual.DelayedCall(attackCoolTime / GameManager.Instance.gameSpeed, () =>
-        {
-            canAttack = true;
-            if (!IsDead)
+
+
+        Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed))
+            .Subscribe(_ =>
             {
-                AttackEvent();
-            }  
-        });
-    }
+                canAttack = true;
+                if (!IsDead)
+                {
+                    AttackEvent();
+                }
+            })
+            .AddTo(this); // thisはMonoBehaviourを指し、購読のライフタイムを管理
 
 
-
-    // ------------- リスト関連 ------------------
-    protected void RemoveInEnemies(IDamageable enemy)
-    {
-        if (enemies.Contains(enemy))
-        {
-            enemies.Remove(enemy);
-        }
-    }
-    protected void RegisterAtEnemies(IDamageable targetEnemy)
-{
-    // ターゲットがすでに死んでいたらreturn
-    Character character = targetEnemy as Character;
-    if (character != null)
-    {
-        if(character.isDead) { return;}
     }
 
-    // enemiesリストにまだ登録されていない場合のみ登録する
-    if (!enemies.Contains(targetEnemy))
-    {
-        enemies.Add(targetEnemy);
-    }
-}
-
-    protected void SetNextEnemy()
-    {
-        enemyObject = enemies.Count > 0 ? enemies[0] : null;
-    }
-    private void UpdateEnemies()
-    {
-        // 破壊されたオブジェクトをリストから削除して
-        enemies.RemoveAll(enemy => enemy == null);
-        if (enemies.Count > 0)
-        {
-            // まだ敵がいるなら攻撃対象に設定
-            SetNextEnemy();
-            return;
-        }
-        characterState = CharacterState.Run;
-
-    }
     // ------------- アニメーションイベント ------------------
 
     private void HitAttack()
@@ -288,11 +256,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (enemyObject != null)
         {
             // 敵が死んだ場合
-            if (HandleDamageAndCheckDead(enemyObject))
-            {
-                HandleNextEnemyOrRun();
-                return;
-            }
+            HandleDamageAndCheckDead(enemyObject);
 
             // 敵がまだ生きている場合
             ScheduleNextAttack();
@@ -332,7 +296,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
         name = characterBase.Name;
         maxHp = characterBase.MaxHp;
-        currentHp = maxHp;
+        currentHp.Value = maxHp;
         atk = characterBase.Atk;
         attackSpeed = characterBase.AttackSpeed;
         attackCoolTime = characterBase.AttackCoolTime;
@@ -343,7 +307,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         cost = characterBase.Cost;
         characterType = characterBase.CharacterType;
         canAttack = true;
-        enemies = new List<IDamageable>();
     }
 
     // ------------- ログ出力 ------------------

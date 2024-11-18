@@ -37,7 +37,7 @@ public class Magician : Character
             // 敵リストに追加
             if (detectedObject != null)
             {
-                RegisterAtEnemies(detectedObject);
+                targetList.RegisterAtEnemies(detectedObject);
             }
 
             Debug.Log("検知したオブジェクト: " + hitCollider.name);

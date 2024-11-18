@@ -38,13 +38,11 @@ public class CharacterMotionFacade : MonoBehaviour
     public void DeathMotion()
     {
         anim.DeadAnim();        // 死亡アニメーションの再生
-        charaMover.Stop();      // 移動を停止
     }
 
     public void IdleMotion()
     {
         anim.IdleAnim();
-        charaMover.Stop();
     }
     public void NormalAttackMotion(float attackSpeed)
     {
