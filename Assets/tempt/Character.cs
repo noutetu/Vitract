@@ -3,6 +3,7 @@ using DG.Tweening;
 using UniRx;
 using Unity.VisualScripting;
 using UnityEngine;
+using Vitract.Character.Effects;
 
 [RequireComponent(typeof(TargetList))]
 [RequireComponent(typeof(CharacterMotionFacade))]
@@ -33,7 +34,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     private string name;               // キャラクターの名前
     private int cost;                  // コスト
     private float maxHp;               // 最大体力
-    public ReactiveProperty<float> currentHp = new ReactiveProperty<float>();           // 現在の体力
+    public ReactiveProperty<float> currentHp{get;set;} = new ReactiveProperty<float>();           // 現在の体力
     private float deffence;            //防御力
     private float magicDeffence;       //魔法防御力
     private float atk;                 // 攻撃力
@@ -106,9 +107,13 @@ public abstract class Character : MonoBehaviour, IDamageable
         }
 
         HandleState();
-        if (enemyObject != null && canAttack)
+        if (enemyObject != null)
         {
-            AttackEvent();
+            MotionFacade.IdleMotion();
+            if (canAttack)
+            {
+                AttackEvent();
+            }
         }
     }
 
@@ -186,16 +191,15 @@ public abstract class Character : MonoBehaviour, IDamageable
         MotionFacade.NormalAttackMotion(attackSpeed);
     }
     // ------------- ダメージ処理と死亡判定 --------------------
-    private bool HandleDamageAndCheckDead(IDamageable target)
+    private void HandleDamageAndCheckDead(IDamageable target)
     {
-        if (target == null) return true;
-        bool targetIsDead = target.TakeDamageAndCheckDead(atk);  // ダメージを与える
-        return targetIsDead;
+        if (target == null) return;
+        target.TakeDamage(atk);  // ダメージを与える
     }
 
-    public bool TakeDamageAndCheckDead(float damage)
+    public void TakeDamage(float damage)
     {
-        if (isDead) return true;  // 既に死亡している場合はすぐに終了
+        if (isDead) return;  // 既に死亡している場合はすぐに終了
 
         currentHp.Value = Mathf.Max(currentHp.Value - damage, 0);
         hpBar.UpdateHP(currentHp.Value / maxHp);
@@ -204,9 +208,8 @@ public abstract class Character : MonoBehaviour, IDamageable
         {
             isDead = true;
             characterState = CharacterState.Die;
-            return true;
-        }
-        return false;
+            return;
+        };
     }
 
     // ------------- 攻撃関連処理 -------------
@@ -221,8 +224,16 @@ public abstract class Character : MonoBehaviour, IDamageable
         }
         else
         {
-            canAttack = true;
+
+
             characterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
+            // クールタイム後再度攻撃
+            Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed))
+                .Subscribe(_ =>
+                {
+                    canAttack = true;
+                })
+                .AddTo(this); // thisはMonoBehaviourを指し、購読のライフタイムを管理
         }
     }
 
@@ -232,8 +243,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         //待機モーション
         MotionFacade.IdleMotion();
-
-
+        // クールタイム後再度攻撃
         Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed))
             .Subscribe(_ =>
             {
@@ -244,8 +254,6 @@ public abstract class Character : MonoBehaviour, IDamageable
                 }
             })
             .AddTo(this); // thisはMonoBehaviourを指し、購読のライフタイムを管理
-
-
     }
 
     // ------------- アニメーションイベント ------------------
@@ -259,7 +267,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             HandleDamageAndCheckDead(enemyObject);
 
             // 敵がまだ生きている場合
-            ScheduleNextAttack();
+            HandleNextEnemyOrRun();
         }
     }
 
@@ -319,7 +327,8 @@ public abstract class Character : MonoBehaviour, IDamageable
 
 public interface IDamageable
 {
-    bool TakeDamageAndCheckDead(float damage);
+    public ReactiveProperty<float> currentHp { get; set; }
+    void TakeDamage(float damage);
 }
 
 public enum CharacterState

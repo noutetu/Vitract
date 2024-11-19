@@ -2,34 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UniRx;
 
-public class Castle : MonoBehaviour,IDamageable
+public class Castle : MonoBehaviour, IDamageable
 {
     private bool isDead;
     [SerializeField] float hp;
     [SerializeField] int cost;
     [SerializeField] bool isPlayer;
-    private float currentHp;
+    public ReactiveProperty<float> currentHp{get;set;} = new ReactiveProperty<float>();           // 現在の体力
     [SerializeField] private HPBar hpBar;
 
     private void Start()
     {
-        currentHp = hp;
-        hpBar.SetHP(currentHp / hp);
+        currentHp.Value = hp;
+        hpBar.SetHP(currentHp.Value / hp);
     }
-    public bool TakeDamageAndCheckDead(float damage)
+    public void TakeDamage(float damage)
     {
-        if(isDead) {return true;}
-        currentHp = Mathf.Max(currentHp - damage, 0);
-        hpBar.UpdateHP(currentHp / hp);
+        if (isDead) { return; }
+        currentHp.Value = Mathf.Max(currentHp.Value - damage, 0);
+        hpBar.UpdateHP(currentHp.Value / hp);
 
-        if (currentHp <= 0)
+        if (currentHp.Value <= 0)
         {
             GameManager.Instance.GameResult(isPlayer);
             isDead = true;
             Destroy(gameObject);
-            return true;
+            return;
         }
-        return false;
     }
 }
