@@ -11,7 +11,8 @@ using Vitract.Character.Effects;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
-    // TODO  二体以上同時リストに登録されると移動しなくなる。
+    // TODO　攻撃のクールタイム中に待機モーションのまま進むあり得ないバグ💢
+    // TODO　UniRxのリファクタリング
     // ------------- キャラクターのステータス ------------------
 
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
@@ -19,7 +20,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     [SerializeField] private HPBar hpBar;               // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
 
-    bool canAttack;
+    [SerializeField] bool canAttack;
     public bool isPlayer;             // プレイヤーかどうか
     private bool isDead;              // 死亡フラグ
     public bool IsDead { get => isDead; }
@@ -27,14 +28,14 @@ public abstract class Character : MonoBehaviour, IDamageable
     // ------------- コンポーネント ------------------
     private CharacterMotionFacade MotionFacade;
     protected CharacterState characterState; // キャラクターの現在の状態
-    protected TargetList targetList;
+    [SerializeField] protected TargetList targetList;
 
     // ------------- キャラクターのステータス ------------------
 
     private string name;               // キャラクターの名前
     private int cost;                  // コスト
     private float maxHp;               // 最大体力
-    public ReactiveProperty<float> currentHp{get;set;} = new ReactiveProperty<float>();           // 現在の体力
+    public ReactiveProperty<float> currentHp { get; set; } = new ReactiveProperty<float>();           // 現在の体力
     private float deffence;            //防御力
     private float magicDeffence;       //魔法防御力
     private float atk;                 // 攻撃力
@@ -59,7 +60,10 @@ public abstract class Character : MonoBehaviour, IDamageable
             {
                 if (count > 0)
                 {
-                    enemyObject = targetList.SetNextEnemy();
+                    if (enemyObject == null)
+                    {
+                        enemyObject = targetList.SetNextEnemy();
+                    }
                 }
                 else
                 {
@@ -150,6 +154,16 @@ public abstract class Character : MonoBehaviour, IDamageable
             if (collidedCharacter != null)
             {
                 targetList.RegisterAtEnemies(collidedCharacter);
+
+                // HPが0以下になったときにリストから削除する購読を追加
+            collidedCharacter.currentHp
+                .Skip(1) // 初期値をスキップして、変化があった時のみ反応
+                .Where(hp => hp <= 0)
+                .Subscribe(_ =>
+                {
+                    enemyObject = null;
+                })
+                .AddTo(this); // 購読を管理リストに追加
             }
 
             // 最初の敵キャラクターを攻撃対象とする
@@ -327,7 +341,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
 public interface IDamageable
 {
-    public ReactiveProperty<float> currentHp { get; set; }
+    ReactiveProperty<float> currentHp { get; set; }
     void TakeDamage(float damage);
 }
 
