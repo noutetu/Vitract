@@ -11,7 +11,6 @@ using Vitract.Character.Effects;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
-    // TODO　攻撃のクールタイム中に待機モーションのまま進むあり得ないバグ💢
     // TODO　UniRxのリファクタリング
     // ------------- キャラクターのステータス ------------------
 
@@ -20,7 +19,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     [SerializeField] private HPBar hpBar;               // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
 
-    [SerializeField] bool canAttack;
+    [SerializeField] protected bool canAttack;
     public bool isPlayer;             // プレイヤーかどうか
     private bool isDead;              // 死亡フラグ
     public bool IsDead { get => isDead; }
@@ -113,7 +112,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         HandleState();
         if (enemyObject != null)
         {
-            MotionFacade.IdleMotion();
+            characterState = CharacterState.Idle;
             if (canAttack)
             {
                 AttackEvent();
@@ -150,12 +149,10 @@ public abstract class Character : MonoBehaviour, IDamageable
         {
             IDamageable collidedCharacter = other.gameObject.GetComponent<IDamageable>();
 
-            // まだリストにない敵キャラクターを登録
-            if (collidedCharacter != null)
-            {
-                targetList.RegisterAtEnemies(collidedCharacter);
 
-                // HPが0以下になったときにリストから削除する購読を追加
+            targetList.RegisterAtEnemies(collidedCharacter);
+
+            // HPが0以下になったときにリストから削除する購読を追加
             collidedCharacter.currentHp
                 .Skip(1) // 初期値をスキップして、変化があった時のみ反応
                 .Where(hp => hp <= 0)
@@ -164,7 +161,7 @@ public abstract class Character : MonoBehaviour, IDamageable
                     enemyObject = null;
                 })
                 .AddTo(this); // 購読を管理リストに追加
-            }
+
 
             // 最初の敵キャラクターを攻撃対象とする
             enemyObject = targetList.SetNextEnemy();
@@ -185,7 +182,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     // ------------- 攻撃処理 ------------------
 
-    private void AttackEvent()
+    protected void AttackEvent()
     {
         canAttack = false;
         if (!IsDead)
@@ -205,7 +202,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         MotionFacade.NormalAttackMotion(attackSpeed);
     }
     // ------------- ダメージ処理と死亡判定 --------------------
-    private void HandleDamageAndCheckDead(IDamageable target)
+    private void HandleDamage(IDamageable target)
     {
         if (target == null) return;
         target.TakeDamage(atk);  // ダメージを与える
@@ -238,8 +235,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         }
         else
         {
-
-
             characterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
             // クールタイム後再度攻撃
             Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed))
@@ -278,7 +273,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (enemyObject != null)
         {
             // 敵が死んだ場合
-            HandleDamageAndCheckDead(enemyObject);
+            HandleDamage(enemyObject);
 
             // 敵がまだ生きている場合
             HandleNextEnemyOrRun();

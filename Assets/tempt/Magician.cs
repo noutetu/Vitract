@@ -1,3 +1,4 @@
+using UniRx;
 using UnityEngine;
 
 public class Magician : Character
@@ -8,6 +9,7 @@ public class Magician : Character
     public LayerMask targetLayer; // 検知対象のレイヤー
     Vector2 detectionCenter;  // 現在の位置を中心にボックス範囲を設定
 
+    // TODO なんか二体目以降にうまく遠距離攻撃できない（接触するといける）
     protected override void Start()
     {
         // rangeを使ってboxSizeを初期化
@@ -35,10 +37,27 @@ public class Magician : Character
             IDamageable detectedObject = hitCollider.GetComponent<IDamageable>();
 
             // 敵リストに追加
-            if (detectedObject != null)
+
+            targetList.RegisterAtEnemies(detectedObject);
+            // HPが0以下になったときにリストから削除する購読を追加
+            detectedObject.currentHp
+                //.Skip(1) // 初期値をスキップして、変化があった時のみ反応
+                .Where(hp => hp <= 0)
+                .Subscribe(_ =>
+                {
+                    enemyObject = null;
+                    targetList.RemoveInEnemies(detectedObject);
+                })
+                .AddTo(this); // 購読を管理リストに追加
+
+            // 最初の敵キャラクターを攻撃対象とする
+            enemyObject = targetList.SetNextEnemy();
+            //敵キャラクターがいて、現在攻撃中でなければ
+            if (enemyObject != null && canAttack)
             {
-                targetList.RegisterAtEnemies(detectedObject);
+                AttackEvent();  // 攻撃イベントの開始
             }
+
 
             Debug.Log("検知したオブジェクト: " + hitCollider.name);
         }

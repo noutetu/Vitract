@@ -72,8 +72,6 @@ public class TargetList : MonoBehaviour
     {
         disposables.Dispose(); // すべての購読を解除
     }
-
-    
 }
 
 
