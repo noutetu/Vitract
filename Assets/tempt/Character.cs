@@ -11,7 +11,7 @@ using Vitract.Character.Effects;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
-    // TODO　UniRxのリファクタリング
+    // TODO　ChatGPTのアドバイス見る
     // ------------- キャラクターのステータス ------------------
 
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
@@ -22,7 +22,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     [SerializeField] protected bool canAttack;
     public bool isPlayer;             // プレイヤーかどうか
     private bool isDead;              // 死亡フラグ
-    public bool IsDead { get => isDead; }
+    public bool IsDead { get => isDead;}
 
     // ------------- コンポーネント ------------------
     private CharacterMotionFacade MotionFacade;
@@ -53,6 +53,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         MotionFacade = GetComponent<CharacterMotionFacade>();
         MotionFacade.Initialize(HitAttack, Dead);
         targetList = GetComponent<TargetList>();
+
         // 敵リストに変更があった場合に通知を受けるようにする
         targetList.enemies.ObserveCountChanged()
             .Subscribe(count =>
@@ -61,7 +62,7 @@ public abstract class Character : MonoBehaviour, IDamageable
                 {
                     if (enemyObject == null)
                     {
-                        enemyObject = targetList.SetNextEnemy();
+                        SetNextEnemy();
                     }
                 }
                 else
@@ -71,6 +72,20 @@ public abstract class Character : MonoBehaviour, IDamageable
                 }
             })
             .AddTo(this);
+
+        // 敵がいるかどうかを監視し、いるなら待機して攻撃可能状態を待つ
+        Observable.EveryUpdate()
+                    .Where(_ => enemyObject != null)
+                    .Subscribe(_ =>
+                    {
+                        // enemyObjectがnullでないときにのみ実行する処理
+                        characterState = CharacterState.Idle;
+                        if (canAttack)
+                        {
+                            AttackEvent();
+                        }
+                    })
+                    .AddTo(this);
     }
 
     private void OnEnable()
@@ -110,14 +125,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         }
 
         HandleState();
-        if (enemyObject != null)
-        {
-            characterState = CharacterState.Idle;
-            if (canAttack)
-            {
-                AttackEvent();
-            }
-        }
     }
 
     // ------------- キャラクターの状態管理 ------------------
@@ -147,28 +154,13 @@ public abstract class Character : MonoBehaviour, IDamageable
         // 敵キャラクターとの衝突処理
         if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Enemy"))
         {
-            IDamageable collidedCharacter = other.gameObject.GetComponent<IDamageable>();
-
-
-            targetList.RegisterAtEnemies(collidedCharacter);
-
-            // HPが0以下になったときにリストから削除する購読を追加
-            collidedCharacter.currentHp
-                .Skip(1) // 初期値をスキップして、変化があった時のみ反応
-                .Where(hp => hp <= 0)
-                .Subscribe(_ =>
-                {
-                    enemyObject = null;
-                })
-                .AddTo(this); // 購読を管理リストに追加
-
-
-            // 最初の敵キャラクターを攻撃対象とする
-            enemyObject = targetList.SetNextEnemy();
-            //敵キャラクターがいて、現在攻撃中でなければ
-            if (enemyObject != null && canAttack)
+            IDamageable enemy = DetectEnemy(other.gameObject);
+            if (enemy != null)
             {
-                AttackEvent();  // 攻撃イベントの開始
+                AddEnemyToList(enemy);
+                SubscribeToEnemyHealth(enemy);
+                SetNextEnemy();
+                InitiateAttackIfPossible();
             }
         }
     }
@@ -251,7 +243,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     private void ScheduleNextAttack()
     {
         //待機モーション
-        MotionFacade.IdleMotion();
+        characterState = CharacterState.Idle;
         // クールタイム後再度攻撃
         Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed))
             .Subscribe(_ =>
@@ -284,6 +276,51 @@ public abstract class Character : MonoBehaviour, IDamageable
     public void Dead()
     {
         Destroy(gameObject);  // キャラクターを削除
+    }
+    //--------------敵感知--------------
+
+    protected IDamageable DetectEnemy(GameObject other)
+    {
+        return other.GetComponent<IDamageable>();
+    }
+
+    protected void AddEnemyToList(IDamageable detectedObject)
+    {
+        // 敵リストに追加
+        targetList.RegisterAtEnemies(detectedObject);
+    }
+
+    protected void SubscribeToEnemyHealth(IDamageable enemy)
+    {
+        // HPが0以下になったときにリストから削除する購読を追加
+        enemy.currentHp
+            //.Skip(1) // 初期値をスキップして、変化があった時のみ反応
+            .Where(hp => hp <= 0)
+            .Subscribe(_ =>
+            {
+                RemoveEnemyAndResetTarget(enemy);
+            })
+            .AddTo(this); // 購読を管理リストに追加
+    }
+
+    protected void RemoveEnemyAndResetTarget(IDamageable enemy)
+    {
+        enemyObject = null;
+        targetList.RemoveInEnemies(enemy);
+    }
+
+    protected void SetNextEnemy()
+    {
+        enemyObject = targetList.SetNextEnemy();
+    }
+
+    protected void InitiateAttackIfPossible()
+    {
+        //敵キャラクターがいて、現在攻撃中でなければ
+        if (enemyObject != null && canAttack)
+        {
+            AttackEvent();  // 攻撃イベントの開始
+        }
     }
     //--------------DOTWEEN--------------
     public void SmoothAppear()

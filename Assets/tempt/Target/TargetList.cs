@@ -44,16 +44,6 @@ public class TargetList : MonoBehaviour
         if (!enemies.Contains(targetEnemy))
         {
             enemies.Add(targetEnemy);
-
-            // HPが0以下になったときにリストから削除する購読を追加
-            targetEnemy.currentHp
-                .Skip(1) // 初期値をスキップして、変化があった時のみ反応
-                .Where(hp => hp <= 0)
-                .Subscribe(_ =>
-                {
-                    RemoveInEnemies(targetEnemy);
-                })
-                .AddTo(disposables); // 購読を管理リストに追加
         }
     }
 
@@ -73,5 +63,13 @@ public class TargetList : MonoBehaviour
         disposables.Dispose(); // すべての購読を解除
     }
 }
-
+/*HPが0以下になったときにリストから削除する購読を追加
+            targetEnemy.currentHp
+                .Skip(1) // 初期値をスキップして、変化があった時のみ反応
+                .Where(hp => hp <= 0)
+                .Subscribe(_ =>
+                {
+                    RemoveInEnemies(targetEnemy);
+                })
+                .AddTo(disposables); 購読を管理リストに追加*/ 
 
