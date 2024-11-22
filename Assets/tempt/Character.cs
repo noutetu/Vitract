@@ -1,7 +1,6 @@
 using System;
 using DG.Tweening;
 using UniRx;
-using Unity.VisualScripting;
 using UnityEngine;
 using Vitract.Character.Effects;
 
@@ -18,11 +17,12 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     [SerializeField] private HPBar hpBar;               // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
-
+    // 攻撃クールダウン管理用の Subject
+    private Subject<Unit> cooldownSubject = new Subject<Unit>();
     [SerializeField] protected bool canAttack;
     public bool isPlayer;             // プレイヤーかどうか
     private bool isDead;              // 死亡フラグ
-    public bool IsDead { get => isDead;}
+    public bool IsDead { get => isDead; }
 
     // ------------- コンポーネント ------------------
     private CharacterMotionFacade MotionFacade;
@@ -86,6 +86,16 @@ public abstract class Character : MonoBehaviour, IDamageable
                         }
                     })
                     .AddTo(this);
+
+        // クールダウンが完了したときに攻撃可能にする購読
+        cooldownSubject
+            .SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed)))
+            .Subscribe(_ =>
+            {
+                canAttack = true;
+                Debug.Log("攻撃が再び可能です");
+            })
+            .AddTo(this);
     }
 
     private void OnEnable()
@@ -157,6 +167,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             IDamageable enemy = DetectEnemy(other.gameObject);
             if (enemy != null)
             {
+                // TODO SetNextEnemyを消したい
                 AddEnemyToList(enemy);
                 SubscribeToEnemyHealth(enemy);
                 SetNextEnemy();
@@ -229,12 +240,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         {
             characterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
             // クールタイム後再度攻撃
-            Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed))
-                .Subscribe(_ =>
-                {
-                    canAttack = true;
-                })
-                .AddTo(this); // thisはMonoBehaviourを指し、購読のライフタイムを管理
+            cooldownSubject.OnNext(Unit.Default);
         }
     }
 
@@ -245,16 +251,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         //待機モーション
         characterState = CharacterState.Idle;
         // クールタイム後再度攻撃
-        Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed))
-            .Subscribe(_ =>
-            {
-                canAttack = true;
-                if (!IsDead)
-                {
-                    AttackEvent();
-                }
-            })
-            .AddTo(this); // thisはMonoBehaviourを指し、購読のライフタイムを管理
+        cooldownSubject.OnNext(Unit.Default);
     }
 
     // ------------- アニメーションイベント ------------------
@@ -300,7 +297,8 @@ public abstract class Character : MonoBehaviour, IDamageable
             {
                 RemoveEnemyAndResetTarget(enemy);
             })
-            .AddTo(this); // 購読を管理リストに追加
+            .AddTo(this) // 購読を管理リストに追加
+            .AddTo(enemy as Component);
     }
 
     protected void RemoveEnemyAndResetTarget(IDamageable enemy)

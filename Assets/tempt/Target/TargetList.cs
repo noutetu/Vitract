@@ -57,6 +57,11 @@ public class TargetList : MonoBehaviour
         return null;
     }
 
+    public bool CheckContainsEnemy(IDamageable targetEnemy)
+    {
+        return enemies.Contains(targetEnemy);
+    }
+
     // ------------------- クリーンアップ -------------------
     private void OnDestroy()
     {
