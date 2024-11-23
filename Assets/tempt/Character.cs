@@ -4,29 +4,28 @@ using UniRx;
 using UnityEngine;
 using Vitract.Character.Effects;
 
-[RequireComponent(typeof(TargetList))]
 [RequireComponent(typeof(CharacterMotionFacade))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
     // ------------- キャラクターのステータス ------------------
-// TODO 　Reactive Collectionを整備したい
+    // TODO 　Reactive Collectionを整備したい
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
 
     [SerializeField] private HPBar hpBar;                 // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
     private Subject<Unit> cooldownSubject
                         = new Subject<Unit>();            // 攻撃クールダウン管理用の Subject
-    [SerializeField] protected bool canAttack; 
-    public bool isPlayer;             
-    private bool isDead;              
+    [SerializeField] protected bool canAttack;
+    public bool isPlayer;
+    private bool isDead;
     public bool IsDead { get => isDead; }
 
     // ------------- コンポーネント ------------------
     private CharacterMotionFacade MotionFacade; //アニメーションと移動管理
     protected CharacterState characterState; // キャラクターの現在の状態
-    [SerializeField] protected TargetList targetList;  // ターゲット管理
+    protected ReactiveCollection<IDamageable> targetList;
 
     // ------------- キャラクターのステータス ------------------
 
@@ -51,38 +50,30 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         MotionFacade = GetComponent<CharacterMotionFacade>();
         MotionFacade.Initialize(HitAttack, Dead);
-        targetList = GetComponent<TargetList>();
-        targetList.Initialize();
 
-        //リストの要素が増えた時 
-        targetList.enemies.ObserveAdd()
-        .Subscribe(addEnemy => 
-        {
+        targetList = new ReactiveCollection<IDamageable>();
+        targetList.ObserveAdd().Subscribe(item =>
+        { 
             SetNextEnemy();
-            // コレクションの最後の要素のHPを購読
-            SubscribeToEnemyHealth(targetList.enemies[targetList.enemies.Count - 1]);
-        })
-        .AddTo(this);
-        // リストの要素が減った時
-        targetList.enemies.ObserveRemove()
-        .Subscribe(addEnemy => 
+            SubscribeToEnemyHealth(targetList[targetList.Count - 1]);
+        });
+        targetList.ObserveRemove().Subscribe(item => 
         {
             //　敵リストに敵がいるならターゲットに設定
-            if(targetList.enemies.Count > 0)
+            if (targetList.Count > 0)
             {
-                if(enemyObject == null)
+                if (enemyObject == null)
                 {
                     SetNextEnemy();
                 }
             }
             //　敵がいないなら走る状態に
-            else{
+            else
+            {
                 characterState = CharacterState.Run;
                 enemyObject = null;
             }
-        })
-        .AddTo(this);
-
+        });
         // 敵がいるかどうかを監視し、いるなら待機して攻撃可能状態を待つ
         Observable.EveryUpdate()
                     .Where(_ => enemyObject != null)
@@ -120,6 +111,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         // イベントの登録解除
         MotionFacade.DeInitialize(HitAttack, Dead);
+        targetList.Dispose();
     }
 
     private void OnDestroy()
@@ -263,7 +255,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     protected void AddEnemyToList(IDamageable detectedObject)
     {
         // 敵リストに追加
-        targetList.RegisterAtEnemies(detectedObject);
+        targetList.Add(detectedObject);
     }
 
     protected void SubscribeToEnemyHealth(IDamageable enemy)
@@ -283,12 +275,12 @@ public abstract class Character : MonoBehaviour, IDamageable
     protected void RemoveEnemyAndResetTarget(IDamageable enemy)
     {
         enemyObject = null;
-        targetList.RemoveInEnemies(enemy);
+        targetList.Remove(enemy);
     }
 
     protected void SetNextEnemy()
     {
-        enemyObject = targetList.SetNextEnemy();
+        enemyObject = targetList[0];
     }
 
     //--------------DOTWEEN--------------
