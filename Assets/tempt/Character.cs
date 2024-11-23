@@ -10,24 +10,23 @@ using Vitract.Character.Effects;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
-    // TODO　ChatGPTのアドバイス見る
     // ------------- キャラクターのステータス ------------------
-
+// TODO 　Reactive Collectionを整備したい
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
 
-    [SerializeField] private HPBar hpBar;               // HPバーの参照
+    [SerializeField] private HPBar hpBar;                 // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
-    // 攻撃クールダウン管理用の Subject
-    private Subject<Unit> cooldownSubject = new Subject<Unit>();
-    [SerializeField] protected bool canAttack;
-    public bool isPlayer;             // プレイヤーかどうか
-    private bool isDead;              // 死亡フラグ
+    private Subject<Unit> cooldownSubject
+                        = new Subject<Unit>();            // 攻撃クールダウン管理用の Subject
+    [SerializeField] protected bool canAttack; 
+    public bool isPlayer;             
+    private bool isDead;              
     public bool IsDead { get => isDead; }
 
     // ------------- コンポーネント ------------------
-    private CharacterMotionFacade MotionFacade;
+    private CharacterMotionFacade MotionFacade; //アニメーションと移動管理
     protected CharacterState characterState; // キャラクターの現在の状態
-    [SerializeField] protected TargetList targetList;
+    [SerializeField] protected TargetList targetList;  // ターゲット管理
 
     // ------------- キャラクターのステータス ------------------
 
@@ -53,25 +52,36 @@ public abstract class Character : MonoBehaviour, IDamageable
         MotionFacade = GetComponent<CharacterMotionFacade>();
         MotionFacade.Initialize(HitAttack, Dead);
         targetList = GetComponent<TargetList>();
+        targetList.Initialize();
 
-        // 敵リストに変更があった場合に通知を受けるようにする
-        targetList.enemies.ObserveCountChanged()
-            .Subscribe(count =>
+        //リストの要素が増えた時 
+        targetList.enemies.ObserveAdd()
+        .Subscribe(addEnemy => 
+        {
+            SetNextEnemy();
+            // コレクションの最後の要素のHPを購読
+            SubscribeToEnemyHealth(targetList.enemies[targetList.enemies.Count - 1]);
+        })
+        .AddTo(this);
+        // リストの要素が減った時
+        targetList.enemies.ObserveRemove()
+        .Subscribe(addEnemy => 
+        {
+            //　敵リストに敵がいるならターゲットに設定
+            if(targetList.enemies.Count > 0)
             {
-                if (count > 0)
+                if(enemyObject == null)
                 {
-                    if (enemyObject == null)
-                    {
-                        SetNextEnemy();
-                    }
+                    SetNextEnemy();
                 }
-                else
-                {
-                    characterState = CharacterState.Run;
-                    enemyObject = null;
-                }
-            })
-            .AddTo(this);
+            }
+            //　敵がいないなら走る状態に
+            else{
+                characterState = CharacterState.Run;
+                enemyObject = null;
+            }
+        })
+        .AddTo(this);
 
         // 敵がいるかどうかを監視し、いるなら待機して攻撃可能状態を待つ
         Observable.EveryUpdate()
@@ -167,11 +177,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             IDamageable enemy = DetectEnemy(other.gameObject);
             if (enemy != null)
             {
-                // TODO SetNextEnemyを消したい
                 AddEnemyToList(enemy);
-                SubscribeToEnemyHealth(enemy);
-                SetNextEnemy();
-                InitiateAttackIfPossible();
             }
         }
     }
@@ -226,46 +232,19 @@ public abstract class Character : MonoBehaviour, IDamageable
         };
     }
 
-    // ------------- 攻撃関連処理 -------------
 
-    // 次の敵を探し、必要であれば攻撃再開か走行状態に遷移
-    private void HandleNextEnemyOrRun()
-    {
-        // 敵キャラクターが存在する場合は攻撃を再開
-        if (enemyObject != null)
-        {
-            ScheduleNextAttack();
-        }
-        else
-        {
-            characterState = CharacterState.Run;  // 敵がいない場合は走行状態に戻る
-            // クールタイム後再度攻撃
-            cooldownSubject.OnNext(Unit.Default);
-        }
-    }
-
-
-    // クールタイムを待って次の攻撃を実行
-    private void ScheduleNextAttack()
-    {
-        //待機モーション
-        characterState = CharacterState.Idle;
-        // クールタイム後再度攻撃
-        cooldownSubject.OnNext(Unit.Default);
-    }
 
     // ------------- アニメーションイベント ------------------
 
     private void HitAttack()
     {
+        // クールタイム後再度攻撃
+        cooldownSubject.OnNext(Unit.Default);
         // 敵キャラクターへの攻撃
         if (enemyObject != null)
         {
             // 敵が死んだ場合
             HandleDamage(enemyObject);
-
-            // 敵がまだ生きている場合
-            HandleNextEnemyOrRun();
         }
     }
 
@@ -312,14 +291,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         enemyObject = targetList.SetNextEnemy();
     }
 
-    protected void InitiateAttackIfPossible()
-    {
-        //敵キャラクターがいて、現在攻撃中でなければ
-        if (enemyObject != null && canAttack)
-        {
-            AttackEvent();  // 攻撃イベントの開始
-        }
-    }
     //--------------DOTWEEN--------------
     public void SmoothAppear()
     {

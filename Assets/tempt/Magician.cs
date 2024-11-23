@@ -20,8 +20,8 @@ public class Magician : Character
 
     protected override void FixedUpdate()
     {
-        DetectObjects();
         base.FixedUpdate();
+        DetectObjects();
     }
 
     void DetectObjects()
@@ -36,10 +36,7 @@ public class Magician : Character
             IDamageable enemy = DetectEnemy(hitCollider.gameObject);
             if (enemy != null)
             {
-                AddEnemyToList(enemy);
-                SubscribeToEnemyHealth(enemy);
-                SetNextEnemy();
-                InitiateAttackIfPossible();
+                    AddEnemyToList(enemy);
             }
             Debug.Log("検知したオブジェクト: " + hitCollider.name);
         }
@@ -49,7 +46,7 @@ public class Magician : Character
         Debug.DrawRay(detectionCenter, Vector2.up * boxSize.y / 2, Color.red);
     }
 
-    
+
 
     // シーン上で可視化するためのメソッド
     private void OnDrawGizmosSelected()

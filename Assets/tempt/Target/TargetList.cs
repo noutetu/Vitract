@@ -3,24 +3,22 @@ using System.Linq;
 using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
+using Unity.Collections;
+using UnityEngine.UIElements;
 
 [Serializable]
 public class TargetList : MonoBehaviour
 {
     public ReactiveCollection<IDamageable> enemies;  // 攻撃対象の敵リスト
-    private CompositeDisposable disposables = new CompositeDisposable(); // 購読の管理用
+    private CompositeDisposable disposables;
 
     public void Initialize()
     {
         enemies = new ReactiveCollection<IDamageable>();
+        disposables = new CompositeDisposable();
     }
-
-    public void set()
-    {
-        
-    }
-
-    // ------------------- リストから削除 -------------------
+    
+    // ------------------- 敵リストから削除 -------------------
     public void RemoveInEnemies(IDamageable targetEnemy)
     {
         if (targetEnemy != null && enemies.Contains(targetEnemy))
@@ -29,7 +27,7 @@ public class TargetList : MonoBehaviour
         }
     }
 
-    // ------------------- リストに追加 -------------------
+    // ------------------- 敵リストに追加 -------------------
     public void RegisterAtEnemies(IDamageable targetEnemy)
     {
         if (targetEnemy == null || targetEnemy.currentHp == null)
@@ -68,13 +66,4 @@ public class TargetList : MonoBehaviour
         disposables.Dispose(); // すべての購読を解除
     }
 }
-/*HPが0以下になったときにリストから削除する購読を追加
-            targetEnemy.currentHp
-                .Skip(1) // 初期値をスキップして、変化があった時のみ反応
-                .Where(hp => hp <= 0)
-                .Subscribe(_ =>
-                {
-                    RemoveInEnemies(targetEnemy);
-                })
-                .AddTo(disposables); 購読を管理リストに追加*/ 
 
