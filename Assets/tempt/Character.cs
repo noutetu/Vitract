@@ -4,6 +4,7 @@ using UniRx;
 using UnityEngine;
 using Vitract.Character.Effects;
 
+[RequireComponent(typeof(Skill))]
 [RequireComponent(typeof(CharacterMotionFacade))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
@@ -24,7 +25,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     protected Skill currentSkill;
     protected Skill normalSkill;
-    protected Skill specialSkill;
+    [SerializeField] protected Skill specialSkill;
 
     // ------------- コンポーネント ------------------
     private CharacterMotionFacade MotionFacade; //アニメーションと移動管理
@@ -59,7 +60,18 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         MotionFacade = GetComponent<CharacterMotionFacade>();
         MotionFacade.Initialize(HitAttack, Dead);
-        normalSkill = new NormalAttack(attackCoolTime);
+
+        normalSkill = GetComponent<Skill>();
+        normalSkill.Initialize(attackCoolTime, (attacker, target) =>
+        {
+            float damage = attacker.Atk; // Attackerの攻撃力を利用
+            if (target != null)
+            {
+                target.TakeDamage(damage); // Targetにダメージを与える
+            }
+        });
+        specialSkill = 
+
         currentSkill = normalSkill;
 
         targetList = new ReactiveCollection<IDamageable>();
@@ -148,7 +160,6 @@ public abstract class Character : MonoBehaviour, IDamageable
             characterState = CharacterState.Idle;
             canAttack = false;
         }
-
         HandleState();
     }
 
@@ -166,6 +177,9 @@ public abstract class Character : MonoBehaviour, IDamageable
                 break;
             case CharacterState.Idle:
                 MotionFacade.IdleMotion();
+                break;
+            case CharacterState.Attack:
+                MotionFacade.NormalAttackMotion(attackSpeed);
                 break;
         }
     }
@@ -206,7 +220,8 @@ public abstract class Character : MonoBehaviour, IDamageable
         }
     }
 
-    
+
+
     // ------------- ダメージ処理と死亡判定 --------------------
 
     public void TakeDamage(float damage)
@@ -236,7 +251,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (enemyObject != null)
         {
             // 敵が死んだ場合
-            currentSkill.Activate(this,enemyObject);
+            currentSkill.Activate(this, enemyObject);
         }
     }
 

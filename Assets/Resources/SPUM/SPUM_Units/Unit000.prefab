@@ -4759,6 +4759,7 @@ GameObject:
   - component: {fileID: 3033117049996478898}
   - component: {fileID: 5516212593636196286}
   - component: {fileID: 6216484884536752212}
+  - component: {fileID: 3872722651930761691}
   m_Layer: 5
   m_Name: Unit000
   m_TagString: Untagged
@@ -4904,7 +4905,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hpBar: {fileID: 426101429959452413}
   characterBase: {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
+  canAttack: 0
   isPlayer: 0
+  specialSkillBase: {fileID: 11400000, guid: 995c700608a5e4625954889f3e7fa6a8, type: 2}
+--- !u!114 &3872722651930761691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6813279844190798747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1636287ff7c7b4e1abefd3c963b5f1d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6822023230457472988
 GameObject:
   m_ObjectHideFlags: 0

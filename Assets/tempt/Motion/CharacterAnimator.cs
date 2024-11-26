@@ -65,7 +65,7 @@ public class CharacterAnimator : MonoBehaviour
     public void SkillAttackAnim(float attackSpeed)
     {
         anim.speed = attackSpeed* GameManager.Instance.gameSpeed;
-        anim.SetFloat("AttackState", 0);
+        anim.SetFloat("AttackState", 1);
         anim.SetTrigger("Attack");
     }
     
