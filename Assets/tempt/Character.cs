@@ -10,17 +10,21 @@ using Vitract.Character.Effects;
 public abstract class Character : MonoBehaviour, IDamageable
 {
     // ------------- キャラクターのステータス ------------------
-    // TODO 　Reactive Collectionを整備したい
+    // TODO 　攻撃処理をなんとかする
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
 
     [SerializeField] private HPBar hpBar;                 // HPバーの参照
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
     private Subject<Unit> cooldownSubject
-                        = new Subject<Unit>();            // 攻撃クールダウン管理用の Subject
+                        = new Subject<Unit>();      // 攻撃クールダウン管理用の Subject
     [SerializeField] protected bool canAttack;
     public bool isPlayer;
     private bool isDead;
     public bool IsDead { get => isDead; }
+
+    protected Skill currentSkill;
+    protected Skill normalSkill;
+    protected Skill specialSkill;
 
     // ------------- コンポーネント ------------------
     private CharacterMotionFacade MotionFacade; //アニメーションと移動管理
@@ -30,12 +34,17 @@ public abstract class Character : MonoBehaviour, IDamageable
     // ------------- キャラクターのステータス ------------------
 
     private string name;               // キャラクターの名前
+    public string Name { get => name; set => name = value; }
+
     private int cost;                  // コスト
     private float maxHp;               // 最大体力
-    public ReactiveProperty<float> currentHp { get; set; } = new ReactiveProperty<float>();           // 現在の体力
+    public ReactiveProperty<float> currentHp { get; set; } = new ReactiveProperty<float>();
     private float deffence;            //防御力
     private float magicDeffence;       //魔法防御力
+
     private float atk;                 // 攻撃力
+    public float Atk { get => atk; set => atk = value; }
+
     private float attackSpeed;         // 攻撃速度
     private float attackCoolTime;      // 攻撃クールタイム
     private float speed;               // 移動速度
@@ -50,14 +59,18 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         MotionFacade = GetComponent<CharacterMotionFacade>();
         MotionFacade.Initialize(HitAttack, Dead);
+        normalSkill = new NormalAttack(attackCoolTime);
+        currentSkill = normalSkill;
 
         targetList = new ReactiveCollection<IDamageable>();
+        // リストの要素が増えた時の処理
         targetList.ObserveAdd().Subscribe(item =>
-        { 
+        {
             SetNextEnemy();
             SubscribeToEnemyHealth(targetList[targetList.Count - 1]);
         });
-        targetList.ObserveRemove().Subscribe(item => 
+        // リストの要素が減った時の処理
+        targetList.ObserveRemove().Subscribe(item =>
         {
             //　敵リストに敵がいるならターゲットに設定
             if (targetList.Count > 0)
@@ -185,29 +198,16 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     protected void AttackEvent()
     {
-        canAttack = false;
-        if (!IsDead)
+        if (!IsDead && enemyObject != null)
         {
-            if (enemyObject != null)
-            {
-                HandleAttackState();
-            }
+            canAttack = false;
+            characterState = CharacterState.Attack;
+            MotionFacade.NormalAttackMotion(attackSpeed);
         }
     }
 
-    private void HandleAttackState()
-    {
-        if (IsDead) return;
-        if (enemyObject == null) { return; }
-        characterState = CharacterState.Attack;
-        MotionFacade.NormalAttackMotion(attackSpeed);
-    }
+    
     // ------------- ダメージ処理と死亡判定 --------------------
-    private void HandleDamage(IDamageable target)
-    {
-        if (target == null) return;
-        target.TakeDamage(atk);  // ダメージを与える
-    }
 
     public void TakeDamage(float damage)
     {
@@ -236,7 +236,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (enemyObject != null)
         {
             // 敵が死んだ場合
-            HandleDamage(enemyObject);
+            currentSkill.Activate(this,enemyObject);
         }
     }
 
@@ -309,10 +309,10 @@ public abstract class Character : MonoBehaviour, IDamageable
             return;
         }
 
-        name = characterBase.Name;
+        Name = characterBase.Name;
         maxHp = characterBase.MaxHp;
         currentHp.Value = maxHp;
-        atk = characterBase.Atk;
+        Atk = characterBase.Atk;
         attackSpeed = characterBase.AttackSpeed;
         attackCoolTime = characterBase.AttackCoolTime;
         speed = characterBase.Speed;
@@ -328,7 +328,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     public void DisplayLogCharacterInfo()
     {
         Debug.Log
-        ($"Name: {name}, Max HP: {maxHp}, Attack: {atk}, Speed: {speed}, Range: {range}, Cost: {cost}, Type: {characterType}");
+        ($"Name: {Name}, Max HP: {maxHp}, Attack: {Atk}, Speed: {speed}, Range: {range}, Cost: {cost}, Type: {characterType}");
     }
 }
 
