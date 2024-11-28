@@ -58,6 +58,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void Awake()
     {
+        InitCharacter();
         MotionFacade = GetComponent<CharacterMotionFacade>();
         MotionFacade.Initialize(HitAttack, Dead);
 
@@ -70,7 +71,6 @@ public abstract class Character : MonoBehaviour, IDamageable
                 target.TakeDamage(damage); // Targetにダメージを与える
             }
         });
-        specialSkill = 
 
         currentSkill = normalSkill;
 
@@ -337,13 +337,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         cost = characterBase.Cost;
         characterType = characterBase.CharacterType;
         canAttack = true;
-    }
-
-    // ------------- ログ出力 ------------------
-    public void DisplayLogCharacterInfo()
-    {
-        Debug.Log
-        ($"Name: {Name}, Max HP: {maxHp}, Attack: {Atk}, Speed: {speed}, Range: {range}, Cost: {cost}, Type: {characterType}");
     }
 }
 

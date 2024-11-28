@@ -16,4 +16,3 @@ public class SkillBase : ScriptableObject
     public Sprite Icon => icon;
     public int Number => number;
 }
-

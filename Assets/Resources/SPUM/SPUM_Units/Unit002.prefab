@@ -4169,6 +4169,8 @@ GameObject:
   - component: {fileID: 3986090303000618529}
   - component: {fileID: 2108187390754438458}
   - component: {fileID: 6960591552022030895}
+  - component: {fileID: 6237100629630160244}
+  - component: {fileID: 445188878684944860}
   m_Layer: 5
   m_Name: Unit002
   m_TagString: Untagged
@@ -4315,6 +4317,32 @@ MonoBehaviour:
   hpBar: {fileID: 2247943339024959225}
   characterBase: {fileID: 11400000, guid: b2a2e5cab263b4a248aaa15ec9c6d1b0, type: 2}
   isPlayer: 0
+  specialSkill: {fileID: 3464388239415316479, guid: a9fa74b21064948d8a6e0774fd1cd3d4, type: 3}
+--- !u!114 &6237100629630160244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6212681934044844666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c571dd1854ad6416eb3fb22406896e65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillBase: {fileID: 0}
+--- !u!114 &445188878684944860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6212681934044844666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1636287ff7c7b4e1abefd3c963b5f1d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6214788437371034105
 GameObject:
   m_ObjectHideFlags: 0

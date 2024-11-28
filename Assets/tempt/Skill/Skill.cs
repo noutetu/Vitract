@@ -49,6 +49,7 @@ public class Skill : MonoBehaviour
     {
          // 派生クラスでエフェクトを設定する場合、このように設定を呼び出す
         SkillEffect = action;
+        SkillCoolTime = attackCoolTime;
     }
 
     // スキルの発動メソッド

@@ -1545,6 +1545,7 @@ GameObject:
   - component: {fileID: 4264906007412231796}
   - component: {fileID: 6741135070882131618}
   - component: {fileID: 9182905363627177138}
+  - component: {fileID: 4684589461615713232}
   m_Layer: 5
   m_Name: Unit003
   m_TagString: Untagged
@@ -1689,8 +1690,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hpBar: {fileID: 3139487639045028912}
   characterBase: {fileID: 11400000, guid: 8a507b4ccb836423998f62782310180a, type: 2}
-  canAttack: 0
   isPlayer: 0
+  specialSkill: {fileID: 3464388239415316479, guid: a9fa74b21064948d8a6e0774fd1cd3d4, type: 3}
   boxSize: {x: 3, y: 2}
   enemyLayer:
     serializedVersion: 2
@@ -1698,10 +1699,6 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 8
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  detectionCenter: {x: 0, y: 0}
 --- !u!114 &9182905363627177138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1714,6 +1711,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1636287ff7c7b4e1abefd3c963b5f1d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4684589461615713232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4587587720858720122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c571dd1854ad6416eb3fb22406896e65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillBase: {fileID: 0}
 --- !u!1 &4731368596200748237
 GameObject:
   m_ObjectHideFlags: 0
