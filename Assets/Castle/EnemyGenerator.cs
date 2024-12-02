@@ -31,6 +31,7 @@ public class EnemyGenerator : MonoBehaviour
     private void MakeUnit(CharacterBase unit)
     {
         Character enemyCharacter = Instantiate(unit.Prefab, transform);
+        enemyCharacter.SetHpBar();
         enemyCharacter.gameObject.tag = "Enemy";
         enemyCharacter.gameObject.layer = LayerMask.NameToLayer("Enemy");
         enemyCharacter.isPlayer = false;

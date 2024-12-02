@@ -13,25 +13,27 @@ public class Skill : MonoBehaviour
     public float SkillValue { get; private set; }
     public Sprite SkillIcon { get; private set; }
     public int SkillNumber { get; private set; }
-    public bool CanUseSkill { get; private set; } = true;
+    public ReactiveProperty<bool> CanUseSkill { get; private set; } = new ReactiveProperty<bool>(true);
 
     // Unityのライフサイクルにおける初期化
-    protected virtual void Awake()
+    public virtual void Awake()
     {
         if (skillBase != null)
         {
-            Initialize(skillBase);
+            SpecialInitialize(skillBase);
         }
     }
 
     // SkillBaseからSkillを初期化するメソッド
-    public void Initialize(SkillBase skillBase)
+    public void SpecialInitialize(SkillBase skillBase)
     {
         SkillName = skillBase.SkillName;
         SkillCoolTime = skillBase.CoolTime;
         SkillValue = skillBase.Value;
         SkillIcon = skillBase.Icon;
         SkillNumber = skillBase.Number;
+
+        Debug.Log($"Special Initialize は{SkillCoolTime}");
 
         // 派生クラスでエフェクトを設定する場合、このように設定を呼び出す
         SkillEffect = (attacker, target) =>
@@ -43,23 +45,25 @@ public class Skill : MonoBehaviour
                 Debug.Log($"{SkillName}が{target}に{damage}のダメージを与えました。");
             }
         };
+
     }
 
-    public void Initialize(float attackCoolTime,Action<Character, IDamageable> action)
+    public void NormalInitialize(float attackCoolTime,Action<Character, IDamageable> action)
     {
          // 派生クラスでエフェクトを設定する場合、このように設定を呼び出す
         SkillEffect = action;
         SkillCoolTime = attackCoolTime;
+        Debug.Log($"Normal Initialize は{SkillCoolTime}");
     }
 
     // スキルの発動メソッド
     public void Activate(Character attacker, IDamageable target)
     {
-        if (CanUseSkill)
+        if (CanUseSkill.Value)
         {
             Debug.Log($"{SkillName}を発動します！");
-            SkillEffect?.Invoke(attacker, target);
             StartCooldown();
+            SkillEffect?.Invoke(attacker, target);
         }
         else
         {
@@ -68,17 +72,23 @@ public class Skill : MonoBehaviour
     }
 
     // クールダウン処理
-    private void StartCooldown()
-    {
-        CanUseSkill = false;
-        Observable.Timer(TimeSpan.FromSeconds(SkillCoolTime))
-            .Subscribe(_ =>
-            {
-                CanUseSkill = true;
-                Debug.Log($"{SkillName}の攻撃が再び可能です。");
-            })
-            .AddTo(disposables);
-    }
+private void StartCooldown()
+{
+    // スキルを使用不可能に設定
+    CanUseSkill.Value = false;
+    Debug.Log($"CanUseSkillは{CanUseSkill}です");
+
+    // クールダウンが完了したときに攻撃可能にする購読
+    Observable.Timer(TimeSpan.FromSeconds(SkillCoolTime / GameManager.Instance.gameSpeed))
+        .Subscribe(_ =>
+        {
+            // スキルを使用可能に設定
+            CanUseSkill.Value = true;
+            Debug.Log("攻撃が再び可能です");
+        })
+        .AddTo(this); // 購読を破棄管理に追加
+}
+
 
     // クリーンアップ処理
     protected virtual void OnDestroy()

@@ -1,6 +1,7 @@
 using System;
 using DG.Tweening;
 using UniRx;
+using Unity.VisualScripting;
 using UnityEngine;
 using Vitract.Character.Effects;
 
@@ -11,18 +12,25 @@ using Vitract.Character.Effects;
 public abstract class Character : MonoBehaviour, IDamageable
 {
     // ------------- キャラクターのステータス ------------------
-    // TODO 　攻撃処理をなんとかする
+    // TODO もう全部unirxにするぞ
+    // TODO リスト増えた時と減った時、数が変わった時通知 クリア
+    // TODO スキルの攻撃可能が切り替わった時通知　　クリア
+    // TODO なんかちゃんとアイドル状態にならない
+    // TODO 待機中に歩き続ける　クリア
+    // TODO Magicianクラスだけ2連続攻撃する クリア
+    // TODO 攻撃とスキル発動をきちんと分ける
+    // TODO specialSkillを入れたらplayer側がダメージを受けないバグ
+
+
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
 
-    [SerializeField] private HPBar hpBar;                 // HPバーの参照
+    private HPBar hpBar;              // HPバーの参照
+    public HPBar uiHpBar;
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
-    private Subject<Unit> cooldownSubject
-                        = new Subject<Unit>();      // 攻撃クールダウン管理用の Subject
-    [SerializeField] protected bool canAttack;
     public bool isPlayer;
     private bool isDead;
     public bool IsDead { get => isDead; }
-
+    // スキル
     protected Skill currentSkill;
     protected Skill normalSkill;
     [SerializeField] protected Skill specialSkill;
@@ -52,35 +60,102 @@ public abstract class Character : MonoBehaviour, IDamageable
     protected float range;               // 射程
     private CharacterType characterType;  // キャラクターのタイプ
 
-
-
     // ------------- Unity ライフサイクル ------------------
 
     private void Awake()
     {
         InitCharacter();
+        hpBar = GetComponentInChildren<HPBar>();
+
         MotionFacade = GetComponent<CharacterMotionFacade>();
         MotionFacade.Initialize(HitAttack, Dead);
 
+        // スキル初期設定------------------------
         normalSkill = GetComponent<Skill>();
-        normalSkill.Initialize(attackCoolTime, (attacker, target) =>
+        normalSkill.NormalInitialize(attackCoolTime, (attacker, target) =>
         {
-            float damage = attacker.Atk; // Attackerの攻撃力を利用
+            float damage = attacker.Atk;
             if (target != null)
             {
-                target.TakeDamage(damage); // Targetにダメージを与える
+                target.TakeDamage(damage);
             }
         });
-
         currentSkill = normalSkill;
+        if(specialSkill != null)
+        {
+            specialSkill.Awake();
+            currentSkill = specialSkill;
+        }
 
+
+
+        // 通常攻撃のCanAttackを購読
+        normalSkill.CanUseSkill
+            .Skip(1)
+            .DistinctUntilChanged() // 値が変わった時のみ反応（重複通知を防ぐ）
+            .Subscribe(value =>
+            {
+                if (value)
+                {
+                    // `CanUseSkill`が`true`になったときの処理
+                    if (enemyObject != null)
+                    {
+                        AttackEvent();
+                    }
+                    Debug.Log("スキルが使用可能になりました。");
+                }
+                else
+                {
+                    // `CanUseSkill`が`false`になったときの処理
+                    characterState = CharacterState.Idle;
+                    Debug.Log("スキルがクールダウン中です。");
+                }
+            })
+            .AddTo(this);
+
+        // スキル攻撃のCanAttackを購読
+        specialSkill.CanUseSkill
+            .Skip(1)
+            .DistinctUntilChanged() // 値が変わった時のみ反応（重複通知を防ぐ）
+            .Subscribe(value =>
+            {
+                if (value)
+                {
+                    // `CanUseSkill`が`true`になったときの処理
+                    if (enemyObject != null)
+                    {
+                        AttackEvent();
+                    }
+                    Debug.Log("スキルが使用可能になりました。");
+                }
+                else
+                {
+                    // `CanUseSkill`が`false`になったときの処理
+                    characterState = CharacterState.Idle;
+                    Debug.Log("スキルがクールダウン中です。");
+                }
+            })
+            .AddTo(this);
+        // リスト初期設定----------------------------------
         targetList = new ReactiveCollection<IDamageable>();
         // リストの要素が増えた時の処理
         targetList.ObserveAdd().Subscribe(item =>
         {
             SetNextEnemy();
             SubscribeToEnemyHealth(targetList[targetList.Count - 1]);
+            if (enemyObject != null)
+            {
+                if (currentSkill.CanUseSkill.Value)
+                {
+                    AttackEvent();
+                }
+                else
+                {
+                    characterState = CharacterState.Idle;
+                }
+            }
         });
+
         // リストの要素が減った時の処理
         targetList.ObserveRemove().Subscribe(item =>
         {
@@ -90,6 +165,14 @@ public abstract class Character : MonoBehaviour, IDamageable
                 if (enemyObject == null)
                 {
                     SetNextEnemy();
+                    if (currentSkill.CanUseSkill.Value)
+                    {
+                        AttackEvent();
+                    }
+                    else
+                    {
+                        characterState = CharacterState.Idle;
+                    }
                 }
             }
             //　敵がいないなら走る状態に
@@ -99,37 +182,22 @@ public abstract class Character : MonoBehaviour, IDamageable
                 enemyObject = null;
             }
         });
-        // 敵がいるかどうかを監視し、いるなら待機して攻撃可能状態を待つ
-        Observable.EveryUpdate()
-                    .Where(_ => enemyObject != null)
-                    .Subscribe(_ =>
-                    {
-                        // enemyObjectがnullでないときにのみ実行する処理
-                        characterState = CharacterState.Idle;
-                        if (canAttack)
-                        {
-                            AttackEvent();
-                        }
-                    })
-                    .AddTo(this);
-
-        // クールダウンが完了したときに攻撃可能にする購読
-        cooldownSubject
-            .SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(attackCoolTime / GameManager.Instance.gameSpeed)))
-            .Subscribe(_ =>
-            {
-                canAttack = true;
-                Debug.Log("攻撃が再び可能です");
-            })
-            .AddTo(this);
     }
+
 
     private void OnEnable()
     {
         // キャラクターの初期化
         InitCharacter();
-        // HPバーの初期化
-        hpBar.SetHP(currentHp.Value / maxHp);
+    }
+
+    public void SetHpBar()
+    {
+        if (uiHpBar != null)
+        {
+            uiHpBar.SubscribeValue(currentHp, maxHp);
+        }
+        hpBar.SubscribeValue(currentHp, maxHp);
     }
 
     private void OnDisable()
@@ -158,7 +226,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (GameManager.Instance.isGameEnd)
         {
             characterState = CharacterState.Idle;
-            canAttack = false;
         }
         HandleState();
     }
@@ -177,9 +244,6 @@ public abstract class Character : MonoBehaviour, IDamageable
                 break;
             case CharacterState.Idle:
                 MotionFacade.IdleMotion();
-                break;
-            case CharacterState.Attack:
-                MotionFacade.NormalAttackMotion(attackSpeed);
                 break;
         }
     }
@@ -214,10 +278,11 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         if (!IsDead && enemyObject != null)
         {
-            canAttack = false;
             characterState = CharacterState.Attack;
             MotionFacade.NormalAttackMotion(attackSpeed);
         }
+        //　攻撃した後は必ず待機状態に移行
+        // characterState = CharacterState.Idle;
     }
 
 
@@ -229,7 +294,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (isDead) return;  // 既に死亡している場合はすぐに終了
 
         currentHp.Value = Mathf.Max(currentHp.Value - damage, 0);
-        hpBar.UpdateHP(currentHp.Value / maxHp);
 
         if (currentHp.Value <= 0)
         {
@@ -245,8 +309,6 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void HitAttack()
     {
-        // クールタイム後再度攻撃
-        cooldownSubject.OnNext(Unit.Default);
         // 敵キャラクターへの攻撃
         if (enemyObject != null)
         {
@@ -270,6 +332,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     protected void AddEnemyToList(IDamageable detectedObject)
     {
         // 敵リストに追加
+        if (targetList.Contains(detectedObject)) { return; }
         targetList.Add(detectedObject);
     }
 
@@ -336,7 +399,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         magicDeffence = characterBase.MagicDefence;
         cost = characterBase.Cost;
         characterType = characterBase.CharacterType;
-        canAttack = true;
     }
 }
 

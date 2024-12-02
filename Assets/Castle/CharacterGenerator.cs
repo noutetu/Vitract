@@ -14,14 +14,19 @@ public class CharacterGenerator : MonoBehaviour
         }
     }
 
-    private void InstantiateCharacter(Character prefab)
-    {
-        // キャラクターを180度回転して生成
-        Character playerCharacter = Instantiate(prefab, transform.position, Quaternion.Euler(0, 180, 0), transform);
-        playerCharacter.gameObject.tag = "Player";
-        playerCharacter.gameObject.layer = LayerMask.NameToLayer("Player");
-        playerCharacter.isPlayer = true;
+    private void InstantiateCharacter(Character prefab, HPBar uiHpBar)
+{
+    // キャラクターを180度回転して生成
+    Character playerCharacter = Instantiate(prefab, transform.position, Quaternion.Euler(0, 180, 0), transform);
 
-        playerCharacter.SmoothAppear();
-    }
+    playerCharacter.uiHpBar = uiHpBar;
+    playerCharacter.SetHpBar();  // SetHpBarをここで呼び出すことで、生成直後にHPバーを設定します。
+    
+    playerCharacter.gameObject.tag = "Player";
+    playerCharacter.gameObject.layer = LayerMask.NameToLayer("Player");
+    playerCharacter.isPlayer = true;
+
+    playerCharacter.SmoothAppear();
+}
+
 }

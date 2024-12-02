@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9072322538013077431}
   - component: {fileID: 3464388239415316479}
+  - component: {fileID: 4827889596682100159}
   m_Layer: 0
   m_Name: JumpAttack
   m_TagString: Untagged
@@ -45,3 +46,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skillBase: {fileID: 11400000, guid: 995c700608a5e4625954889f3e7fa6a8, type: 2}
+--- !u!114 &4827889596682100159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9185743540177277803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb219b23cdf4b314f94a27bca3cc8012, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

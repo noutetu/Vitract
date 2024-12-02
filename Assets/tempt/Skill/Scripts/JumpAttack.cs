@@ -5,7 +5,7 @@ using UnityEngine;
 public class JumpAttack : Skill
 {
     // 派生クラス特有の初期化
-    protected override void Awake()
+    public override void Awake()
     {
         base.Awake();
 

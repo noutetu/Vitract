@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using UniRx;
 using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 
@@ -8,7 +9,6 @@ using UnityEngine;
 public class HPBar : MonoBehaviour
 {
     [SerializeField] GameObject health;
-
 
     public void SetHP(float HP)
     {
@@ -21,6 +21,15 @@ public class HPBar : MonoBehaviour
         {
             health.transform.localScale = new Vector3(newHP, 1, 1);
         }
+    }
+
+    public void SubscribeValue(ReactiveProperty<float> Value,float maxValue)
+    {
+        Value.DistinctUntilChanged()
+        .Subscribe(value =>
+        {
+            UpdateHP(value/maxValue);
+        });
     }
 
     /*public IEnumerator SetHPSmooth(float newHP)

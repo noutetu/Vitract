@@ -6,13 +6,16 @@ using UnityEngine.UI;
 
 public class CharacterFlame : MonoBehaviour
 {
-    public UnityAction<Character> OnTouch;
+    public UnityAction<Character,HPBar> OnTouch;
     public CharacterBase Base;
     private Character prefab;
     public Image icon;
+    private HPBar uiHpBar;
 
     private void Start()
     {
+        uiHpBar = GetComponentInChildren<HPBar> ();
+        
         if (Base == null)
         {
             Debug.LogError("Base is not assigned in CharacterFlame.");
@@ -31,7 +34,7 @@ public class CharacterFlame : MonoBehaviour
         if (OnTouch != null)
         {
             Debug.Log("OnTouch has subscribers."); // イベントにリスナーが登録されている
-            OnTouch.Invoke(prefab); // イベントを呼び出す
+            OnTouch.Invoke(prefab,uiHpBar); // イベントを呼び出す
         }
         else
         {
