@@ -25,5 +25,7 @@ MonoBehaviour:
   attackCoolTime: 3
   speed: 0.35
   range: 0
+  specialSkill: {fileID: 0}
+  normalSkill: {fileID: 11400000, guid: be58d5f0a6c734661ac991ca40cdb68c, type: 2}
   characterType: 0
   sprite: {fileID: -468272165, guid: 1be3df94bbdb545dab885542078b2653, type: 3}

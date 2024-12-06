@@ -61,14 +61,14 @@ public class CharacterAnimator : MonoBehaviour
         anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
         anim.SetTrigger("Attack");
     }
-    
+
     public void SkillAttackAnim(float attackSpeed)
     {
-        anim.speed = attackSpeed* GameManager.Instance.gameSpeed;
+        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
         anim.SetFloat("AttackState", 1);
         anim.SetTrigger("Attack");
     }
-    
+
     public void DeadAnim()
     {
         anim.speed = 0.6f * GameManager.Instance.gameSpeed;
@@ -77,8 +77,8 @@ public class CharacterAnimator : MonoBehaviour
 
     public void DebuffAnim()
     {
-        anim.speed = 1* GameManager.Instance.gameSpeed;
-        anim.SetFloat ("RunState", 3);
+        anim.speed = 1 * GameManager.Instance.gameSpeed;
+        anim.SetFloat("RunState", 3);
     }
 
     public void StopAnimator()
@@ -86,14 +86,26 @@ public class CharacterAnimator : MonoBehaviour
         anim.speed = 0;
     }
 
-//---------------------------unity animationEventで呼び出すメソッド---------------------------------
+    //---------------------------unity animationEventで呼び出すメソッド---------------------------------
     public void TriggerAttackEvent()
     {
-        OnAttack?.Invoke();
+        if (OnAttack == null)
+        {
+            Debug.Log("OnAttack event is null. No subscribers to invoke.");
+        }
+        else
+        {
+            Debug.Log("OnAttack is called");
+            Debug.Log($"Number of subscribers: {(OnAttack?.GetInvocationList()?.Length ?? 0)}");
+
+            OnAttack?.Invoke();
+        }
     }
+
+
     public void TriggerDeadAction()
     {
         OnDead?.Invoke();
     }
-//------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
 }

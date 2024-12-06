@@ -6,7 +6,8 @@ using UniRx;
 
 public class Castle : MonoBehaviour, IDamageable
 {
-    private bool isDead;
+    private bool isDead; // キャラクターが死亡しているかどうか
+    public bool IsDead => isDead; // 死亡状態の取得
     [SerializeField] float hp;
     [SerializeField] int cost;
     [SerializeField] bool isPlayer;

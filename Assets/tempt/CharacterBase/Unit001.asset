@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 791d0042c0834446288f6de7e41d2e9e, type: 3}
   m_Name: Unit001
   m_EditorClassIdentifier: 
+  characterID: 0
   prefab: {fileID: 1487492656222882109, guid: 376c16992d4894491a5ecbd2876967ce, type: 3}
   name: "\u4E3B\u4EBA\u516C"
   cost: 10
@@ -21,8 +22,10 @@ MonoBehaviour:
   canBlockCount: 2
   atk: 50
   attackSpeed: 0.6
-  attackCoolTime: 0.9
+  attackCoolTime: 3
   speed: 0.3
   range: 0
+  specialSkill: {fileID: 0}
+  normalSkill: {fileID: 11400000, guid: be58d5f0a6c734661ac991ca40cdb68c, type: 2}
   characterType: 0
   sprite: {fileID: 114712159, guid: 3458c3542cc4d4bb186bc6f65d6982b9, type: 3}

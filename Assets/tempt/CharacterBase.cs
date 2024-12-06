@@ -58,6 +58,13 @@ public class CharacterBase : ScriptableObject
     [SerializeField] float range;
     public float Range { get => range;}
 
+    // スキル
+    [SerializeField] SkillData specialSkill;
+    public SkillData SpecialSkill { get => specialSkill;}
+
+    [SerializeField] SkillData normalSkill;
+    public SkillData NormalSkill { get => normalSkill;}
+
     //キャラクタータイプ
     [SerializeField] CharacterType characterType;
     public CharacterType CharacterType { get => characterType;}

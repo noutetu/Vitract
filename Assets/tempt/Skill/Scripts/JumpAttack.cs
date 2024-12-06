@@ -1,23 +1,16 @@
-using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-// 特殊攻撃のスキルクラス
-public class JumpAttack : Skill
+// --------------- ジャンプアタック ---------------
+[CreateAssetMenu(fileName = "JumpAttack", menuName = "Skill/JumpAttack")]
+public class JumpAttack : SkillData
 {
-    // 派生クラス特有の初期化
-    public override void Awake()
+    public override void Activate(Character character, IDamageable target)
     {
-        base.Awake();
-
-        // スキル効果を設定
-        SkillEffect = (attacker, target) =>
-        {
-            float damage = SkillValue; // SkillBaseからダメージ値を取得
-            if (target != null)
-            {
-                target.TakeDamage(damage); // Targetにダメージを与える
-                Debug.Log($"{SkillName}が{target}に{damage}のダメージを与えました。");
-            }
-        };
+        float attackValue = character.Atk * value / 100;
+        target.TakeDamage(attackValue);
+        Debug.Log($"{skillName}を使って{target}に{attackValue}のダメージを与えました。");
+        StartCoolDown();
     }
 }

@@ -1402,7 +1402,6 @@ GameObject:
   - component: {fileID: 966055320557703414}
   - component: {fileID: 5883703621201438826}
   - component: {fileID: 1487492656222882109}
-  - component: {fileID: 953963106469091976}
   - component: {fileID: 7788627399273955537}
   m_Layer: 5
   m_Name: Unit001
@@ -1546,23 +1545,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b00cb527a1d846e4a1736136068fe1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hpBar: {fileID: 6370078252479155502}
+  uiHpBar: {fileID: 0}
   characterBase: {fileID: 11400000, guid: c284ade13ad3046c4a5f3848dd0367b1, type: 2}
   isPlayer: 0
-  specialSkill: {fileID: 3464388239415316479, guid: a9fa74b21064948d8a6e0774fd1cd3d4, type: 3}
---- !u!114 &953963106469091976
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2534896665565900937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c571dd1854ad6416eb3fb22406896e65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skillBase: {fileID: 0}
 --- !u!114 &7788627399273955537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4205,14 +4190,3 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2095447850086008102, guid: 076f39545fee84b369194e8a027c71eb, type: 3}
   m_PrefabInstance: {fileID: 5405278462660689815}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6370078252479155502 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1397374224817173177, guid: 076f39545fee84b369194e8a027c71eb, type: 3}
-  m_PrefabInstance: {fileID: 5405278462660689815}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf4cfb119cd294ec283c768516523390, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

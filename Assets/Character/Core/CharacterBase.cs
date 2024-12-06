@@ -33,8 +33,8 @@ namespace Vitract.Character.Core
 
         [Header("Abilities")]
         // スキル
-        [SerializeField] SkillBase skill;
-        public SkillBase Skill { get => skill; }
+        [SerializeField] SkillData skill;
+        public SkillData Skill { get => skill; }
 
         [Header("Evolution Requirements")]
         // 進化に必要なアイテム情報
