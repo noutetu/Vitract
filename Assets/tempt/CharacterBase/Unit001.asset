@@ -16,11 +16,11 @@ MonoBehaviour:
   prefab: {fileID: 1487492656222882109, guid: 376c16992d4894491a5ecbd2876967ce, type: 3}
   name: "\u4E3B\u4EBA\u516C"
   cost: 10
-  maxHp: 200
+  maxHp: 150
   defence: 0
   magicDefence: 0
   canBlockCount: 2
-  atk: 50
+  atk: 45
   attackSpeed: 0.6
   attackCoolTime: 3
   speed: 0.3

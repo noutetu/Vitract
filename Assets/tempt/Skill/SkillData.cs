@@ -21,15 +21,21 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
 
     public abstract void Activate(Character character, IDamageable target);  // キャラクターを引数に追加
 
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private CompositeDisposable cooldownDisposables = new CompositeDisposable();
 
     protected void StartCoolDown()
     {
-        disposables.Clear();  // 既存のタイマーをクリア
+
+    if (!canUseSkill.Value) return; // 既にクールダウン中であれば何もしない
         canUseSkill.Value = false;
+        cooldownDisposables.Clear();  // 既存のタイマーをクリア
+
         Observable.Timer(TimeSpan.FromSeconds(cooldownTime / GameManager.Instance.gameSpeed))
-            .Subscribe(_ => canUseSkill.Value = true)
-            .AddTo(disposables);
+            .Subscribe(_ => 
+            {
+                canUseSkill.Value = true;
+            })
+            .AddTo(cooldownDisposables);
     }
 
 }

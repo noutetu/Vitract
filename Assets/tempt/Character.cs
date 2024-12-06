@@ -7,7 +7,9 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Character : MonoBehaviour, IDamageable
 {
-    // TODO 二体以上ブロックした時に最初だけ連続攻撃するバグ
+    // TODO 二体以上ブロックした時に最初だけ連続攻撃するバグ　クリア
+    // TakeDamege(敵が死んだらCanUseのまますぐにAttackEventが呼ばれる)
+    // その後StartCooldownをしていたからダメだった。　
 
     // ================= フィールド =================
     // キャラクターのステータス
@@ -54,19 +56,23 @@ public abstract class Character : MonoBehaviour, IDamageable
         InitializeTargetList(); // ターゲットリストの初期化
     }
 
-    private void OnEnable() => InitCharacter(); // 有効化時の初期化
+    private void OnEnable()
+    {
+        InitCharacter(); // 有効化時の初期化
+    }
 
     private void OnDisable()
     {
         motionFacade.DeInitialize(HitAttack, Dead); // アニメーションイベントの解除
-        disposables.Clear(); // 購読解除
-        targetList.Dispose(); // ターゲットリストの破棄
+        disposables.Dispose(); // 購読解除
+        targetList?.Dispose(); // ターゲットリストの破棄
     }
 
     private void OnDestroy()
     {
         DOTween.Kill(this); // DOTweenアニメーションの破棄
-        disposables.Clear(); // 購読解除
+        disposables.Dispose(); // 購読解除
+        targetList?.Dispose(); // ターゲットリストの破棄
     }
 
     protected virtual void Start() { }
@@ -118,10 +124,6 @@ public abstract class Character : MonoBehaviour, IDamageable
     private void InitializeSkills()
     {
         normalSkillInstance = Instantiate(characterBase.NormalSkill); // 通常スキルのインスタンス化
-        if (characterBase.SpecialSkill != null)
-        {
-            specialSkillInstance = Instantiate(characterBase.SpecialSkill); // 特殊スキルのインスタンス化（存在する場合）
-        }
         currentSkill = normalSkillInstance; // 現在のスキルを通常スキルに設定
     }
 
@@ -134,21 +136,12 @@ public abstract class Character : MonoBehaviour, IDamageable
             if (enemyObject == null)
             {
                 SetNextEnemy(); // 新しいターゲットを設定
+                if (currentSkill.CanUseSkill.Value)
+                {
+                    AttackEvent(); // 攻撃イベントを呼び出し
+                }
             }
-            if (currentSkill.CanUseSkill.Value)
-            {
-                AttackEvent(); // 攻撃イベントを呼び出し
-            }
-            else
-            {
-
-            }
-        }).AddTo(disposables);
-
-        targetList.ObserveRemove().Subscribe(item =>
-        {
-            
-        }).AddTo(disposables);
+        }).AddTo(this);
     }
 
     // ================= 状態管理メソッド =================
@@ -195,7 +188,8 @@ public abstract class Character : MonoBehaviour, IDamageable
     // ================= 攻撃処理 =================
     protected void AttackEvent()
     {
-        if (!IsDead && enemyObject != null && currentSkill.CanUseSkill.Value)
+        if (!IsDead && enemyObject != null 
+        && currentSkill.CanUseSkill.Value)
         {
             motionFacade.NormalAttackMotion(AttackSpeed); // 通常攻撃アニメーション
         }
@@ -246,7 +240,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         enemy.currentHp
             .Where(hp => hp <= 0)
             .Subscribe(_ => RemoveEnemyAndResetTarget(enemy))
-            .AddTo(this)
+            .AddTo(disposables)
             .AddTo(enemy as Component);
     }
 
@@ -255,7 +249,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         targetList.Remove(enemy); // ターゲットリストから削除
         enemyObject = null; // 現在のターゲットをリセット
 
-        
         if (targetList.Count > 0)
         {
             SetNextEnemy(); // 次のターゲットを設定
@@ -267,7 +260,6 @@ public abstract class Character : MonoBehaviour, IDamageable
         }
         characterState = CharacterState.Run;
     }
-
 
     protected void SetNextEnemy() => enemyObject = targetList[0]; // 次のターゲットを設定
 
@@ -301,7 +293,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             .DistinctUntilChanged()
             .Subscribe(value =>
             {
-                if (value)
+                if (value == true)
                 {
                     if (enemyObject != null)
                     {
@@ -315,31 +307,9 @@ public abstract class Character : MonoBehaviour, IDamageable
                 }
             })
             .AddTo(this);
-
-        if (specialSkillInstance != null)
-        {
-            specialSkillInstance.CanUseSkill
-            .Skip(1)
-            .DistinctUntilChanged()
-            .Subscribe(value =>
-            {
-                if (value)
-                {
-                    if (enemyObject != null)
-                    {
-                        AttackEvent();
-                    }
-                    Debug.Log("スキルが使用可能になりました。");
-                }
-                else
-                {
-                    Debug.Log("スキルがクールダウン中です。");
-                }
-            })
-            .AddTo(this);
-        }
     }
 }
+
 
 public interface IDamageable
 {
