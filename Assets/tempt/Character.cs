@@ -10,6 +10,9 @@ public abstract class Character : MonoBehaviour, IDamageable
     // TODO 二体以上ブロックした時に最初だけ連続攻撃するバグ　クリア
     // TakeDamege(敵が死んだらCanUseのまますぐにAttackEventが呼ばれる)
     // その後StartCooldownをしていたからダメだった。　
+    // TODO 音楽をつける
+    // TODO エフェクトをつける
+    // TODO 音楽をつける
 
     // ================= フィールド =================
     // キャラクターのステータス
@@ -123,8 +126,13 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void InitializeSkills()
     {
-        normalSkillInstance = Instantiate(characterBase.NormalSkill); // 通常スキルのインスタンス化
-        currentSkill = normalSkillInstance; // 現在のスキルを通常スキルに設定
+        normalSkillInstance = Instantiate(characterBase.NormalSkill); // 通常攻撃のインスタンス化
+        currentSkill = normalSkillInstance; // 現在のスキルを通常攻撃に設定
+        if(characterBase.SpecialSkill != null)
+        {
+            specialSkillInstance = Instantiate(characterBase.SpecialSkill); // スキルのインスタンス化
+            currentSkill = specialSkillInstance; // 現在のスキルをスキルに設定
+        }
     }
 
     private void InitializeTargetList()
@@ -191,7 +199,14 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (!IsDead && enemyObject != null 
         && currentSkill.CanUseSkill.Value)
         {
-            motionFacade.NormalAttackMotion(AttackSpeed); // 通常攻撃アニメーション
+            if(currentSkill == normalSkillInstance)
+            {
+                motionFacade.NormalAttackMotion(AttackSpeed); // 通常攻撃アニメーション
+            }
+            if(currentSkill == specialSkillInstance)
+            {
+                motionFacade.SkillAttackMotion(AttackSpeed); // 通常攻撃アニメーション
+            }
         }
     }
 
@@ -289,6 +304,26 @@ public abstract class Character : MonoBehaviour, IDamageable
     private void SubscribeToSkillCooldown()
     {
         normalSkillInstance.CanUseSkill
+            .Skip(1)
+            .DistinctUntilChanged()
+            .Subscribe(value =>
+            {
+                if (value == true)
+                {
+                    if (enemyObject != null)
+                    {
+                        AttackEvent();
+                    }
+                    Debug.Log("スキルが使用可能になりました。");
+                }
+                else
+                {
+                    Debug.Log("スキルがクールダウン中です。");
+                }
+            })
+            .AddTo(this);
+            if(specialSkillInstance == null){return;}
+        specialSkillInstance.CanUseSkill
             .Skip(1)
             .DistinctUntilChanged()
             .Subscribe(value =>

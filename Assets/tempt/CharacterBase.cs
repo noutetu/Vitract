@@ -73,6 +73,12 @@ public class CharacterBase : ScriptableObject
     [SerializeField] Sprite sprite;
     public Sprite Sprite { get => sprite;}
 
+    // サウンド
+    [SerializeField] AudioClip normalAttackSound;
+    public AudioClip NormalAttackSound { get => normalAttackSound;}
+    [SerializeField] AudioClip specialAttackSound;
+    public AudioClip SpecialAttackSound { get => specialAttackSound;}
+
     ///---------------------------------------------メソッド----------------------------------------------------------------------
     //ソードマンなら射程を0に
     private void OnEnable() 

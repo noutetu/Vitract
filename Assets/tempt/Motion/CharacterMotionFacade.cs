@@ -48,7 +48,7 @@ public class CharacterMotionFacade : MonoBehaviour
     {
         anim.NormalAttackAnim(attackSpeed);
     }
-    public void SkillAttackAnim(float attackSpeed)
+    public void SkillAttackMotion(float attackSpeed)
     {
         anim.SkillAttackAnim(attackSpeed);
     }

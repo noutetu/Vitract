@@ -6,7 +6,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NormalAttack", menuName = "Skill/NormalAttack")]
 public class NormalAttack : SkillData
 {
-    
     public override void Activate(Character character, IDamageable target)
     {
         if (CanUseSkill.Value && target is not null)
