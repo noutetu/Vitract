@@ -16,3 +16,4 @@ MonoBehaviour:
   value: 300
   cooldownTime: 10
   icon: {fileID: 21300000, guid: 04e8a961b49d1164e9b9fe2b980c00fd, type: 3}
+  attackSound: {fileID: 8300000, guid: ea5fc2d2350a5d647b0763cc8f00f63e, type: 3}

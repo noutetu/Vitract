@@ -74,8 +74,6 @@ public class CharacterBase : ScriptableObject
     public Sprite Sprite { get => sprite;}
 
     // サウンド
-    [SerializeField] AudioClip normalAttackSound;
-    public AudioClip NormalAttackSound { get => normalAttackSound;}
     [SerializeField] AudioClip specialAttackSound;
     public AudioClip SpecialAttackSound { get => specialAttackSound;}
 

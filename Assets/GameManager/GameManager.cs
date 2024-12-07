@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Karugamo.Audio;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -32,6 +33,7 @@ public class GameManager : MonoBehaviour
         isEnemyDefeated = false;
         isGameEnd = false;
         gameSpeed = 1;
+        BGMManager.Instance.PlayBGM(AudioPlayLocation.Battle);
     }
 
     public void GameResult(bool isPlayer)  // 他のクラスからも呼び出せるようにpublicにする

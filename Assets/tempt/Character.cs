@@ -2,6 +2,7 @@ using DG.Tweening;
 using UniRx;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 [RequireComponent(typeof(CharacterMotionFacade))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
@@ -33,6 +34,8 @@ public abstract class Character : MonoBehaviour, IDamageable
     private CharacterMotionFacade motionFacade; // アニメーションと移動管理のファサード
     protected CompositeDisposable disposables = new CompositeDisposable(); // 購読の破棄管理
     protected ReactiveCollection<IDamageable> targetList; // ターゲットのリスト
+    protected AudioSource audioSource;
+    protected SpriteRenderer[] spriteRenderers;
 
     // キャラクターのパラメータ
     public string Name { get; set; } // キャラクター名
@@ -66,6 +69,8 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
+
+        DOTween.Kill(this); // DOTweenアニメーションの破棄
         motionFacade.DeInitialize(HitAttack, Dead); // アニメーションイベントの解除
         disposables.Dispose(); // 購読解除
         targetList?.Dispose(); // ターゲットリストの破棄
@@ -122,6 +127,8 @@ public abstract class Character : MonoBehaviour, IDamageable
         hpBar = GetComponentInChildren<HPBar>(); // HPバーの取得
         motionFacade = GetComponent<CharacterMotionFacade>(); // アニメーション管理の取得
         motionFacade.Initialize(HitAttack, Dead); // アニメーションイベントの初期化
+        audioSource = GetComponent<AudioSource>();
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
     private void InitializeSkills()
@@ -214,7 +221,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         // if (isDead) return;
-
+        motionFacade.DamageAnimation(spriteRenderers);
         currentHp.Value = Mathf.Max(currentHp.Value - damage, 0); // ダメージを受けた後のHPを計算
 
         if (currentHp.Value <= 0)
@@ -232,6 +239,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         {
             Debug.Log("敵への攻撃！！");
             currentSkill.Activate(this, enemyObject); // スキルを発動
+            audioSource.PlayOneShot(currentSkill.AttackSound);
         }
     }
 
@@ -282,7 +290,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     public void SmoothAppear()
     {
         // キャラクターをフェードインさせる処理
-        foreach (var spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
+        foreach (var spriteRenderer in spriteRenderers)
         {
             Color color = spriteRenderer.color;
             color.a = 0f;
@@ -290,6 +298,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             spriteRenderer.DOFade(1f, 0.5f);
         }
     }
+
 
     public void SetHpBar()
     {

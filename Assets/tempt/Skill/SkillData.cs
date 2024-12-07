@@ -15,9 +15,16 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
     public float value;  // スキルの倍率や影響度
     public float cooldownTime;  // クールダウン時間
     public Sprite icon;
+    [SerializeField] AudioClip attackSound;
+    public AudioClip AttackSound { get => attackSound;}
+    
 
     private ReactiveProperty<bool> canUseSkill = new ReactiveProperty<bool>(true);
     public IReadOnlyReactiveProperty<bool> CanUseSkill => canUseSkill;
+
+    private void Start() {
+        
+    }
 
     public abstract void Activate(Character character, IDamageable target);  // キャラクターを引数に追加
 
@@ -26,16 +33,17 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
     protected void StartCoolDown()
     {
 
-    if (!canUseSkill.Value) return; // 既にクールダウン中であれば何もしない
-        canUseSkill.Value = false;
-        cooldownDisposables.Clear();  // 既存のタイマーをクリア
 
-        Observable.Timer(TimeSpan.FromSeconds(cooldownTime / GameManager.Instance.gameSpeed))
-            .Subscribe(_ => 
-            {
-                canUseSkill.Value = true;
-            })
-            .AddTo(cooldownDisposables);
+        if (!canUseSkill.Value) return; // 既にクールダウン中であれば何もしない
+            canUseSkill.Value = false;
+            cooldownDisposables.Clear();  // 既存のタイマーをクリア
+
+            Observable.Timer(TimeSpan.FromSeconds(cooldownTime / GameManager.Instance.gameSpeed))
+                .Subscribe(_ => 
+                {
+                    canUseSkill.Value = true;
+                })
+                .AddTo(cooldownDisposables);
     }
 
 }
