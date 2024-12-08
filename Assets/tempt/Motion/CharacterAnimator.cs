@@ -60,14 +60,49 @@ public class CharacterAnimator : MonoBehaviour
     {
         anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
         anim.SetTrigger("Attack");
+        anim.SetFloat("AttackState", 0f);
+        anim.SetFloat("NormalState", 0f);
     }
 
-    public void SkillAttackAnim(float attackSpeed)
+    public void NormalMagicAttackAnim(float attackSpeed)
     {
         anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
-        anim.SetFloat("AttackState", 1);
         anim.SetTrigger("Attack");
+        anim.SetFloat("AttackState", 0f);
+        anim.SetFloat("NormalState", 1f);
     }
+
+    public void NormalBowAttackAnim(float attackSpeed)
+    {
+        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
+        anim.SetTrigger("Attack");
+        anim.SetFloat("AttackState", 0f);
+        anim.SetFloat("NormalState", 0.5f);
+    }
+
+    public void SkillSwordAttackAnim(float attackSpeed)
+    {
+        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
+        anim.SetTrigger("Attack");
+        anim.SetFloat("AttackState", 1f);
+        anim.SetFloat("NormalState", 0f);
+    }
+    public void SkillBowAttackAnim(float attackSpeed)
+    {
+        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
+        anim.SetTrigger("Attack");
+        anim.SetFloat("AttackState", 1f);
+        anim.SetFloat("NormalState", 0.5f);
+    }
+    public void SkillMagicAttackAnim(float attackSpeed)
+    {
+        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
+        anim.SetTrigger("Attack");
+        anim.SetFloat("AttackState", 1f);
+        anim.SetFloat("NormalState", 1f);
+    }
+
+    
 
     public void DeadAnim()
     {

@@ -5,7 +5,7 @@ using System;
 public class Magician : Character
 {
     // ================= フィールド =================
-    [SerializeField] Vector2 boxSize;  // 検知するボックスのサイズ
+    Vector2 boxSize;  // 検知するボックスのサイズ
     [SerializeField] private LayerMask enemyLayer; // 敵キャラクターのレイヤー
     [SerializeField] private LayerMask playerLayer; // プレイヤーキャラクターのレイヤー
     private LayerMask targetLayer; // 検知対象のレイヤー（敵か味方か）
@@ -15,6 +15,7 @@ public class Magician : Character
     // ================= Unity ライフサイクル =================
     protected override void Start()
     {
+        Debug.Log("Magicianです");
         // ボックスサイズを設定（横幅はrangeを使い、縦幅は固定値）
         boxSize = new Vector2(range, 2);
         

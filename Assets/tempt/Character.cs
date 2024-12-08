@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UniRx;
+using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
@@ -11,9 +12,8 @@ public abstract class Character : MonoBehaviour, IDamageable
     // TODO 二体以上ブロックした時に最初だけ連続攻撃するバグ　クリア
     // TakeDamege(敵が死んだらCanUseのまますぐにAttackEventが呼ばれる)
     // その後StartCooldownをしていたからダメだった。　
-    // TODO 音楽をつける
+    // TODO 音楽をつける 
     // TODO エフェクトをつける
-    // TODO 音楽をつける
 
     // ================= フィールド =================
     // キャラクターのステータス
@@ -134,11 +134,9 @@ public abstract class Character : MonoBehaviour, IDamageable
     private void InitializeSkills()
     {
         normalSkillInstance = Instantiate(characterBase.NormalSkill); // 通常攻撃のインスタンス化
-        currentSkill = normalSkillInstance; // 現在のスキルを通常攻撃に設定
-        if(characterBase.SpecialSkill != null)
+        if (characterBase.SpecialSkill != null)
         {
             specialSkillInstance = Instantiate(characterBase.SpecialSkill); // スキルのインスタンス化
-            currentSkill = specialSkillInstance; // 現在のスキルをスキルに設定
         }
     }
 
@@ -203,14 +201,14 @@ public abstract class Character : MonoBehaviour, IDamageable
     // ================= 攻撃処理 =================
     protected void AttackEvent()
     {
-        if (!IsDead && enemyObject != null 
+        if (!IsDead && enemyObject != null
         && currentSkill.CanUseSkill.Value)
         {
-            if(currentSkill == normalSkillInstance)
+            if (currentSkill == normalSkillInstance)
             {
                 motionFacade.NormalAttackMotion(AttackSpeed); // 通常攻撃アニメーション
             }
-            if(currentSkill == specialSkillInstance)
+            if (currentSkill == specialSkillInstance)
             {
                 motionFacade.SkillAttackMotion(AttackSpeed); // 通常攻撃アニメーション
             }
@@ -238,8 +236,8 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (enemyObject != null)
         {
             Debug.Log("敵への攻撃！！");
-            currentSkill.Activate(this, enemyObject); // スキルを発動
             audioSource.PlayOneShot(currentSkill.AttackSound);
+            currentSkill.Activate(this, enemyObject); // スキルを発動
         }
     }
 
@@ -313,45 +311,49 @@ public abstract class Character : MonoBehaviour, IDamageable
     private void SubscribeToSkillCooldown()
     {
         normalSkillInstance.CanUseSkill
-            .Skip(1)
             .DistinctUntilChanged()
             .Subscribe(value =>
             {
-                if (value == true)
-                {
-                    if (enemyObject != null)
-                    {
-                        AttackEvent();
-                    }
-                    Debug.Log("スキルが使用可能になりました。");
-                }
-                else
-                {
-                    Debug.Log("スキルがクールダウン中です。");
-                }
+                UpdateCurrentSkill();
+                Debug.Log(value ? "通常スキルが使用可能になりました。" : "通常スキルがクールダウン中です。");
             })
             .AddTo(this);
-            if(specialSkillInstance == null){return;}
+
+        if (specialSkillInstance == null) return;
+
         specialSkillInstance.CanUseSkill
-            .Skip(1)
             .DistinctUntilChanged()
             .Subscribe(value =>
             {
-                if (value == true)
-                {
-                    if (enemyObject != null)
-                    {
-                        AttackEvent();
-                    }
-                    Debug.Log("スキルが使用可能になりました。");
-                }
-                else
-                {
-                    Debug.Log("スキルがクールダウン中です。");
-                }
+                UpdateCurrentSkill();
+                Debug.Log(value ? "特殊スキルが使用可能になりました。" : "特殊スキルがクールダウン中です。");
             })
             .AddTo(this);
     }
+
+    private void UpdateCurrentSkill()
+    {
+        // specialSkillが使用可能な場合は常に優先
+        if (specialSkillInstance != null && specialSkillInstance.CanUseSkill.Value)
+        {
+            currentSkill = specialSkillInstance;
+        }
+        else if (normalSkillInstance != null && normalSkillInstance.CanUseSkill.Value)
+        {
+            currentSkill = normalSkillInstance;
+        }
+        else
+        {
+            currentSkill = null;
+        }
+
+        // currentSkillがセットされ、かつターゲットがいる場合は攻撃イベントをトリガー
+        if (currentSkill != null && enemyObject != null)
+        {
+            AttackEvent();
+        }
+    }
+
 }
 
 

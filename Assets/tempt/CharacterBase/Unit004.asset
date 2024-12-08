@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 791d0042c0834446288f6de7e41d2e9e, type: 3}
-  m_Name: Unit003
+  m_Name: Unit004
   m_EditorClassIdentifier: 
   characterID: 0
-  prefab: {fileID: 7111321183345867347, guid: 48b0abeab4be9447f99e250a49a9d7d0, type: 3}
+  prefab: {fileID: 7099325907377268843, guid: 79ffd8b55d63146898aea67a4fa3a315, type: 3}
   name: "\u91D1\u9AEA"
-  cost: 15
-  maxHp: 70
+  cost: 28
+  maxHp: 200
   defence: 0
-  magicDefence: 10
-  canBlockCount: 1
-  atk: 70
+  magicDefence: 20
+  canBlockCount: 0
+  atk: 100
   attackSpeed: 0.6
   attackCoolTime: 3
   speed: 0.35
-  range: 10
+  range: 0
   specialSkill: {fileID: 0}
-  normalSkill: {fileID: 11400000, guid: be58d5f0a6c734661ac991ca40cdb68c, type: 2}
+  normalSkill: {fileID: 0}
   characterType: 2
-  sprite: {fileID: 1562503072, guid: 49b65b4f3e37e41a9931208ef8f9cd7d, type: 3}
+  sprite: {fileID: 0}
   specialAttackSound: {fileID: 0}

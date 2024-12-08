@@ -82,6 +82,6 @@ public class CharacterMotionFacade : MonoBehaviour
     }
     public void SkillAttackMotion(float attackSpeed)
     {
-        anim.SkillAttackAnim(attackSpeed);
+        anim.SkillSwordAttackAnim(attackSpeed);
     }
 }
