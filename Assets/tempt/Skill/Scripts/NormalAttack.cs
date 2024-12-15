@@ -10,12 +10,12 @@ public class NormalAttack : SkillData
     {
         if (CanUseSkill.Value && target is not null)
         {
-            float attackValue = character.Atk * value / 100;
-            cooldownTime = character.AttackCoolTime;  // キャラクターの攻撃速度を取得
+            float attackValue = character.Atk * Value / 100;
+            CooldownTime = character.AttackCoolTime;  // キャラクターの攻撃速度を取得
 
             StartCoolDown();
             target.TakeDamage(attackValue);
-            Debug.Log($"{skillName}を使って{target}に{attackValue}のダメージを与えました。");
+            Debug.Log($"{SkillName}を使って{target}に{attackValue}のダメージを与えました。");
         }
     }
 }

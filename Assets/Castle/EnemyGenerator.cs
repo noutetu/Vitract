@@ -35,6 +35,5 @@ public class EnemyGenerator : MonoBehaviour
         enemyCharacter.gameObject.tag = "Enemy";
         enemyCharacter.gameObject.layer = LayerMask.NameToLayer("Enemy");
         enemyCharacter.isPlayer = false;
-        enemyCharacter.SmoothAppear();
     }
 }

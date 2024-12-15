@@ -58,7 +58,16 @@ public class SPUM_SpriteList : MonoBehaviour
             if (_backList[i] != null) _backList[i].sprite = null;
         }
     }
-
+    // public void SetBody(List<Sprite> _mainBodyList , Texture2D mainBody, string bodyString){
+    //     _bodyList[0].sprite = _mainBodyList[5];
+    //     _bodyList[1].sprite = _mainBodyList[2];
+    //     _bodyList[2].sprite = _mainBodyList[0];
+    //     _bodyList[3].sprite = _mainBodyList[1];
+    //     _bodyList[4].sprite = _mainBodyList[3];
+    //     _bodyList[5].sprite = _mainBodyList[4];
+    //     _bodyTexture = mainBody;
+    //     _bodyString = bodyString;
+    // }
     public void LoadSpriteSting()
     {
 

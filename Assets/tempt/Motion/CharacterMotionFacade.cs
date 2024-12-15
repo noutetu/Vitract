@@ -63,25 +63,16 @@ public class CharacterMotionFacade : MonoBehaviour
 
     public void RunMotion(float speed, bool isPlayer)
     {
-        anim.RunAnim(speed / 2); // 走行アニメーションの再生
+        anim.PlayAnimation(AnimType.Run,speed ); // 走行アニメーションの再生
         charaMover.Move(speed * 2, isPlayer);  // キャラクターを移動させる
     }
-
-    public void DeathMotion()
+    
+    public void PlayAnim(AnimType animType, float speed)
     {
-        anim.DeadAnim();        // 死亡アニメーションの再生
+        anim.PlayAnimation(animType,speed);
     }
-
-    public void IdleMotion()
+    public void PlayAnim(AnimType animType, float speed,int attackType)
     {
-        anim.IdleAnim();
-    }
-    public void NormalAttackMotion(float attackSpeed)
-    {
-        anim.NormalAttackAnim(attackSpeed);
-    }
-    public void SkillAttackMotion(float attackSpeed)
-    {
-        anim.SkillSwordAttackAnim(attackSpeed);
+        anim.PlayAnimation(animType,speed,attackType);
     }
 }

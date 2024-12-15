@@ -39,7 +39,13 @@ public class SpriteSync : MonoBehaviour
 
         if(_manager==null)
         {
-            _manager = GameObject.FindObjectOfType<SPUM_SpriteEditManager>();
+            #if UNITY_2023_1_OR_NEWER
+                _manager = FindAnyObjectByType<SPUM_SpriteEditManager>();
+            #else
+                #pragma warning disable CS0618
+                _manager = FindObjectOfType<SPUM_SpriteEditManager>();
+                #pragma warning restore CS0618
+            #endif
         }
     }
 

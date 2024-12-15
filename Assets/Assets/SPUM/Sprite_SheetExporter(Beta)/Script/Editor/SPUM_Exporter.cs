@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Linq;
-
+using System.Security.Cryptography;
+using System.Reflection;
 [CustomEditor(typeof(SPUM_Exporter))]
 [CanEditMultipleObjects]
 public class SPUM_ExporterEditor : Editor
 {
     //field list
     SerializedProperty _unitPrefab;
-    SerializedProperty _unitType;
     SerializedProperty _separated;
     SerializedProperty _imageName;
     SerializedProperty _imageSize;
@@ -32,9 +32,6 @@ public class SPUM_ExporterEditor : Editor
 	SerializedProperty useTimer;
 	SerializedProperty _netAnimClip;
 	SerializedProperty animNum;
-    SerializedProperty animationClips;
-	SerializedProperty _animNameList;
-	SerializedProperty _animNameNow;
 	SerializedProperty _textSaveList;
     SerializedProperty _gifExportUse;
 	SerializedProperty _gifBGColor; 
@@ -53,16 +50,13 @@ public class SPUM_ExporterEditor : Editor
     float tAnimTimer;
     float tAnimTimerFactor;
     float timeSave;
-    float tValuee = 0 ;
-    bool objectSelectionFoldout = false;
-    int objectSelectionToolbar = 0;
-
+    //float tValuee = 0 ;
+    //bool objectSelectionFoldout = false;
+    //int objectSelectionToolbar = 0;
+    bool allChecked = false;
     void OnEnable()
     {
-
-        // Fetch the objects from the GameObject script to display in the inspector
         _unitPrefab = serializedObject.FindProperty("_unitPrefab");
-        _unitType = serializedObject.FindProperty("_unitType");
         _separated = serializedObject.FindProperty("_separated");
         _imageName = serializedObject.FindProperty("_imageName");
         _imageSize = serializedObject.FindProperty("_imageSize");
@@ -82,9 +76,6 @@ public class SPUM_ExporterEditor : Editor
         useTimer = serializedObject.FindProperty("useTimer");
         _netAnimClip = serializedObject.FindProperty("_netAnimClip");
         animNum = serializedObject.FindProperty("animNum");
-        animationClips = serializedObject.FindProperty("animationClips");
-        _animNameList = serializedObject.FindProperty("_animNameList");
-        _animNameNow = serializedObject.FindProperty("_animNameNow");
         _textSaveList = serializedObject.FindProperty("_textSaveList");
         _gifExportUse = serializedObject.FindProperty("_gifExportUse");
         _gifBGColor = serializedObject.FindProperty("_gifBGColor");
@@ -95,7 +86,12 @@ public class SPUM_ExporterEditor : Editor
         _gifRepeatNum = serializedObject.FindProperty("_gifRepeatNum");
 
     }
-    
+    private void OnUnitPrefabChanged()
+    {
+        SPB.CheckObjNow();
+ 
+        SPB.MakeObjNow();
+    }
 
     // Start is called before the first frame update
     public override void OnInspectorGUI()
@@ -104,8 +100,14 @@ public class SPUM_ExporterEditor : Editor
         SPB = (SPUM_Exporter)target;
         // base.OnInspectorGUI();
         // EditorGUILayout.BeginVertical();
+        EditorGUI.BeginChangeCheck();
         EditorGUILayout.PropertyField(_unitPrefab);
-        EditorGUILayout.PropertyField(_unitType);
+        if (EditorGUI.EndChangeCheck())
+        {
+            serializedObject.ApplyModifiedProperties();
+            OnUnitPrefabChanged();
+        }
+        //EditorGUILayout.PropertyField(_unitPrefab);
         EditorGUILayout.PropertyField(_separated);
         EditorGUILayout.PropertyField(_imageName);
         EditorGUILayout.PropertyField(_imageSize);
@@ -114,7 +116,42 @@ public class SPUM_ExporterEditor : Editor
         EditorGUILayout.PropertyField(_frameRate);
         //Gif Exporter Value Sync;
         //For Gif Exporter
+        if (GUILayout.Button("RELOAD CLIP DATA"))
+        {
+            SPB.LoadAnimationStateClip();
+        }
+        EditorGUILayout.HelpBox("Extracting the checked clips.",MessageType.Info);
+        if(SPB.items.Count > 0)
+        {
+            EditorGUILayout.BeginHorizontal();
+            bool newAllChecked = EditorGUILayout.Toggle(allChecked, GUILayout.Width(20));
+            if (newAllChecked != allChecked)
+            {
+                allChecked = newAllChecked;
+                SPB.items.ForEach(item => item.isChecked = allChecked);
+            }
+            EditorGUILayout.LabelField( "STATES", GUILayout.Width(100) );
+            EditorGUILayout.LabelField( "ANIMATION CLIP");
+            EditorGUILayout.EndHorizontal();
+            GUILayout.Space(-9);
+            GUIStyle horizontalLine = new GUIStyle(GUI.skin.horizontalSlider);
+            EditorGUILayout.LabelField("", horizontalLine);
+            GUILayout.Space(-9);
+        }
+        for (int i = 0; i < SPB.items.Count; i++)
+        {
+            EditorGUILayout.BeginHorizontal();
+            SPB.items[i].isChecked = EditorGUILayout.Toggle( SPB.items[i].isChecked, GUILayout.Width(20));
+            EditorGUILayout.LabelField( ""+SPB.items[i].name, GUILayout.Width(100) );
+            SPB.items[i].animationClip = (AnimationClip)EditorGUILayout.ObjectField(SPB.items[i].animationClip, typeof(AnimationClip), false);
+            // if (GUILayout.Button("Remove"))
+            // {
+            //     SPB.items.RemoveAt(i);
+            // }
+            EditorGUILayout.EndHorizontal();
+        }
 
+         
 
         float xSize = Handles.GetMainGameViewSize().x;
         float ySize = Handles.GetMainGameViewSize().y;
@@ -122,8 +159,11 @@ public class SPUM_ExporterEditor : Editor
         if( xSize < 1920f || ySize < 1080)
         {
             EditorGUILayout.PropertyField(_gifExportUse, new GUIContent("Disable Gif Export"));
-            EditorGUILayout.HelpBox("!!! Please set Game Windows size over the 1920x1080 to use export method !!!",MessageType.Error);
-
+            EditorGUILayout.HelpBox("!!! Please set Game Windows size over the Full HD (1920x1080) to use export method !!!",MessageType.Error);
+            if (GUILayout.Button("OK Change resolution now.",GUILayout.Height(50))) 
+            {
+                SetCaptureSize();
+            }
             return;
         }
 
@@ -174,9 +214,8 @@ public class SPUM_ExporterEditor : Editor
             EditorGUILayout.PropertyField(useTimer);
             EditorGUILayout.PropertyField(_netAnimClip);
             EditorGUILayout.PropertyField(animNum);
-            EditorGUILayout.PropertyField(animationClips);
-            EditorGUILayout.PropertyField(_animNameList);
-            EditorGUILayout.PropertyField(_animNameNow);
+            //EditorGUILayout.PropertyField(animationClips);
+            //EditorGUILayout.PropertyField(_animNameNow);
             EditorGUILayout.PropertyField(_textSaveList);
         }
 
@@ -190,10 +229,16 @@ public class SPUM_ExporterEditor : Editor
         {
             if(!SPB.useTimer)
             {
+                var isAnyAnimationChecked = SPB.items.Any(item => item.isChecked);
+                if (!isAnyAnimationChecked)
+                {
+                    Debug.Log("No animations are checked. The process will not start.");
+                    return;
+                }
                 Debug.Log("Starting Export Sprite Sheets...");
-                SPB.StartExport();
+                SPB.ImageNumber = 0;
                 SPB.animNum = 0;
-                SPB.animationClips = SPB._anim.runtimeAnimatorController.animationClips;
+
                 SPB._textSaveList.Clear();
                 SPB._netAnimClip = true;
             }
@@ -204,6 +249,7 @@ public class SPUM_ExporterEditor : Editor
             if (GUILayout.Button("Remove Object",GUILayout.Height(50))) 
             {
                 Debug.Log("Removed Prefab Object!!");
+                SPB.items.Clear();
                 SPB._unitPrefab = null;
                 SPB._imageName = "";
             }
@@ -219,85 +265,9 @@ public class SPUM_ExporterEditor : Editor
             SPB._objectPivot.transform.localScale = new Vector3(SPB._scaleFactor,SPB._scaleFactor,SPB._scaleFactor);
         }
 
-        if(SPB.useTimer)
-        {
-            float tTimer = Time.realtimeSinceStartup - timeSave;
-            timeSave = Time.realtimeSinceStartup;
-            SPB.timer += tTimer;
-
-            if(SPB.timer > SPB.timerForSave)
-            {
-                tValue += tAnimTimerFactor;
-                
-                SPB.timer = 0;
-                SPB.frameNowNumber++;
-                if(SPB.frameNowNumber >= SPB._frameNumber)
-                {
-                    SPB.frameNowNumber = 0;
-                    tValue = 0;
-                    SPB.animNum++;
-                    SPB.useTimer = false;
-                    if(SPB._separated) 
-                    {
-                        SPB._sepaName = tAnimSave.name;
-                    }
-                    if(SPB.animNum < SPB._animNameNow.Count)
-                    {
-                        if(SPB._separated) SPB.MakeScreenShotFile();
-                        SPB._netAnimClip = true;
-                    }
-                    else
-                    {
-                        SPB.MakeScreenShotFile();
-                        SPB.PrintEndMessage();
-                    }
-                }
-                
-                if(SPB.animNum >= SPB._animNameNow.Count)
-                {
-                    ExporterReset();
-                    SPB.MakeGifAnimation();
-                }
-                else 
-                {
-                    ExporterShot();
-                    SPB.SetScreenShot();
-                }
-                
-            }
-        }
-
-        if(SPB._netAnimClip)
-        {
-            SPB._netAnimClip = false;
-            AnimationClip tAnim = null;
-            foreach( var obj in SPB.animationClips)
-            {
-                if(obj.name == SPB._animNameNow[SPB.animNum])
-                {
-                    tAnim = obj;
-                }
-            }
-            
-            if(tAnim == null) return;
-
-            tAnimSave = tAnim;
-            tAnimTimer = tAnimSave.length;
-            tAnimTimerFactor = 1f / (SPB._frameRate*1f);
-            SPB._frameNumber = (int)(tAnimTimer / tAnimTimerFactor);
-            Debug.Log("[[Generating : "+ tAnimSave.name + " || Time Length : " + tAnimSave.length + " sec " + "|| Frame Numbers : "+ SPB._frameNumber+"]]");
-            SPB.frameNowNumber = 0;
-            tValue = 0;
-            SPB.timer = 0;
-            SPB.useTimer = true;
-            timeSave = Time.realtimeSinceStartup;
-
-            SPB._textSaveList.Clear();
-            ExporterShot();
-            SPB.SetScreenShot();
-        }
+        UpdateTimer();
+        ProcessNextAnimationClip();
     }
-
     public void ExporterShot()
     {
         AnimationMode.StartAnimationMode();
@@ -315,5 +285,177 @@ public class SPUM_ExporterEditor : Editor
         AnimationMode.StopAnimationMode();
     }
 
+private void UpdateTimer()
+{
+    if (!SPB.useTimer) return;
 
+    float elapsedTime = Time.realtimeSinceStartup - timeSave;
+    timeSave = Time.realtimeSinceStartup;
+    SPB.timer += elapsedTime;
+
+    if (SPB.timer <= SPB.timerForSave) return;
+
+    ProcessFrame();
+}
+
+private void ProcessFrame()
+{
+    tValue += tAnimTimerFactor;
+    SPB.timer = 0;
+    SPB.frameNowNumber++;
+
+    if (SPB.frameNowNumber >= SPB._frameNumber)
+    {
+        ProcessAnimation();
+    }
+    else
+    {
+        CaptureAndSaveScreenshot();
+    }
+}
+
+private void ProcessAnimation()
+{
+    SPB.frameNowNumber = 0;
+    tValue = 0;
+    SPB.useTimer = false;
+
+    if (SPB._separated)
+    {
+        SPB._sepaName = tAnimSave.name;
+    }
+
+    if (MoveToNextCheckedAnimation())
+    {
+        if (SPB._separated) SPB.MakeScreenShotFile();
+        SPB._netAnimClip = true;
+    }
+    else
+    {
+        SPB.MakeScreenShotFile();
+        SPB.PrintEndMessage();
+        ExporterReset();
+        SPB.MakeGifAnimation();
+    }
+}
+
+private bool MoveToNextCheckedAnimation()
+{
+    do
+    {
+        SPB.animNum++;
+        if (SPB.animNum >= SPB.items.Count)
+        {
+            return false;
+        }
+    } while (!SPB.items[SPB.animNum].isChecked);
+
+    return true;
+}
+
+
+private void CaptureAndSaveScreenshot()
+{
+    ExporterShot();
+    SPB.SetScreenShot();
+}
+
+private void ProcessNextAnimationClip()
+{
+    if (!SPB._netAnimClip) return;
+
+    //Debug.Log(SPB.animNum);
+    SPB._netAnimClip = false;
+
+    if (!SPB.items[SPB.animNum].isChecked)
+    {
+        // 현재 애니메이션이 체크되지 않았다면 다음 체크된 애니메이션으로 이동
+        if (!MoveToNextCheckedAnimation())
+        {
+            // 더 이상 체크된 애니메이션이 없으면 종료
+            SPB.MakeScreenShotFile();
+            SPB.PrintEndMessage();
+            ExporterReset();
+            SPB.MakeGifAnimation();
+            return;
+        }
+    }
+
+    AnimationClip currentAnim = SPB.items[SPB.animNum].animationClip;
+    string stateName = SPB.items[SPB.animNum].name;
+
+    if (currentAnim == null) return;
+
+    SetupNewAnimation(currentAnim, stateName);
+    CaptureAndSaveScreenshot();
+}
+
+private void SetupNewAnimation(AnimationClip anim, string stateName)
+{
+    tAnimSave = anim;
+    tAnimTimer = tAnimSave.length;
+    tAnimTimerFactor = 1f / (SPB._frameRate * 1f);
+    SPB._frameNumber = (int)(tAnimTimer / tAnimTimerFactor);
+    
+    Debug.Log($"[[Generating : {stateName}_{tAnimSave.name} || Time Length : {tAnimSave.length} sec || Frame Numbers : {SPB._frameNumber}]]");
+    
+    SPB.frameNowNumber = 0;
+    tValue = 0;
+    SPB.timer = 0;
+    SPB.useTimer = true;
+    timeSave = Time.realtimeSinceStartup;
+
+    SPB._textSaveList.Clear();
+}
+    public void SetCaptureSize()
+    {
+        int idx = FindSize(GameViewSizeGroupType.Standalone, 1920, 1080);
+        if (idx != -1)
+            SetSize(idx);
+    }
+    public int FindSize(GameViewSizeGroupType sizeGroupType, int width, int height)
+    {
+        // goal:
+        // GameViewSizes group = gameViewSizesInstance.GetGroup(sizeGroupType);
+        // int sizesCount = group.GetBuiltinCount() + group.GetCustomCount();
+        // iterate through the sizes via group.GetGameViewSize(int index)
+
+        var group = GetGroup(sizeGroupType);
+        var groupType = group.GetType();
+        var getBuiltinCount = groupType.GetMethod("GetBuiltinCount");
+        var getCustomCount = groupType.GetMethod("GetCustomCount");
+        int sizesCount = (int)getBuiltinCount.Invoke(group, null) + (int)getCustomCount.Invoke(group, null);
+        var getGameViewSize = groupType.GetMethod("GetGameViewSize");
+        var gvsType = getGameViewSize.ReturnType;
+        var widthProp = gvsType.GetProperty("width");
+        var heightProp = gvsType.GetProperty("height");
+        var indexValue = new object[1];
+        for (int i = 0; i < sizesCount; i++)
+        {
+            indexValue[0] = i;
+            var size = getGameViewSize.Invoke(group, indexValue);
+            int sizeWidth = (int)widthProp.GetValue(size, null);
+            int sizeHeight = (int)heightProp.GetValue(size, null);
+            if (sizeWidth == width && sizeHeight == height)
+                return i;
+        }
+        return -1;
+    }
+    private object GetGroup(GameViewSizeGroupType type)
+    {
+        var sizesType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizes");
+        var singleType = typeof(ScriptableSingleton<>).MakeGenericType(sizesType);
+        var instanceProp = singleType.GetProperty("instance");
+        var getGroup = sizesType.GetMethod("GetGroup");
+        var gameViewSizesInstance = instanceProp.GetValue(null, null);
+        return getGroup.Invoke(gameViewSizesInstance, new object[] { (int)type });
+    }
+    public void SetSize(int index)
+    {
+        var gvWndType = typeof(Editor).Assembly.GetType("UnityEditor.GameView");
+        var selectedSizeIndexProp = gvWndType.GetProperty("selectedSizeIndex",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var gvWnd = EditorWindow.GetWindow(gvWndType);
+        selectedSizeIndexProp.SetValue(gvWnd, index, null);
+    }
 }

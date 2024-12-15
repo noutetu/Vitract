@@ -14,6 +14,9 @@ public abstract class Character : MonoBehaviour, IDamageable
     // その後StartCooldownをしていたからダメだった。　
     // TODO 音楽をつける 
     // TODO エフェクトをつける
+    // TODO 攻撃のアニメーション管理をちゃんとする
+    // TODO ジャンプ攻撃のアニメーションで直後の通常攻撃が反応しないバグ。　クリア
+    // なんかよくわからんけどアニメーションイベントの秒数変更したらいけた。なんで？
 
     // ================= フィールド =================
     // キャラクターのステータス
@@ -60,16 +63,26 @@ public abstract class Character : MonoBehaviour, IDamageable
         InitializeSkills(); // スキルの初期化
         SubscribeToSkillCooldown(); // スキルのクールダウン購読の設定
         InitializeTargetList(); // ターゲットリストの初期化
+        
+        SmoothAppear();
     }
 
-    private void OnEnable()
-    {
-        InitCharacter(); // 有効化時の初期化
-    }
+    
 
     private void OnDisable()
     {
+        if (spriteRenderers != null)
+        {
+            foreach (var spriteRenderer in spriteRenderers)
+            {
+                if (spriteRenderer != null)
+                {
+                    DOTween.Kill(spriteRenderer, true); // SpriteRenderer関連のTweenを停止
+                }
+            }
+        }
 
+        Debug.Log("DoTween is killed");
         DOTween.Kill(this); // DOTweenアニメーションの破棄
         motionFacade.DeInitialize(HitAttack, Dead); // アニメーションイベントの解除
         disposables.Dispose(); // 購読解除
@@ -78,9 +91,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void OnDestroy()
     {
-        DOTween.Kill(this); // DOTweenアニメーションの破棄
-        disposables.Dispose(); // 購読解除
-        targetList?.Dispose(); // ターゲットリストの破棄
+        
     }
 
     protected virtual void Start() { }
@@ -90,6 +101,9 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (isDead)
         {
             characterState = CharacterState.Die; // キャラクターが死亡した場合の状態設定
+            Debug.Log("キャラが死亡した");
+            motionFacade.PlayAnim(AnimType.Dead,1f); // 死ぬモーション
+            return;
         }
         else if (GameManager.Instance.isGameEnd)
         {
@@ -113,13 +127,15 @@ public abstract class Character : MonoBehaviour, IDamageable
         currentHp.Value = maxHp;
         Atk = characterBase.Atk;
         AttackSpeed = characterBase.AttackSpeed;
-        AttackCoolTime = characterBase.AttackCoolTime;
+        AttackCoolTime = characterBase.CoolTime;
         speed = characterBase.Speed;
         range = characterBase.Range;
         deffence = characterBase.Defence;
         magicDeffence = characterBase.MagicDefence;
         cost = characterBase.Cost;
         characterType = characterBase.CharacterType;
+        characterState = CharacterState.Run;
+
     }
 
     private void InitializeComponents()
@@ -149,7 +165,8 @@ public abstract class Character : MonoBehaviour, IDamageable
             if (enemyObject == null)
             {
                 SetNextEnemy(); // 新しいターゲットを設定
-                if (currentSkill.CanUseSkill.Value)
+
+                if (currentSkill?.CanUseSkill.Value == true)
                 {
                     AttackEvent(); // 攻撃イベントを呼び出し
                 }
@@ -166,10 +183,10 @@ public abstract class Character : MonoBehaviour, IDamageable
                 motionFacade.RunMotion(speed, isPlayer); // 走るモーション
                 break;
             case CharacterState.Die:
-                motionFacade.DeathMotion(); // 死ぬモーション
+                motionFacade.PlayAnim(AnimType.Dead,1f); // 死ぬモーション
                 break;
             case CharacterState.Idle:
-                motionFacade.IdleMotion(); // 待機モーション
+                motionFacade.PlayAnim(AnimType.Idle,1); // 待機モーション
                 break;
         }
     }
@@ -201,26 +218,32 @@ public abstract class Character : MonoBehaviour, IDamageable
     // ================= 攻撃処理 =================
     protected void AttackEvent()
     {
-        if (!IsDead && enemyObject != null
-        && currentSkill.CanUseSkill.Value)
+        if (!IsDead && enemyObject != null)
         {
-            if (currentSkill == normalSkillInstance)
-            {
-                motionFacade.NormalAttackMotion(AttackSpeed); // 通常攻撃アニメーション
-            }
             if (currentSkill == specialSkillInstance)
             {
-                motionFacade.SkillAttackMotion(AttackSpeed); // 通常攻撃アニメーション
+                motionFacade.PlayAnim(specialSkillInstance.AnimType,AttackSpeed,specialSkillInstance.AttackType); // 通常攻撃アニメーション
+                return;
             }
+            if (currentSkill == normalSkillInstance)
+            {
+                motionFacade.PlayAnim(normalSkillInstance.AnimType,AttackSpeed,normalSkillInstance.AttackType); // 通常攻撃アニメーション
+            }
+            
         }
+        Debug.Log ("AttackEvent");
     }
 
     // ================= ダメージ処理と死亡判定 =================
     public void TakeDamage(float damage)
     {
-        // if (isDead) return;
         motionFacade.DamageAnimation(spriteRenderers);
-        currentHp.Value = Mathf.Max(currentHp.Value - damage, 0); // ダメージを受けた後のHPを計算
+        float damageAmount = damage - deffence;
+        float minDamage = damage / 10 ; // 最低保証ダメージ
+        if(damageAmount < minDamage){damageAmount = minDamage;}
+        currentHp.Value = Mathf.Max(currentHp.Value - damageAmount, 0); // ダメージを受けた後のHPを計算
+
+        Debug.Log($"{this.gameObject.name}は{damageAmount}くらった");
 
         if (currentHp.Value <= 0)
         {
@@ -236,19 +259,22 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (enemyObject != null)
         {
             Debug.Log("敵への攻撃！！");
-            audioSource.PlayOneShot(currentSkill.AttackSound);
-            currentSkill.Activate(this, enemyObject); // スキルを発動
+            audioSource?.PlayOneShot(currentSkill?.AttackSound);
+            currentSkill?.Activate(this, enemyObject); // スキルを発動
         }
     }
 
-    public void Dead() => Destroy(gameObject); // キャラクターの削除
+    public void Dead()
+    {
+        Destroy(gameObject); // キャラクターの削除
+    }
 
     // ================= 敵感知処理 =================
     protected IDamageable DetectEnemy(GameObject other) => other.GetComponent<IDamageable>(); // 敵を感知
 
     protected void AddEnemyToList(IDamageable detectedObject)
     {
-        if (!targetList.Contains(detectedObject))
+        if (!targetList.Contains(detectedObject) && !detectedObject.IsDead)
         {
             targetList.Add(detectedObject); // 新しい敵をリストに追加
             SubscribeToEnemyHealth(detectedObject);
@@ -273,12 +299,14 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (targetList.Count > 0)
         {
             SetNextEnemy(); // 次のターゲットを設定
-            if (currentSkill.CanUseSkill.Value)
+
+            if (currentSkill?.CanUseSkill.Value == true)
             {
                 AttackEvent(); // 次の敵に攻撃
             }
             return;
         }
+
         characterState = CharacterState.Run;
     }
 
@@ -287,15 +315,18 @@ public abstract class Character : MonoBehaviour, IDamageable
     // ================= その他のメソッド =================
     public void SmoothAppear()
     {
-        // キャラクターをフェードインさせる処理
         foreach (var spriteRenderer in spriteRenderers)
         {
+            if (spriteRenderer == null) continue; // SpriteRendererが破棄されている場合スキップ
+
             Color color = spriteRenderer.color;
             color.a = 0f;
             spriteRenderer.color = color;
-            spriteRenderer.DOFade(1f, 0.5f);
+            spriteRenderer.DOFade(1f, 0.5f)
+                .OnKill(() => Debug.Log("Tween killed to prevent null reference."));
         }
     }
+
 
 
     public void SetHpBar()
@@ -310,7 +341,7 @@ public abstract class Character : MonoBehaviour, IDamageable
 
     private void SubscribeToSkillCooldown()
     {
-        normalSkillInstance.CanUseSkill
+        normalSkillInstance?.CanUseSkill
             .DistinctUntilChanged()
             .Subscribe(value =>
             {
@@ -319,9 +350,7 @@ public abstract class Character : MonoBehaviour, IDamageable
             })
             .AddTo(this);
 
-        if (specialSkillInstance == null) return;
-
-        specialSkillInstance.CanUseSkill
+        specialSkillInstance?.CanUseSkill
             .DistinctUntilChanged()
             .Subscribe(value =>
             {
@@ -353,7 +382,6 @@ public abstract class Character : MonoBehaviour, IDamageable
             AttackEvent();
         }
     }
-
 }
 
 

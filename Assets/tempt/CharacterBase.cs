@@ -1,92 +1,83 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 [CreateAssetMenu]
 [System.Serializable]
 public class CharacterBase : ScriptableObject
 {
-    [SerializeField] int characterID; 
+    [Header("基本情報")]
+    [Tooltip("キャラクターのID")]
+    [SerializeField] int characterID;
 
-    // 対応するプレハブ
+    [Tooltip("対応するキャラクタープレハブ")]
     [SerializeField] Character prefab;
-    public Character Prefab { get => prefab;}
+    public Character Prefab { get => prefab; set => prefab = value; }
 
-    //名前
+    [Tooltip("キャラクターの名前")]
     [SerializeField] new string name;
-    public string Name { get => name;}
+    public string Name { get => name; set => name = value; }
 
-    //コスト
+    [Tooltip("配置に必要なコスト")]
     [SerializeField] int cost;
-    public int Cost { get => cost;}
+    public int Cost { get => cost; set => cost = value; }
 
-
-    //最大体力
+    [Header("ステータス")]
+    [Tooltip("キャラクターの最大体力")]
     [SerializeField] float maxHp;
-    public float MaxHp { get => maxHp;}
+    public float MaxHp { get => maxHp; set => maxHp = value; }
 
-    //防御力
+    [Tooltip("キャラクターの防御力")]
     [SerializeField] float defence;
-    public float Defence { get => defence;}
+    public float Defence { get => defence; set => defence = value; }
 
-    //魔法耐性
+    [Tooltip("キャラクターの魔法耐性")]
     [SerializeField] float magicDefence;
-    public float MagicDefence { get => magicDefence;}
+    public float MagicDefence { get => magicDefence; set => magicDefence = value; }
 
-    //ブロック数
-    [SerializeField] int canBlockCount;
-    public int CanBlockCount { get => canBlockCount;}
-
-    //攻撃力
+    [Tooltip("キャラクターの攻撃力")]
     [SerializeField] float atk;
-    public float Atk { get => atk;}
+    public float Atk { get => atk; set => atk = value; }
 
-    //攻撃アニメーション速度
-    [SerializeField] float attackSpeed;
-    public float AttackSpeed { get => attackSpeed;}
+    [Tooltip("キャラクターの攻撃クールタイム")]
+    [SerializeField] float coolTime;
+    public float CoolTime { get => coolTime; set => coolTime = value; }
     
-    //攻撃のクールタイム
-    [SerializeField] float attackCoolTime;
-    public float AttackCoolTime { get => attackCoolTime;}
+    [Tooltip("キャラクターの攻撃速度")]
+    [SerializeField] float attackSpeed;
+    public float AttackSpeed { get => attackSpeed; set => attackSpeed = value; }
 
-    //スピード
-    [SerializeField] float speed;
-    public float Speed { get => speed;}
-
-    //射程
+    [Tooltip("キャラクターの攻撃範囲")]
     [SerializeField] float range;
-    public float Range { get => range;}
+    public float Range { get => range; }
 
-    // スキル
+    [Tooltip("キャラクターの移動速度")]
+    [SerializeField] float speed;
+    public float Speed { get => speed; set => speed = value; }
+
+    [Header("スキル")]
+    [Tooltip("キャラクターの特別なスキル")]
     [SerializeField] SkillData specialSkill;
-    public SkillData SpecialSkill { get => specialSkill;}
+    public SkillData SpecialSkill { get => specialSkill; set => specialSkill = value; }
 
+    [Tooltip("キャラクターの通常スキル")]
     [SerializeField] SkillData normalSkill;
-    public SkillData NormalSkill { get => normalSkill;}
+    public SkillData NormalSkill { get => normalSkill; set => normalSkill = value; }
 
-    //キャラクタータイプ
+    [Header("設定")]
+    [Tooltip("キャラクターの種類")]
     [SerializeField] CharacterType characterType;
-    public CharacterType CharacterType { get => characterType;}
+    public CharacterType CharacterType { get => characterType; set => characterType = value; }
 
-    //キャラクター画像
-    [SerializeField] Sprite sprite;
-    public Sprite Sprite { get => sprite;}
+    [Tooltip("キャラクターの役職")]
+    [SerializeField] string roleName;
+    [TextArea(3, 5)] // 最小3行、最大5行
+    [SerializeField] string description;
 
-    // サウンド
-    [SerializeField] AudioClip specialAttackSound;
-    public AudioClip SpecialAttackSound { get => specialAttackSound;}
-
-    ///---------------------------------------------メソッド----------------------------------------------------------------------
-    //ソードマンなら射程を0に
-    private void OnEnable() 
-    {
-        if(characterType == CharacterType.SwordMan)
-        {
-            range = 0;
-        }
-    }
+    [Tooltip("キャラクター画像")]
+    [SerializeField] Sprite icon;
+    public Sprite Icon { get => icon; set => icon = value; }
 }
+
 
 public enum CharacterType
 {

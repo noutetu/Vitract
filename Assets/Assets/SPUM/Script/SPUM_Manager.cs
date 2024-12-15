@@ -8,2809 +8,1575 @@ using UnityEditor;
 #endif
 using System.IO;
 using System.Linq;
-
+using System;
+using System.Globalization;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
-
+[Serializable]
+public class SPUM_Animator{
+    public string Type;
+    public RuntimeAnimatorController RuntimeAnimator;
+}
 public class SPUM_Manager : MonoBehaviour
 {
-    #if UNITY_EDITOR
     public float _version;
-    public Transform _characterPivot;
-    public Texture2D _mainBody;
-    public Texture2D _mainEye;
-    public List<Sprite> _mainBodyList = new List<Sprite>();
-    public int _maxNumber = 100;
-    public string unitPath = "Assets/Resources/SPUM/SPUM_Units/";
-    public SPUM_Prefabs _unitObjSet;
-    public List<SPUM_SpriteButtonST> _textureList = new List<SPUM_SpriteButtonST>();
-    public SPUM_SpriteList _spriteObj;
-    public Text _unitCode;
-    public Text _unitNumber;
-    public GameObject _drawItemObj;
-    public int _drawItemIndex;
-    public GameObject _childItem;
-    public Transform _childPool;
-    public Text _spumVersion;
+    public string unitPath = "Assets/SPUM/Resources/Units/"; // 프리펩 저장 장소
+    public string unitBackUpPath = "Assets/SPUM/Backup/";
+    public bool isSaveSamePath = false;
+    public SPUM_Prefabs EditPrefab;
+    public SPUM_Prefabs PreviewPrefab; // 프리뷰 프리펩
+    public SPUM_Animator[] SPUM_Animator; 
+    public Dictionary<string, RuntimeAnimatorController> SPUM_AnimatorDic = new();
+    public Toggle RandomColorButton;
+    //public List<SPUM_PackageButton> _packageButtonList = new List<SPUM_PackageButton>(); // 스펌 생성된 패키지 버튼 리스트
+    //public Dictionary<string, bool> SpritePackagesFilterList = new Dictionary<string, bool>(); //보여질 패키지 상태 관리
+    public List<SpumPackage> spumPackages;
+    public List<string> StateList = new ();
+    public List<string> UnitTypeList = new();
+    public List<string> SpritePackageNameList = new();
+    [Header("Manager")]
+    [SerializeField] public SPUM_AnimationManager animationManager;
+    [SerializeField] public SPUM_UIManager UIManager;
+    [SerializeField] public SPUM_PaginationManager paginationManager;
 
-    public List<string> _packageList = new List<string>();
-
-    public Text _panelTitle;
-    public List<SPUM_PackageButton> _packageButtonList = new List<SPUM_PackageButton>();
-    public Transform _packageButtonPool;
-    public ScrollRect _packageButtonScroll;
-    public GameObject _packageButtonObj;
-
-    public bool _horseCheck;
-    public List<Transform> _rootList = new List<Transform>();
-    public List<Animator> _rootAnimList = new List<Animator>();
-    public List<RuntimeAnimatorController> _animControllerList = new List<RuntimeAnimatorController>();
-    
-
-    // Start is called before the first frame update
+#if UNITY_EDITOR
+#region Unity Function
     void Awake()
     {
         SoonsoonData.Instance._spumManager= this;
+        LoadPackages();
+        var unit = PreviewPrefab;
+        if(unit.spumPackages.Count.Equals(0)) {
+            var InitLegacyData = GetSpumLegacyData();
+            if(string.IsNullOrEmpty(unit.UnitType)) unit.UnitType = "Unit";
+            unit.spumPackages = InitLegacyData;
+        }
+        var uniqueTypes = spumPackages
+            .SelectMany(package => package.SpumAnimationData)
+            .Select(clip => clip.StateType.ToUpper())
+            .Distinct(System.StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        StateList = uniqueTypes;
+
+        var uniqueUnitTypes = spumPackages
+            .SelectMany(package => package.SpumAnimationData)
+            .Select(clip => clip.UnitType)
+            .Distinct(System.StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        UnitTypeList = uniqueUnitTypes;
+
+        var uniquePackageNames = spumPackages
+        .Where(package => package.SpumTextureData.Count > 0)
+        .Select(package => package.Name)
+        .Distinct(System.StringComparer.OrdinalIgnoreCase)
+        .ToList();
+        SpritePackageNameList = uniquePackageNames;
     }
     void Start()
     {
-        // PlayerPrefs.DeleteAll();
-        if(_spumVersion!=null) _spumVersion.text = "VER " + _version.ToString(); 
+       
+        SPUM_AnimatorDic = SPUM_Animator.ToDictionary(item => item.Type, item => item.RuntimeAnimator);
+        
         StartCoroutine(StartProcess());
+        SetType("Unit");
+        ItemResetAll();
     }
+    [ContextMenu("Setup")]
+    public void Setup(){
+        SetDefultSet("Unit", "Body", "Human_1", Color.white);
+        SetDefultSet("Unit", "Eye", "Eye0", new Color32(71, 26,26, 255));
+        SetDefultSet("Horse", "Body", "Horse1", Color.white);
+    }
+#endregion
 
 
+    // public void SetPackageActiveStateList(){{
+    //     SpritePackagesFilterList = animationManager.SpritePackageNameList.ToDictionary(name => name, name => true);
+    // }}
+    // 타입을 설정 유닛 / 말
     public IEnumerator StartProcess()
     {
         Debug.Log("Data Load processing..");
+
+        // 버전 체크 및 패키지 데이터 체크
         yield return StartCoroutine(SoonsoonData.Instance.LoadData());
         
 
-        bool dirChk = Directory.Exists("Assets/Resources/SPUM/SPUM_Sprites/Items");
+        // bool dirChk = Directory.Exists("Assets/Resources/SPUM/SPUM_Sprites/Items");
+        // if(!dirChk)
+        //     UIManager.OnNotice("[Empty body image source]\n\nYou need setup first\nPlease Sprite images locate to Resource Folder\nPlease Read Readme.txt file",1,1);
+        //     yield return null;
 
-        if(!dirChk)
-        {
-            OnNotice("[Empty body image source]\n\nYou need setup first\nPlease Sprite images locate to Resource Folder\nPlease Read Readme.txt file",1,1);
-            yield return null;
-        }
-        else
-        {
-            SetSpriteList(0,"0_Hair"); //헤어 연결
-            SetSpriteList(1,"1_FaceHair"); //수염 연결
-            SetSpriteList(2,"4_Helmet"); //투구 연결
-            SetSpriteList(3,"2_Cloth"); //옷 연결
-            SetSpriteList(4,"3_Pant"); //헤어 연결
-            SetSpriteList(5,"5_Armor"); //갑옷 연결
-            SetSpriteList(6,"7_Back"); //뒤 아이템 연결
-            SetSpriteList(7,"6_Weapons"); //오른쪽 무기 연결
-            SetSpriteList(8,"6_Weapons"); //왼쪽 무기 연결
-            SetSpriteList(9,"Eye"); //눈 연결
+        //     //yield return StartCoroutine(GetPrefabList());
+        //     //프리팹 연동
+        //     ShowNowUnitNumber(); //프리팹 숫자 연동
 
-            //추가 패키지 연결
-            AddPackageSprite();
+        //     SetInit();
+        //     //기본 색 연동
+        //     //UI연동.
 
-            yield return StartCoroutine(GetPrefabList());
-            //프리팹 연동
-            ShowNowUnitNumber(); //프리팹 숫자 연동
 
-            SetInit();
-            //기본 색 연동
-            //UI연동.
-
-            _unitCode.text = GetFileName();
-
-            //데이터 인증 부분
-            //패키지 데이터 저장
-            if(SoonsoonData.Instance._soonData2.packageList.Count > 0)
-            {
-                SoonsoonData.Instance.LoadPackageData();
-            }
-        }
-        _nowSelectColor.SetActive(false);
-        // 색정보 연동
-        if( SoonsoonData.Instance._soonData2._savedColorList == null)
+        // 작업 색상 정보 로드
+        if( SoonsoonData.Instance._soonData2._savedColorList == null ||  SoonsoonData.Instance._soonData2._savedColorList.Count.Equals(0))
         {
             SoonsoonData.Instance._soonData2._savedColorList = new List<string>();
             for(var i = 0 ; i < 17 ;i++)
             {
                 SoonsoonData.Instance._soonData2._savedColorList.Add("");
             }
-
             SoonsoonData.Instance.SaveData();
         }
         else
         {
+            //Debug.Log( SoonsoonData.Instance._soonData2._savedColorList.Count);
             for(var i = 0 ; i < SoonsoonData.Instance._soonData2._savedColorList.Count ;i++)
             {
                 string tSTR = SoonsoonData.Instance._soonData2._savedColorList[i];
-                if(tSTR!="")
+                //Debug.Log(tSTR);
+                Color parsedColor;
+                if(ColorUtility.TryParseHtmlString(tSTR, out parsedColor)){
+                    UIManager._colorSaveList[i]._savedColor.gameObject.SetActive(true);
+                    UIManager._colorSaveList[i]._savedColor.color = parsedColor;
+                }else{
+                    if(string.IsNullOrWhiteSpace(tSTR)) continue;
+                    Debug.LogWarning(tSTR + " is Invalid color information");
+                }
+            }
+
+        }
+    }
+    private void LoadPackages()
+    {
+        spumPackages.Clear();
+        var jsonFileArray = Resources.LoadAll<TextAsset>("");
+        //Debug.Log("Index" + jsonFileArray.Length);
+        foreach (var asset in jsonFileArray)
+        {
+            if(!asset.name.Contains("Index")) continue;
+            if(!asset) continue;
+            Debug.Log(asset);
+            var Package = JsonUtility.FromJson<SpumPackage>(asset.ToString());
+            spumPackages.Add(Package);
+        }
+        var dataSortList = spumPackages.OrderBy(p => DateTime.ParseExact(p.CreationDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)).ToList();
+        spumPackages = dataSortList;
+    }
+    public List<SpumPackage> GetSpumPackageData(){
+        return spumPackages;
+    }
+    public List<SpumPackage> GetSpumLegacyData(){
+        string targetString = "Legacy";
+        var LegacyData = spumPackages;
+        foreach (var package in LegacyData)
+        {
+            if(package.Name.Equals(targetString)) {
+                foreach (var data in package.SpumAnimationData)
                 {
-                    Color tCol = StrToColor(tSTR);
-                    _colorSaveList[i]._savedColor.gameObject.SetActive(true);
-                    _colorSaveList[i]._savedColor.color = tCol;
+                    data.HasData = true;
                 }
             }
         }
+        return LegacyData; // Package;
     }
-
-    public void SetInit()
+#region PreviewItemPanel
+    public void DrawItemList(SPUM_SpriteButtonST ButtonData)
     {
-        //SetInitValue
-        _spriteObj._eyeList[2].color = _basicColor;
-        _spriteObj._eyeList[3].color = _basicColor;
-        _spriteObj._hairList[3].color = _basicColor;
-        _spriteObj._hairList[0].color = _basicColor;
-        SetInitColor();
-        _spriteObj.Reset(); 
-        //눈도 초기화
-        SetSprite(9,null,"",-1);
-
-        for(var i = 0 ; i < _textureList.Count;i++)
-        {
-            _textureList[i].SetUse(false);
-        }
-    }
-
-    public void SetInitColor()
-    {
-        for(var i =0 ; i < _textureList.Count;i++)
-        {
-            _textureList[i]._colorBG.color = Color.white;
-        }
-
-        _textureList[0]._colorBG.color = _basicColor;
-        _textureList[1]._colorBG.color = _basicColor;
-        _textureList[9]._colorBG.color = _basicColor;
-    }
-
-    public void SetSpriteList(int num, string path)
-    {
-        _textureList[num]._textureList.Clear();
-
-        if(num!=9)
-        {
-            Object[] tObj = Resources.LoadAll("SPUM/SPUM_Sprites/Items/"+path+"/",typeof(Texture2D));
-            for(var i = 0 ; i < tObj.Length; i++)
-            {
-                if(tObj[i].GetType() == typeof(Texture2D))
-                {
-                    string ttPath = "SPUM/SPUM_Sprites/Items/"+path+"/" + tObj[i].name;
-                    _textureList[num]._textureList.Add(ttPath);
-                }
-            }
-        }
-        else
-        {
-            
-            string path2 = AssetDatabase.GetAssetPath(_mainBody);
-            string tName = _mainBody.name + ".png";
-            path = path2.Replace(tName,"")+ "Eye/";
-
-            
-            DirectoryInfo dir = new DirectoryInfo(path);
-            FileInfo[] info = dir.GetFiles("*.png");
-            
-            for(var i = 0 ; i < info.Length; i++)
-            {
-                string ttPath = path +"/" + info[i].Name;
-                _textureList[num]._textureList.Add(ttPath);
-            }
-        }
-
+        UIManager.SetPackageButtons(ButtonData);
         
-    }
-
-    //패키지 추가
-    public void AddPackageSprite()
-    {
-        string packagePath = "Assets/Resources/SPUM/SPUM_Sprites/Packages";
-        bool packageChk = Directory.Exists(packagePath);
-        if(packageChk)
-        {
-            DirectoryInfo dir = new DirectoryInfo(packagePath);
-            FileInfo[] info = dir.GetFiles("*.*");
-            foreach (FileInfo f in info) 
-            {
-                string[] words = (f.Name).Split('.');
-                if(words[0].Length > 0 )
-                {
-                    _packageList.Add(words[0]);
-                }
-            }
-        }
-
-        for (var j = 0; j < _textureList.Count; j++)
-        {
-            _textureList[j]._packageList.Add(true);
-            _textureList[j]._packageNameList.Add("Basic");
-        }
-
-        if (_packageList.Count > 0)
-        {
-            for (var i = 0; i < _packageList.Count; i++)
-            {
-                for (var j = 0; j < _textureList.Count; j++)
-                {
-                    _textureList[j]._packageList.Add(true);
-                    _textureList[j]._packageNameList.Add(_packageList[i]);
-                }
-            }
-        }
-
-
-
-        //for (var i = 0 ; i < _packageButtonList.Count;i++)
-        //{
-        //    _packageButtonList[i].gameObject.SetActive(false);
-        //}
-
-
-    }
-
-    public void SetPackageButtons()
-    {
-        foreach (Transform obj in _packageButtonPool)
-        {
-            Destroy(obj.gameObject);
-        }
-
-        GameObject tObjInit = Instantiate(_packageButtonObj);
-        tObjInit.transform.SetParent(_packageButtonPool);
-        tObjInit.transform.localScale = Vector3.one;
-
-        SPUM_PackageButton tObjInitST = tObjInit.GetComponent<SPUM_PackageButton>();
-
-        tObjInitST._spumManager = this;
-        tObjInitST._title.text = "Basic";
-        tObjInitST._index = 0;
-        tObjInitST.SetInit();
-
-        if (_packageList.Count > 0)
-        {
-            for (var i = 0; i < _packageList.Count; i++)
-            {
-                GameObject tObj = Instantiate(_packageButtonObj);
-                tObj.transform.SetParent(_packageButtonPool);
-                tObj.transform.localScale = Vector3.one;
-                SPUM_PackageButton tObjST = tObj.GetComponent<SPUM_PackageButton>();
-
-                tObjST._spumManager = this;
-                tObjST._title.text = _packageList[i];
-                tObjST._index = i + 1;
-                tObjST.SetInit();
-            }
-        }
-    }
-
-    public void SetSpritePackageList(int num, string path, string package)
-    {
-        Object[] tObj = Resources.LoadAll("SPUM/SPUM_Sprites/Packages/"+package+"/"+path+"/",typeof(Texture2D));
-        for(var i = 0 ; i < tObj.Length; i++)
-        {
-            if(tObj[i].GetType() == typeof(Texture2D))
-            {
-                string ttPath = "SPUM/SPUM_Sprites/Packages/"+package+"/"+path+"/" + tObj[i].name;
-                _textureList[num]._textureList.Add(ttPath);
-            }
-        }
-    }
-    
-    public void SetHair(int value){SetSpriteItem(0,value);}
-    public void SetFaceHair(int value){SetSpriteItem(1,value);}
-    public void SetHelmet(int value){SetSpriteItem(2,value);}
-    public void SetClothSet(int value){SetSpriteItem(3,value);}
-    public void SetPantSet(int value){SetSpriteItem(4,value);}
-    public void SetArmorSet(int value){SetSpriteItem(5,value);}
-    public void SetBack(int value){SetSpriteItem(6,value);}
-    public void SetWeaponRight(int value){SetSpriteItem(7,value);}
-    public void SetWeaponLeft(int value){SetSpriteItem(8,value);}
-    
-
-    public void SetSpriteItem (int listNum,int num, bool rand = false)
-    {
-        if(_textureList[listNum]._textureList.Count == 0 ) return;
-
-        if( num != 0 )
-        {
-            _textureList[listNum].SetUse(true);
-            
-            Sprite tSprite = null;
-            Object[] tObj = null;
-            if(listNum != 9 )
-            {
-                int value = (rand) ? Random.Range(0,_textureList[listNum]._textureList.Count) : num; 
-                bool textureChk = (listNum == 3||listNum == 4||listNum == 5 || listNum ==9) ? false : true;
-
-                if(textureChk) tSprite = Resources.Load<Sprite>(_textureList[listNum]._textureList[value]);
-                else tObj = Resources.LoadAll<Sprite>(_textureList[listNum]._textureList[value]);
-            }
-            else
-            {
-                string path = AssetDatabase.GetAssetPath(_mainBody);
-                string tName = _mainBody.name + ".png";
-                path = path.Replace(tName,"")+ "Eye/";
-
-                DirectoryInfo dir = new DirectoryInfo(path);
-                FileInfo[] info = dir.GetFiles("*.png");
-
-                int rV = (rand) ? Random.Range(0, info.Length) : num;
-
-                Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(path+info[rV].Name);
-                for(var j = 0 ; j < sprites.Length ;j++)
-                {
-                    if(sprites[j].GetType() == typeof(Sprite))
-                    {
-                        if(sprites[j].name == "Back")
-                        {
-                            _spriteObj._eyeList[0].sprite = (Sprite)sprites[j];
-                            _spriteObj._eyeList[1].sprite = (Sprite)sprites[j];
-                        }
-                        else if(sprites[j].name == "Front")
-                        {
-                            _spriteObj._eyeList[2].sprite = (Sprite)sprites[j];
-                            _spriteObj._eyeList[3].sprite = (Sprite)sprites[j];
-                        }
-                    }
-                }
-            }
-            
-            switch(listNum)
-            {
-                case 0: 
-                // 헤어
-                _spriteObj._hairList[0].sprite = tSprite;
-                _spriteObj._hairList[1].sprite = null;
-
-                if(EmptyChk())
-                {
-                    _spriteObj._hairList[0].sprite = null;
-                    _spriteObj._hairList[1].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                
-                break;
-
-                case 1: 
-                //수염
-                _spriteObj._hairList[3].sprite = tSprite;
-
-                if(EmptyChk())
-                {
-                    _spriteObj._hairList[3].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                break;
-
-                case 2: 
-                //헬멧
-                _spriteObj._hairList[1].sprite = tSprite;
-                _spriteObj._hairList[0].sprite = null;
-                if(EmptyChk())
-                {
-                    _spriteObj._hairList[1].sprite = null;
-                    _spriteObj._hairList[0].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                break;
-
-                case 3: 
-                // 옷
-                _spriteObj._clothList[0].sprite = null;
-                _spriteObj._clothList[1].sprite = null;
-                _spriteObj._clothList[2].sprite = null;
-                for(var i = 0; i < tObj.Length;i++)
-                {
-                    switch(tObj[i].name)
-                    {
-                        case "Body":
-                        _spriteObj._clothList[0].sprite = tObj[i] as Sprite;
-                        break;
-
-                        case "Left":
-                        _spriteObj._clothList[1].sprite = tObj[i] as Sprite;
-                        break;
-
-                        case "Right":
-                        _spriteObj._clothList[2].sprite = tObj[i] as Sprite;
-                        break;
-
-                    }
-                }
-
-                if(EmptyChk())
-                {
-                    _spriteObj._clothList[0].sprite = null;
-                    _spriteObj._clothList[1].sprite = null;
-                    _spriteObj._clothList[2].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                break;
-
-                case 4: 
-                //바지
-                for(var i = 0; i < tObj.Length;i++)
-                {
-                    switch(tObj[i].name)
-                    {
-                        case "Left":
-                        _spriteObj._pantList[0].sprite = tObj[i] as Sprite;
-                        break;
-
-                        case "Right":
-                        _spriteObj._pantList[1].sprite = tObj[i] as Sprite;
-                        break;
-                    }
-                }
-                if(EmptyChk())
-                {
-                    _spriteObj._pantList[0].sprite = null;
-                    _spriteObj._pantList[1].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                break;
-
-                
-
-                case 5: 
-                // 갑옷
-                _spriteObj._armorList[0].sprite = null;
-                _spriteObj._armorList[1].sprite = null;
-                _spriteObj._armorList[2].sprite = null;
-
-                for(var i = 0; i < tObj.Length;i++)
-                {
-                    switch(tObj[i].name)
-                    {
-                        case "Body":
-                        _spriteObj._armorList[0].sprite = tObj[i] as Sprite;
-                        break;
-
-                        case "Left":
-                        _spriteObj._armorList[1].sprite = tObj[i] as Sprite;
-                        break;
-
-                        case "Right":
-                        _spriteObj._armorList[2].sprite = tObj[i] as Sprite;
-                        break;
-
-                    }
-                }
-                if(EmptyChk())
-                {
-                    _spriteObj._armorList[0].sprite = null;
-                    _spriteObj._armorList[1].sprite = null;
-                    _spriteObj._armorList[2].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                break;
-
-                case 6: 
-                //뒤 아이템
-                _spriteObj._backList[0].sprite = tSprite;
-                if(EmptyChk())
-                {
-                    _spriteObj._backList[0].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                break;
-
-                case 7: 
-                //오른손 무기
-                string tRWName = tSprite.name;
-                if(tRWName.Contains("Shield"))
-                {
-                    //방패
-                    _spriteObj._weaponList[0].sprite = null;
-                    _spriteObj._weaponList[1].sprite = tSprite;
-                }
-                else
-                {
-                    _spriteObj._weaponList[0].sprite = tSprite;
-                    _spriteObj._weaponList[1].sprite = null;
-                }
-                if(EmptyChk())
-                {
-                    _spriteObj._weaponList[0].sprite = null;
-                    _spriteObj._weaponList[1].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                break;
-
-                case 8: 
-                //왼손 무기
-                string tLWName = tSprite.name;
-                if(tLWName.Contains("Shield"))
-                {
-                    //방패
-                    _spriteObj._weaponList[2].sprite = null;
-                    _spriteObj._weaponList[3].sprite = tSprite;
-                }
-                else
-                {
-                    _spriteObj._weaponList[2].sprite = tSprite;
-                    _spriteObj._weaponList[3].sprite = null;
-                }
-                if(EmptyChk())
-                {
-                    _spriteObj._weaponList[2].sprite = null;
-                    _spriteObj._weaponList[3].sprite = null;
-                    _textureList[listNum].SetUse(false);
-                }
-                break;
-            }
-        }
-        else
-        {
-            _textureList[listNum].SetUse(false);
-
-            // 없을때 초기화 구문
-            switch(listNum)
-            {
-                case 0: 
-                // 헤어
-                _spriteObj._hairList[0].sprite = null;
-                break;
-
-                case 1: 
-                //수염
-                _spriteObj._hairList[3].sprite = null;
-                break;
-
-                case 2: 
-                //헬멧
-                _spriteObj._hairList[1].sprite = null;
-                break;
-
-                case 3: 
-                // 옷
-                _spriteObj._clothList[0].sprite = null;
-                _spriteObj._clothList[1].sprite = null;
-                _spriteObj._clothList[2].sprite = null;
-                break;
-
-                case 4: 
-                //바지
-                _spriteObj._pantList[0].sprite = null;
-                _spriteObj._pantList[1].sprite = null;
-                break;
-
-                case 5: 
-                // 갑옷
-                _spriteObj._armorList[0].sprite = null;
-                _spriteObj._armorList[1].sprite = null;
-                _spriteObj._armorList[2].sprite = null;
-                break;
-
-                case 6: 
-                //뒤 아이템
-                _spriteObj._backList[0].sprite = null;
-                break;
-
-                case 7: 
-                //오른손 무기
-                _spriteObj._weaponList[0].sprite = null;
-                _spriteObj._weaponList[1].sprite = null;
-                break;
-
-                case 8: 
-                //왼손 무기
-                _spriteObj._weaponList[2].sprite = null;
-                _spriteObj._weaponList[3].sprite = null;
-                break;
-
-                case 9: 
-                //왼손 무기
-                
-                break;
-
-                
-            }
-        }
-
-    }
-
-
-    public void AllRandom()
-    {
-        RandomSelect(0);
-        RandomSelect(1);
-        RandomSelect(2);
-        RandomSelect(3);
-        RandomSelect(4);
-        RandomSelect(5);
-        RandomSelect(6);
-        RandomSelect(7);
-        RandomSelect(8);
-        RandomSelect(9);
-
-        float tValue = Random.Range(0,0.7f);
-        if(tValue <= 0.1f)
-        {
-            //대머리
-        }
-        else if(tValue <= 0.4f) //머리를 설치
-        {
-            RandomSelect(0); 
-        }
-        else
-        {
-            RandomSelect(2);
-        }
-
-        // _spriteObj._eyeList[0].color = _basicColor;
-        // _spriteObj._eyeList[1].color = _basicColor;
-
-        // if(!_SPButtonList[0]._toggle.isOn) RandomObjColor(0);
-        // if(!_SPButtonList[2]._toggle.isOn) RandomObjColor(1);
-        // if(!_SPButtonList[4]._toggle.isOn) RandomObjColor(2);
-    }
-
-    //랜덤 메이킹
-    public void RandomSelect(int num)
-    {
-        switch(num)
-        {
-            case 0:
-            //헤어 종류
-            if(!_textureList[0]._LockBtn[1].activeInHierarchy) SetSpriteItem(0,-1,true);
-            if(!_textureList[0]._LockBtn[1].activeInHierarchy) RandomObjColor(0);
-            _panelTitle.text = "Hair Items";
-            break;
-
-            case 1:
-            //수염
-            if(!_textureList[1]._LockBtn[1].activeInHierarchy) SetSpriteItem(1,-1,true);
-            if(!_textureList[1]._LockBtn[1].activeInHierarchy) RandomObjColor(1);
-            _panelTitle.text = "Mustache Items";
-            break;
-
-            case 2:
-            //헬멧 종류
-            if(!_textureList[2]._LockBtn[1].activeInHierarchy) SetSpriteItem(2,-1,true);
-            _panelTitle.text = "Helmet Items";
-            break;
-
-            case 3:
-            //옷 종류
-            if(!_textureList[3]._LockBtn[1].activeInHierarchy) SetSpriteItem(3,-1,true);
-            _panelTitle.text = "Cloths Items";
-            break;
-
-            case 4:
-            //바지 종류
-            if(!_textureList[4]._LockBtn[1].activeInHierarchy) SetSpriteItem(4,-1,true);
-            _panelTitle.text = "Pants Items";
-            break;
-
-            case 5:
-            //갑옷 종류
-            if(!_textureList[5]._LockBtn[1].activeInHierarchy) SetSpriteItem(5,-1,true);
-            _panelTitle.text = "Armor Items";
-            break;
-
-            case 6:
-            //뒤 종류
-            if(!_textureList[6]._LockBtn[1].activeInHierarchy) SetSpriteItem(6,-1,true);
-            _panelTitle.text = "Back Items";
-            break;
-
-            case 7:
-            //오른손 무기 종류
-            if(!_textureList[7]._LockBtn[1].activeInHierarchy) SetSpriteItem(7,-1,true);
-            _panelTitle.text = "Right Weapons";
-            break;
-
-            case 8:
-            //왼손 무기 종류
-            if(!_textureList[8]._LockBtn[1].activeInHierarchy) SetSpriteItem(8,-1,true);
-            _panelTitle.text = "Left Weapons";
-            break;
-
-            case 9:
-            //눈 색
-            if(!_textureList[9]._LockBtn[1].activeInHierarchy) SetSpriteItem(9,-1,true);
-            if(!_textureList[9]._LockBtn[1].activeInHierarchy) RandomObjColor(9);
-            _panelTitle.text = "Eye Color";
-            break;
-        }
-    }
-
-    public void SetPivot(Image sp,int num)
-    {
-        float tX = ((sp.sprite.rect.width * 0.5f) - sp.sprite.pivot.x) * 6.28f;
-        float tY = ((sp.sprite.rect.height * 0.5f) - sp.sprite.pivot.y) * 6.28f;
-        sp.rectTransform.localPosition = new Vector2(tX,tY);
-    }
-    
-    public void DrawItem(int num)
-    {
-        _drawItemIndex = num;
-        switch(num)
-        {
-            case -1:
-            _panelTitle.text = "Select Body";
-            break;
-
-            case 0:
-            //헤어 종류
-            _panelTitle.text = "Hair Items";
-            break;
-
-            case 1:
-            //수염
-            _panelTitle.text = "Mustache Items";
-            break;
-
-            case 2:
-            //헬멧 종류
-            _panelTitle.text = "Helmet Items";
-            break;
-
-            case 3:
-            //옷 종류
-            _panelTitle.text = "Cloths Items";
-            break;
-
-            case 4:
-            //바지 종류
-            _panelTitle.text = "Pants Items";
-            break;
-
-            case 5:
-            //갑옷 종류
-            _panelTitle.text = "Armor Items";
-            break;
-
-            case 6:
-            //뒤 종류
-            _panelTitle.text = "Back Items";
-            break;
-
-            case 7:
-            //오른손 무기 종류
-            _panelTitle.text = "Right Weapons";
-            break;
-
-            case 8:
-            //왼손 무기 종류
-            _panelTitle.text = "Left Weapons";
-            break;
-
-            case 9:
-            //눈 색
-            _panelTitle.text = "Eye Color";
-            break;
-
-            case 10:
-            //말 선택
-            _panelTitle.text = "Horse Select";
-            break;
-        }
-
-        _packageButtonScroll.verticalNormalizedPosition = 1f;
-        DrawItemProcess();
-        _drawItemObj.SetActive(true);
-    }
-
-    public void DrawItemProcess()
-    {
-        //차일드 삭제
-        if(_childPool.childCount > 0)
-        {
-            for(var i=0; i < _childPool.childCount;i++)
-            {
-                Destroy(_childPool.GetChild(i).gameObject);
-            }
-        }
-        bool textureChk = (_drawItemIndex == 3||_drawItemIndex == 4||_drawItemIndex == 5) ? true : false;
-
-        GameObject ttObj2 = Instantiate(_childItem) as GameObject;
-        ttObj2.transform.SetParent(_childPool);
-        ttObj2.transform.localScale = new Vector3(1,1,1);
-        SPUM_PreviewItem ttObjST2 = ttObj2.GetComponent<SPUM_PreviewItem>();
-        ttObjST2._basicImage.sprite = null;
-        ttObjST2.ShowObj(-2);
-        ttObjST2._managerST = this;
-        ttObjST2._itemType = _drawItemIndex;
-        ttObjST2._sprite = null;
-
-        if( _drawItemIndex == 9 ) //눈의 경우
-        {
-            string path = AssetDatabase.GetAssetPath(_mainBody);
-            string tName = _mainBody.name + ".png";
-            path = path.Replace(tName,"")+ "Eye/";
-
-            DirectoryInfo dir = new DirectoryInfo(path);
-            FileInfo[] info = dir.GetFiles("*.png");
-            
-            for(var i = 0 ; i < info.Length; i++)
-            {
-                GameObject ttObj = Instantiate(_childItem) as GameObject;
-                ttObj.transform.SetParent(_childPool);
-                ttObj.transform.localScale = new Vector3(1,1,1);
-
-                SPUM_PreviewItem ttObjST = ttObj.GetComponent<SPUM_PreviewItem>();
-                ttObjST.ShowObj(6);
-                ttObjST._managerST = this;
-                ttObjST._itemType = _drawItemIndex;
-                ttObjST._name = path+info[i].Name;
-                
-                ttObjST._eyeSetList[4].sprite = _mainBodyList[5];
-                ttObjST._eyeSetList[4].SetNativeSize();
-
-                Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(path+info[i].Name);
-                for(var j = 0 ; j < sprites.Length ;j++)
-                {
-                    if(sprites[j].GetType() == typeof(Sprite))
-                    {
-                        if(sprites[j].name == "Back")
-                        {
-                            ttObjST._eyeSetList[0].sprite = (Sprite)sprites[j];
-                            ttObjST._eyeSetList[1].sprite = (Sprite)sprites[j];
-
-                            ttObjST._eyeSetList[0].SetNativeSize();
-                            ttObjST._eyeSetList[1].SetNativeSize();
-
-                            SetPivot(ttObjST._eyeSetList[0],i);
-                            SetPivot(ttObjST._eyeSetList[1],i);
-                        }
-                        else if(sprites[j].name == "Front")
-                        {
-                            ttObjST._eyeSetList[2].sprite = (Sprite)sprites[j];
-                            ttObjST._eyeSetList[3].sprite = (Sprite)sprites[j];
-
-                            ttObjST._eyeSetList[2].SetNativeSize();
-                            ttObjST._eyeSetList[3].SetNativeSize();
-
-                            SetPivot(ttObjST._eyeSetList[2],i);
-                            SetPivot(ttObjST._eyeSetList[3],i);
-                        }
-                    }
-                }
-            }
-        }
-        else if(_drawItemIndex == -1 ) //몸
-        {
-            string path = "Assets/SPUM/SPUM_Sprites/BodySource/Species/";
-            DirectoryInfo dir = new DirectoryInfo(path);
-            FileInfo[] info = dir.GetFiles("*.*");
-            List<string> _speciesList = new List<string>();
-            List<string> _bodyList = new List<string>();
-
-
-            foreach (FileInfo f in info) 
-            {
-                string[] words = (f.Name).Split('.');
-                _speciesList.Add(words[0]);
-            }
-            
-            for(var i = 0 ; i < _speciesList.Count; i++)
-            {
-                string nPath = path+_speciesList[i] + "/";
-                DirectoryInfo dir2 = new DirectoryInfo(nPath);
-                FileInfo[] info2 = dir2.GetFiles("*.png");
-
-                foreach (FileInfo f in info2) 
-                {
-                    _bodyList.Add(nPath + f.Name);
-                }
-            }
-
-            for(var i = 0 ; i < _bodyList.Count; i++)
-            {
-                GameObject ttObj = Instantiate(_childItem) as GameObject;
-                ttObj.transform.SetParent(_childPool);
-                ttObj.transform.localScale = new Vector3(1,1,1);
-
-                SPUM_PreviewItem ttObjST = ttObj.GetComponent<SPUM_PreviewItem>();
-                ttObjST.ShowObj(1);
-                ttObjST._managerST = this;
-                ttObjST._itemType = _drawItemIndex;
-                ttObjST._name = _bodyList[i];
-
-                Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(_bodyList[i]);
-                var sortedList = sprites.OrderBy(go=>go.name).ToList();
-                for(var k = 0 ; k < sortedList.Count;k++)
-                {
-                    if(sortedList[k].GetType() == typeof(Sprite))
-                    {
-                        switch(sortedList[k].name)
-                        {
-                            case "Head":
-                            ttObjST._skinList[0].sprite = (Sprite)sortedList[k];
-                            ttObjST._skinList[0].SetNativeSize();
-                            break;
-
-                            case "Body":
-                            ttObjST._skinList[1].sprite = (Sprite)sortedList[k];
-                            ttObjST._skinList[1].SetNativeSize();
-                            break;
-
-                            case "Arm_L":
-                            ttObjST._skinList[2].sprite = (Sprite)sortedList[k];
-                            ttObjST._skinList[2].SetNativeSize();
-                            break;
-
-                            case "Arm_R":
-                            ttObjST._skinList[3].sprite = (Sprite)sortedList[k];
-                            ttObjST._skinList[3].SetNativeSize();
-                            break;
-
-                            case "Foot_L":
-                            ttObjST._skinList[4].sprite = (Sprite)sortedList[k];
-                            ttObjST._skinList[4].SetNativeSize();
-                            break;
-
-                            case "Foot_R":
-                            ttObjST._skinList[5].sprite = (Sprite)sortedList[k];
-                            ttObjST._skinList[5].SetNativeSize();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        else if(_drawItemIndex == 10) // 말의 경우
-        {
-            string path = "Assets/SPUM/SPUM_Sprites/RideSource/";
-            DirectoryInfo dir = new DirectoryInfo(path);
-            FileInfo[] info = dir.GetFiles("*.*");
-            List<string> _dirList = new List<string>();
-            List<string> _horseList = new List<string>();
-
-
-            foreach (FileInfo f in info) 
-            {
-                string[] words = (f.Name).Split('.');
-                _dirList.Add(words[0]);
-            }
-            
-            for(var i = 0 ; i < _dirList.Count; i++)
-            {
-                string nPath = path+_dirList[i] + "/";
-                DirectoryInfo dir2 = new DirectoryInfo(nPath);
-                FileInfo[] info2 = dir2.GetFiles("*.png");
-
-                foreach (FileInfo f in info2) 
-                {
-                    _horseList.Add(nPath + f.Name);
-                }
-            }
-
-            for(var i = 0 ; i < _horseList.Count; i++)
-            {
-                GameObject ttObj = Instantiate(_childItem) as GameObject;
-                ttObj.transform.SetParent(_childPool);
-                ttObj.transform.localScale = new Vector3(1,1,1);
-
-                SPUM_PreviewItem ttObjST = ttObj.GetComponent<SPUM_PreviewItem>();
-                ttObjST.ShowObj(7);
-                ttObjST._managerST = this;
-                ttObjST._itemType = _drawItemIndex;
-                ttObjST._name = _horseList[i];
-
-                Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(_horseList[i]);
-                var sortedList = sprites.OrderBy(go=>go.name).ToList();
-
-                ttObjST._horseList[14].gameObject.SetActive(false);
-                ttObjST._horseList[15].gameObject.SetActive(false);
-                ttObjST._horseList[16].gameObject.SetActive(false);
-
-                for(var k = 0 ; k < sortedList.Count;k++)
-                {
-                    if(sortedList[k].GetType() == typeof(Sprite))
-                    {
-                        switch(sortedList[k].name)
-                        {
-                            case "Head":
-                            ttObjST._horseList[0].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[0].SetNativeSize();
-                            break;
-
-                            case "Neck":
-                            ttObjST._horseList[1].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[0].SetNativeSize();
-                            break;
-
-                            case "BodyFront":
-                            ttObjST._horseList[2].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[2].SetNativeSize();
-                            break;
-
-                            case "BodyBack":
-                            ttObjST._horseList[3].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[3].SetNativeSize();
-                            break;
-
-                            case "FootFrontTop":
-                            ttObjST._horseList[4].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[4].SetNativeSize();
-                            ttObjST._horseList[5].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[5].SetNativeSize();
-                            break;
-
-                            case "FootFrontBottom":
-                            ttObjST._horseList[6].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[6].SetNativeSize();
-                            ttObjST._horseList[7].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[7].SetNativeSize();
-                            break;
-
-                            case "FootBackTop":
-                            ttObjST._horseList[8].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[8].SetNativeSize();
-                            ttObjST._horseList[9].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[9].SetNativeSize();
-                            break;
-
-                            case "FootBackBottom":
-                            ttObjST._horseList[10].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[10].SetNativeSize();
-                            ttObjST._horseList[11].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[11].SetNativeSize();
-                            break;
-
-                            case "Tail":
-                            ttObjST._horseList[12].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[12].SetNativeSize();
-                            break;
-
-                            case "Acc":
-                            ttObjST._horseList[13].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[13].SetNativeSize();
-                            break;
-
-                            case "Acc2":
-                            ttObjST._horseList[14].gameObject.SetActive(true);
-                            ttObjST._horseList[14].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[14].SetNativeSize();
-                            break;
-
-                            case "Acc3":
-                            ttObjST._horseList[15].gameObject.SetActive(true);
-                            ttObjST._horseList[15].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[15].SetNativeSize();
-                            break;
-
-                            case "Acc4":
-                            ttObjST._horseList[16].gameObject.SetActive(true);
-                            ttObjST._horseList[16].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[16].SetNativeSize();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            //texture set
-             _textureList[_drawItemIndex]._textureList.Clear();
-
-             for(var i = 0 ; i < _textureList[_drawItemIndex]._packageList.Count;i++)
-             {
-                 if(i==0)
-                 {
-                    if(_textureList[_drawItemIndex]._packageList[0])
-                    {
-                        switch(_drawItemIndex)
-                        {
-                            case 0:
-                            //헤어 종류
-                            SetSpriteList(0,"0_Hair"); //헤어 연결
-                            break;
-
-                            case 1:
-                            //수염
-                            SetSpriteList(1,"1_FaceHair"); //수염 연결
-                            break;
-
-                            case 2:
-                            //헬멧 종류
-                            SetSpriteList(2,"4_Helmet"); //투구 연결
-                            break;
-
-                            case 3:
-                            //옷 종류
-                            SetSpriteList(3,"2_Cloth"); //옷 연결
-                            break;
-
-                            case 4:
-                            //바지 종류
-                             SetSpriteList(4,"3_Pant"); //헤어 연결
-                            break;
-
-                            case 5:
-                            //갑옷 종류
-                            SetSpriteList(5,"5_Armor"); //갑옷 연결
-                            break;
-
-                            case 6:
-                            //뒤 종류
-                            SetSpriteList(6,"7_Back"); //뒤 아이템 연결
-                            break;
-
-                            case 7:
-                            //오른손 무기 종류
-                            SetSpriteList(7,"6_Weapons"); //오른쪽 무기 연결
-                            break;
-
-                            case 8:
-                            //왼손 무기 종류
-                            SetSpriteList(8,"6_Weapons"); //왼쪽 무기 연결
-                            break;
-                        }
-                    }
-                 }
-                 else
-                 {
-                    if(_textureList[_drawItemIndex]._packageList[i])
-                    {
-                        switch(_drawItemIndex)
-                        {
-                            case 0:
-                            //헤어 종류
-                            SetSpritePackageList(0,"0_Hair",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 1:
-                            //수염
-                            SetSpritePackageList(1,"1_FaceHair",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 2:
-                            //헬멧 종류
-                            SetSpritePackageList(2,"4_Helmet",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 3:
-                            //옷 종류
-                            SetSpritePackageList(3,"2_Cloth",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 4:
-                            //바지 종류
-                            SetSpritePackageList(4,"3_Pant",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 5:
-                            //갑옷 종류
-                            SetSpritePackageList(5,"5_Armor",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 6:
-                            //뒤 종류
-                            SetSpritePackageList(6,"7_Back",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 7:
-                            //오른손 무기 종류
-                            SetSpritePackageList(7,"6_Weapons",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 8:
-                            //왼손 무기 종류
-                            SetSpritePackageList(8,"6_Weapons",_textureList[_drawItemIndex]._packageNameList[i]); //헤어 연결
-                            break;
-                        }
-                    }
-                 }
-                
-             }
-
-             //
-            if(!textureChk)
-            {
-                List<Sprite> tObj = new List<Sprite>();
-                for(var i = 0 ; i < _textureList[_drawItemIndex]._textureList.Count;i++ )
-                {
-                    Sprite tSP = Resources.Load<Sprite>(_textureList[_drawItemIndex]._textureList[i]);
-                    tObj.Add(tSP);
-                }
-                for(var i = 0 ; i < tObj.Count; i++)
-                {
-                    GameObject ttObj = Instantiate(_childItem) as GameObject;
-                    ttObj.transform.SetParent(_childPool);
-                    ttObj.transform.localScale = new Vector3(1,1,1);
-
-                    SPUM_PreviewItem ttObjST = ttObj.GetComponent<SPUM_PreviewItem>();
-
-                    ttObjST._basicImage.sprite = tObj[i];
-                    ttObjST._basicImage.SetNativeSize();
-                    ttObjST._basicImage.rectTransform.pivot =  new Vector2(tObj[i].pivot.x/tObj[i].rect.width,tObj[i].pivot.y/tObj[i].rect.height);
-
-                    ttObjST._basicImage.rectTransform.localPosition = Vector2.zero;
-                    ttObjST.ShowObj(0);
-                    ttObjST._managerST = this;
-                    ttObjST._itemType = _drawItemIndex;
-                    ttObjST._sprite = tObj[i];
-
-                    if(_drawItemIndex==7 || _drawItemIndex ==8)
-                    {
-                         ttObjST._basicImage.rectTransform.pivot = new Vector2(0.5f,0.5f);
-                         ttObjST._basicImage.rectTransform.localPosition = Vector2.zero;
-                    }
-                }
-            }
-            else
-            {
-                List<Texture2D> tObj = new List<Texture2D>();
-                for(var i = 0 ; i < _textureList[_drawItemIndex]._textureList.Count;i++ )
-                {
-                    Texture2D tSP = Resources.Load<Texture2D>(_textureList[_drawItemIndex]._textureList[i]);
-                    tObj.Add(tSP);
-                }
-                
-                for(var i = 0 ; i < tObj.Count; i++)
-                {
-                    if(tObj[i].GetType() == typeof(Texture2D))
-                    {
-                        GameObject ttObj = Instantiate(_childItem) as GameObject;
-                        ttObj.transform.SetParent(_childPool);
-                        ttObj.transform.localScale = new Vector3(1,1,1);
-
-                        SPUM_PreviewItem ttObjST = ttObj.GetComponent<SPUM_PreviewItem>();
-                        switch(_drawItemIndex)
-                        {
-                            case 3:
-                            //옷 종류
-                            ttObjST._clothList[0].gameObject.SetActive(false);
-                            ttObjST._clothList[1].gameObject.SetActive(false);
-                            ttObjST._clothList[2].gameObject.SetActive(false);
-
-                            Sprite[] tSpriteCloth = Resources.LoadAll<Sprite>( _textureList[_drawItemIndex]._textureList[i]);
-                            for(var j = 0; j < tSpriteCloth.Length;j++)
-                            {
-                                switch(tSpriteCloth[j].name)
-                                {
-                                    case "Body":
-                                    ttObjST._clothList[0].gameObject.SetActive(true);
-                                    ttObjST._clothList[0].sprite = tSpriteCloth[j];
-                                    ttObjST._clothList[0].SetNativeSize();
-                                    break;
-
-                                    case "Left":
-                                    ttObjST._clothList[1].gameObject.SetActive(true);
-                                    ttObjST._clothList[1].sprite = tSpriteCloth[j];
-                                    ttObjST._clothList[1].SetNativeSize();
-                                    break;
-
-                                    case "Right":
-                                    ttObjST._clothList[2].gameObject.SetActive(true);
-                                    ttObjST._clothList[2].sprite = tSpriteCloth[j];
-                                    ttObjST._clothList[2].SetNativeSize();
-                                    break;
-
-                                }
-                            }
-                            ttObjST.ShowObj(3);
-                            break;
-
-                            case 4:
-                            //바지 종류
-                            ttObjST._pantList[0].sprite=null;
-                            ttObjST._pantList[1].sprite=null;
-                            //바지
-                            Sprite[] tSpritePant = Resources.LoadAll<Sprite>( _textureList[_drawItemIndex]._textureList[i]);
-                            for(var j = 0; j < tSpritePant.Length;j++)
-                            {
-                                switch(tSpritePant[j].name)
-                                {
-                                    case "Left":
-                                    ttObjST._pantList[0].sprite = tSpritePant[j];
-                                    ttObjST._pantList[0].SetNativeSize();
-                                    break;
-
-                                    case "Right":
-                                    ttObjST._pantList[1].sprite = tSpritePant[j];
-                                    ttObjST._pantList[1].SetNativeSize();
-                                    break;
-                                }
-                            }
-                            ttObjST.ShowObj(4);
-                            break;
-
-                            case 5:
-                            //갑옷 종류
-                            ttObjST._armorList[0].gameObject.SetActive(false);
-                            ttObjST._armorList[1].gameObject.SetActive(false);
-                            ttObjST._armorList[2].gameObject.SetActive(false);
-
-                            Sprite[] tSpriteArmor = Resources.LoadAll<Sprite>( _textureList[_drawItemIndex]._textureList[i]);
-
-                            for(var j = 0; j < tSpriteArmor.Length;j++)
-                            {
-                                switch(tSpriteArmor[j].name)
-                                {
-                                    case "Body":
-                                    ttObjST._armorList[0].gameObject.SetActive(true);
-                                    ttObjST._armorList[0].sprite = tSpriteArmor[j];
-                                    ttObjST._armorList[0].SetNativeSize();
-                                    break;
-
-                                    case "Left":
-                                    ttObjST._armorList[1].gameObject.SetActive(true);
-                                    ttObjST._armorList[1].sprite = tSpriteArmor[j];
-                                    ttObjST._armorList[1].SetNativeSize();
-                                    break;
-
-                                    case "Right":
-                                    ttObjST._armorList[2].gameObject.SetActive(true);
-                                    ttObjST._armorList[2].sprite = tSpriteArmor[j];
-                                    ttObjST._armorList[2].SetNativeSize();
-                                    break;
-
-                                }
-                            }
-                            ttObjST.ShowObj(2);
-                            break;
-                        }
-                        
-                        ttObjST._managerST = this;
-                        ttObjST._itemType = _drawItemIndex;
-                        ttObjST._name = _textureList[_drawItemIndex]._textureList[i];
-                    }
-                }
-            }
-        }
-
-        SetPackageButtons();
-    }
-
-    public void DrawItemOff()
-    {
-        _drawItemObj.SetActive(false);
-    }
-
-    public void SetSprite(int num, Sprite sprite, string name,int index)
-    {
-        if(num != -1 && num != 11 && num != 10)
-        {
-            _textureList[num].SetUse(true);
-
-            if( num == 9 || num == 3 || num == 4 || num == 5)
-            {
-                if( name.Length < 2) 
-                {
-                    _textureList[num].SetUse(false);
-                    _textureList[num]._colorBG.color = Color.white;
-
-                    if(num == 9 )
-                    {
-                        _textureList[num]._colorBG.color = _basicColor;
-                    }
-                }
-            }
-            else
-            {
-                if(sprite == null)
-                {
-                    _textureList[num].SetUse(false);
-                    _textureList[num]._colorBG.color = Color.white;
-
-                    if( num == 0 || num == 1|| num == 9 ) _textureList[num]._colorBG.color = _basicColor;
-                }
-            }
-        }
+        var enabledPackages =  UIManager.SpritePackagesFilterList
+            .Where(kvp => kvp.Value)
+            .Select(kvp => kvp.Key)
+            .ToList();
         
+        UIManager._panelTitle.text = ButtonData.PartType;
 
-        switch(num)
+        UIManager.ClearPreviewItems();
+
+        var SpumPackages =  spumPackages;
+
+        string unitType = ButtonData.UnitType;
+        string partType = ButtonData.PartType;
+
+        //패키지 구룹화 - 패키지 필터 조건
+        var groupedPackageData = SpumPackages
+            .Where(p => enabledPackages.Contains(p.Name)) // 패키지 이름이 enabledPackages 리스트에 있는 것만 선택
+            .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
+            .Where(x => x.Texture.PartType.Equals(partType) && x.Texture.UnitType.Equals(unitType))
+            .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 구룹 키
+            .Select(g => new 
+            { 
+                Key = g.Key, 
+                Items = g.ToList() 
+            })
+            .ToList();
+        
+        // 필터된 패키지 아이템 순환
+        foreach (var package in groupedPackageData) 
         {
-            case -1:
-            if( name == "")
-            {
-
-            }
-            else
-            {
-                _mainBody = (Texture2D)AssetDatabase.LoadAssetAtPath(name,typeof(Texture2D));
-                SetBodySprite();
-            }
-            break;
-
-            case 0:
-            //헤어 종류
-            _spriteObj._hairList[0].sprite = sprite;
-            _spriteObj._hairList[1].sprite = null;
-            break;
             
-            case 1:
-            //수염
-            _spriteObj._hairList[3].sprite = sprite;
-            break;
-            
-            case 2:
-            //헬멧 종류
-            _spriteObj._hairList[1].sprite = sprite;
-            _spriteObj._hairList[0].sprite = null;
-            break;
-
-            case 3:
-            //옷 종류
-            // 옷
-            _spriteObj._clothList[0].sprite = null;
-            _spriteObj._clothList[1].sprite = null;
-            _spriteObj._clothList[2].sprite = null;
-
-            if(name.Length > 0)
+            // 프리뷰 아이템 버튼 생성
+            var PreviewItem = UIManager.CreatePreviewItem();
+            var previewButton = PreviewItem.GetComponent<SPUM_PreviewItem>();
+            previewButton.name = package.Key.Name;
+            // Hide Other Element
+            foreach (Transform tr in previewButton.transform)
             {
-                Sprite[] tSpriteCloth = Resources.LoadAll<Sprite>(name);
-                for(var i = 0; i < tSpriteCloth.Length;i++)
+                tr.gameObject.SetActive(tr.name.ToUpper() == ButtonData.ItemShowType.ToUpper());
+            }
+            previewButton.SetSpriteButton.onClick.AddListener(()=> { ButtonData.IsActive = true; } );
+
+            //Preview Element Matching Map
+            var UnitPartLists = previewButton.GetComponentsInChildren<SPUM_PreviewMatchingList>(); 
+
+            // 보여질 이미지 추출
+            var UnitPartList = UnitPartLists 
+                .SelectMany(table => table.matchingTables)
+                .Where(element => element.PartType == package.Key.PartType && element.UnitType == package.Key.UnitType)
+                .ToList();
+            //Debug.Log($"PartType: {group.Key.PartType}, Name: {group.Key.Name}, UnitType: {group.Key.UnitType}");
+            foreach (var item in package.Items) // 아이템 개별 항목 순환
+            {
+                //Debug.Log($"  Package: {item.Package.Name}, SubType: {item.Texture.SubType}, Path: {item.Texture.Path}");
+                foreach (var part in UnitPartList)
                 {
-                    switch(tSpriteCloth[i].name)
+                    if(part.Structure == item.Texture.SubType){ // 멀티플 타입 이미지 인 경우
+                        var LoadSprite = LoadSpriteFromMultiple(item.Texture.Path, item.Texture.SubType);
+                        part.ItemPath = item.Texture.Path;
+                        part.image.sprite = LoadSprite;
+                        part.PartSubType = item.Texture.PartSubType;
+                        float pixelWidth = LoadSprite.rect.width;
+                        float pixelHeight = LoadSprite.rect.height;
+
+                        float unityWidth = pixelWidth / LoadSprite.pixelsPerUnit;
+                        float unityHeight = pixelHeight / LoadSprite.pixelsPerUnit;
+
+                        part.image.rectTransform.sizeDelta = new Vector2(unityWidth * 100, unityHeight * 100);
+                        part.Dir = ButtonData.Direction;
+                        Color PartColor = ButtonData.ignoreColorPart.Contains(item.Texture.SubType) ? Color.white : ButtonData.PartSpriteColor;
+                        part.image.color = PartColor;
+                        part.Color = PartColor;
+                        part.MaskIndex = (int)ButtonData.SpriteMask;
+                        previewButton.ImageElement.Add(part);
+                    }
+                    else if(UnitPartList.Count == 1) // 서브타입이 없는 멀티플이 아닌경우 
                     {
-                        case "Body":
-                        _spriteObj._clothList[0].sprite = tSpriteCloth[i];
-                        break;
+                        var LoadSprite = LoadSpriteFromMultiple(item.Texture.Path, item.Texture.SubType);
+                        part.ItemPath = item.Texture.Path;
+                        part.image.sprite = LoadSprite;
+                        part.PartSubType = item.Texture.PartSubType;
+                        float pixelWidth = LoadSprite.rect.width;
+                        float pixelHeight = LoadSprite.rect.height;
 
-                        case "Left":
-                        _spriteObj._clothList[1].sprite = tSpriteCloth[i];
-                        break;
+                        float unityWidth = pixelWidth / LoadSprite.pixelsPerUnit;
+                        float unityHeight = pixelHeight / LoadSprite.pixelsPerUnit;
 
-                        case "Right":
-                        _spriteObj._clothList[2].sprite = tSpriteCloth[i];
-                        break;
+                        part.image.rectTransform.sizeDelta = new Vector2(unityWidth * 100, unityHeight * 100);
+                        part.Dir = ButtonData.Direction;
+                        part.Structure = item.Texture.SubType.Equals(item.Texture.Name) ? package.Key.PartType : item.Texture.SubType;
+                        Color PartColor = ButtonData.ignoreColorPart.Contains(item.Texture.PartSubType) ? Color.white : ButtonData.PartSpriteColor;
+                        part.image.color = PartColor;
+                        part.Color = PartColor;
+                        part.MaskIndex = (int)ButtonData.SpriteMask;
+                        previewButton.ImageElement.Add(part);
                     }
                 }
             }
-            
-            break;
-
-            case 4:
-            //바지 종류
-            //바지
-            _spriteObj._pantList[0].sprite = null;
-            _spriteObj._pantList[1].sprite = null;
-            if(name.Length > 0)
+            previewButton.ImageElement = previewButton.ImageElement.Distinct().ToList();
+            // 필요없는 항목 비활성화
+            UnitPartList.ForEach(item => 
             {
-                Sprite[] tSpritePant = Resources.LoadAll<Sprite>(name);
-                for(var i = 0; i < tSpritePant.Length;i++)
-                {
-                    switch(tSpritePant[i].name)
-                    {
-                        case "Left":
-                        _spriteObj._pantList[0].sprite = tSpritePant[i];
-                        break;
+                item.image.gameObject.SetActive(item.image.sprite != null);
+            });
 
-                        case "Right":
-                        _spriteObj._pantList[1].sprite = tSpritePant[i];
-                        break;
-                    }
-                }
-            }
-            break;
-
-            case 5:
-            //갑옷 종류
-            _spriteObj._armorList[0].sprite = null;
-            _spriteObj._armorList[1].sprite = null;
-            _spriteObj._armorList[2].sprite = null;
-            if(name.Length > 0)
-            {
-                Sprite[] tSpriteCloth = Resources.LoadAll<Sprite>(name);
-                for(var i = 0; i < tSpriteCloth.Length;i++)
-                {
-                    switch(tSpriteCloth[i].name)
-                    {
-                        case "Body":
-                        _spriteObj._armorList[0].sprite = tSpriteCloth[i];
-                        break;
-
-                        case "Left":
-                        _spriteObj._armorList[1].sprite = tSpriteCloth[i];
-                        break;
-
-                        case "Right":
-                        _spriteObj._armorList[2].sprite = tSpriteCloth[i];
-                        break;
-                    }
-                }
-            }
-            break;
-
-            case 6:
-            //뒷 아이템
-            _spriteObj._backList[0].sprite = sprite;
-            break;
-
-            case 7:
-            //오른손 무기 종류
-            if(sprite==null)
-            {
-                _spriteObj._weaponList[0].sprite = null;
-                _spriteObj._weaponList[1].sprite = null;
-            }
-            else
-            {
-                if((sprite.name).Contains("Shield"))
-                {
-                    //방패
-                    _spriteObj._weaponList[0].sprite = null;
-                    _spriteObj._weaponList[1].sprite = sprite;
-                }
-                else
-                {
-                    _spriteObj._weaponList[0].sprite = sprite;
-                    _spriteObj._weaponList[1].sprite = null;
-                }
-            }
-            
-            break;
-
-            case 8:
-            //왼손 무기 종류
-            if(sprite==null)
-            {
-                _spriteObj._weaponList[2].sprite = null;
-                _spriteObj._weaponList[3].sprite = null;
-            }
-            else
-            {
-                if((sprite.name).Contains("Shield"))
-                {
-                    //방패
-                    _spriteObj._weaponList[2].sprite = null;
-                    _spriteObj._weaponList[3].sprite = sprite;
-                }
-                else
-                {
-                    _spriteObj._weaponList[2].sprite = sprite;
-                    _spriteObj._weaponList[3].sprite = null;
-                }
-            }
-            break;
-
-            case 9:
-            //눈 기본으로 리셋
-
-            if(name.Length > 0)
-            {
-                Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(name);
-                for(var j = 0 ; j < sprites.Length ;j++)
-                {
-                    if(sprites[j].GetType() == typeof(Sprite))
-                    {
-                        if(sprites[j].name == "Back")
-                        {
-                            _spriteObj._eyeList[0].sprite = (Sprite)sprites[j];
-                            _spriteObj._eyeList[1].sprite = (Sprite)sprites[j];
-
-                        }
-                        else if(sprites[j].name == "Front")
-                        {
-                            _spriteObj._eyeList[2].sprite = (Sprite)sprites[j];
-                            _spriteObj._eyeList[3].sprite = (Sprite)sprites[j];
-                        }
-                    }
-                }
-            }
-            else
-            {
-                string path = AssetDatabase.GetAssetPath(_mainEye);
-                Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(path);
-                for(var j = 0 ; j < sprites.Length ;j++)
-                {
-                    if(sprites[j].GetType() == typeof(Sprite))
-                    {
-                        if(sprites[j].name == "Back")
-                        {
-                            _spriteObj._eyeList[0].sprite = (Sprite)sprites[j];
-                            _spriteObj._eyeList[1].sprite = (Sprite)sprites[j];
-
-                        }
-                        else if(sprites[j].name == "Front")
-                        {
-                            _spriteObj._eyeList[2].sprite = (Sprite)sprites[j];
-                            _spriteObj._eyeList[3].sprite = (Sprite)sprites[j];
-                        }
-                    }
-                }
-
-                _spriteObj._eyeList[2].color = _basicColor;
-                _spriteObj._eyeList[3].color = _basicColor;
-
-            }
-            break;
-
-            case 10:
-            //말
-            if(name.Length ==0)
-            {
-                SetHorse(false,name);
-            }
-            else
-            {
-                SetHorse(true,name);
-                SetHorseBody(name);
-            }
-            break;
-
-            
-
-            case 11:
-            //풀셋
-            editObjNum = index;
-            LoadUnitDataName(index);
-            LoadButtonSet(true);
-            CloseLoadData();
-            break;
-
-            case 12:
-
-            break;
-
+            // 바뀔 프리뷰 항목 가져오기
         }
-
-        DrawItemOff();
+        // 프리뷰 아이템 데이터를 적용 필요
+        UIManager.ShowItem();
     }
+#endregion
 
-    
-
-    public void SetHorseBody(string name)
-    {
-        SPUM_HorseSpriteList hST = _rootAnimList[1].GetComponent<SPUM_HorseSpriteList>();
-
-        Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(name);
-        for(var j = 0 ; j < sprites.Length ;j++)
+#region PreviewUnit
+    public void SetType(string Type){
+        var PreviewUnit = PreviewPrefab;
+        PreviewUnit.UnitType = Type;
+        foreach (Transform child in PreviewUnit.transform)
         {
-            if(sprites[j].GetType() == typeof(Sprite))
-            {
-                Sprite tSP =  (Sprite)sprites[j];
-                switch(sprites[j].name)
-                {
-                    case "Head":
-                    hST._spList[0].sprite = tSP;
-                    break;
-
-                    case "Neck":
-                    hST._spList[1].sprite = tSP;
-                    break;
-
-                    case "BodyFront":
-                    hST._spList[2].sprite = tSP;
-                    break;
-
-                    case "BodyBack":
-                    hST._spList[3].sprite = tSP;
-                    break;
-
-                    case "FootFrontTop":
-                    hST._spList[4].sprite = tSP;
-                    hST._spList[5].sprite = tSP;
-                    break;
-
-                    case "FootFrontBottom":
-                    hST._spList[6].sprite = tSP;
-                    hST._spList[7].sprite = tSP;
-                    break;
-
-                    case "FootBackTop":
-                    hST._spList[8].sprite = tSP;
-                    hST._spList[9].sprite = tSP;
-                    break;
-
-                    case "FootBackBottom":
-                    hST._spList[10].sprite = tSP;
-                    hST._spList[11].sprite = tSP;
-                    break;
-
-                    case "Tail":
-                    hST._spList[12].sprite = tSP;
-                    break;
-
-                    case "Acc":
-                    hST._spList[13].sprite = tSP;
-                    break;
-                }
-            }
+            child.gameObject.SetActive(child.name.Contains(Type));
         }
-    }
+        var anim = PreviewUnit.GetComponentInChildren<Animator>();
+        PreviewPrefab._anim = anim;
 
-    public GameObject _colorPicker;
-    public int _nowColorNum;
-    public Color _basicColor;
-    public Color _nowColor;
-    public void OpenColorPick(int num)
-    {
-        bool available = false;
-
-        switch(num)
+        if(Type.Equals("Unit"))
         {
-            case 0: //머리의 경우
-            if(_spriteObj._hairList[0].sprite != null ) available = true;
-            break;
-
-            case 1: //수염의 경우
-            if(_spriteObj._hairList[3].sprite != null ) available = true;
-            break;
-
-            case 2: //헬멧
-            if(_spriteObj._hairList[1].sprite != null ) available = true;
-            break;
-
-            case 3: //옷
-            if(_spriteObj._bodyList[0].sprite != null ) available = true;
-            break;
-
-            case 4: //바지
-            if(_spriteObj._pantList[0].sprite != null ) available = true;
-            break;
-
-            case 5: //아머
-            if(_spriteObj._armorList[0].sprite != null ) available = true;
-            break;
-
-            case 6: //뒤
-            if(_spriteObj._backList[0].sprite != null ) available = true;
-            break;
-
-            case 7: //오른손
-            if(_spriteObj._weaponList[0].sprite!=null) available = true;
-            if(_spriteObj._weaponList[1].sprite!=null) available = true;
-            break;
-
-            case 8: //왼손
-            if(_spriteObj._weaponList[2].sprite!=null) available = true;
-            if(_spriteObj._weaponList[3].sprite!=null) available = true;
-            break;
-
-            case 9: //눈의 경우
-            available = true;
-            _spriteObj._eyeList[2].color = _nowColor;
-            _spriteObj._eyeList[3].color = _nowColor;
-            break;
-        }
-
-        if(available)
-        {
-            _colorPicker.SetActive(true);
-            _nowColorNum = num;
-        }
-        else
-        {
-            ToastOn("No Selected");
+            var ElementList = PreviewUnit.ImageElement;
+            ElementList.RemoveAll(element => element.UnitType != Type);
+        }else{
+            SetDefultSet(Type, "Body", Type+"1", Color.white);
         }
         
     }
+    public void SetDefultSet(string UnitType, string PartType, string TextureName, Color color)
+    {
+        string PackageName ="Legacy";
+        //패키지 구룹화
+        var groupedData = spumPackages
+            .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
+            .Where(x => x.Texture.PartType.Equals(PartType) && x.Texture.UnitType.Equals(UnitType) && x.Package.Name.Equals(PackageName) && x.Texture.Name.Equals(TextureName))
+            .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 그룹 키
+            .Select(g => new 
+            { 
+                Key = g.Key, 
+                Items = g.ToList() 
+            })
+            .ToList();
 
-    public void CloseColorPick()
-    {
-        _colorPicker.SetActive(false);
-    }
-    Texture2D tex;
+        var Parts = groupedData[0];
 
-    public List<GameObject> _colorPanelType = new List<GameObject>();
-    public Image _nowColorShow;
-    public InputField _hexColorText;
-    public List<ColorSelect> _colorSaveList = new List<ColorSelect>();
-    public int _nowSelectColorNum;
-    public GameObject _nowSelectColor;
-    public void DeleteSelectColor()
-    {
-        if(!_nowSelectColor.activeInHierarchy) return;
-        _colorSaveList[_nowSelectColorNum]._savedColor.gameObject.SetActive(false);
-        SoonsoonData.Instance._soonData2._savedColorList[_nowSelectColorNum]="";
-        _nowSelectColor.SetActive(false);
-        SoonsoonData.Instance.SaveData();
-    }
-    
-    public void SetColorPickerPanel(int num)
-    {
-        foreach( var obj in _colorPanelType )
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var item in Parts.Items)
         {
-            obj.SetActive(false);
+            //Debug.Log($"Path: {PartType}, SubType: { item.Texture.SubType}");
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.PartSubType = item.Texture.PartSubType;
+            part.Dir = "";
+            part.ItemPath = item.Texture.Path;
+            part.Structure = item.Texture.SubType.Equals(item.Texture.Name) ? PartType : item.Texture.SubType;
+            part.MaskIndex = 0;
+            part.Color = color;
+
+            ListElement.Add(part);
         }
-
-        _colorPanelType[num].SetActive(true);
+        SetSprite(ListElement);
     }
-    public void PickColor()
+    public void SetSprite(List<PreviewMatchingElement> ImageElement)
     {
-        tex = new Texture2D(1, 1);
-        //get the color printed by calling:
-        StartCoroutine(CaptureTempArea());
-    }
+        var PreviewUnit = PreviewPrefab;
+        SaveElementData(ImageElement);
 
+        // 프리뷰 유닛의 매칭 리스트를 가지고 온다.
+        var matchingTables = PreviewUnit.GetComponentsInChildren<SPUM_MatchingList>(true);
 
-    public void PickerColorText()
-    {
-        _nowColorShow.color = StrToColor(_hexColorText.text);
-        _nowColor = _nowColorShow.color;
-        SetObjColor();
-    }
-
-    IEnumerator CaptureTempArea() {
-        yield return new WaitForEndOfFrame();
-        #if ENABLE_INPUT_SYSTEM
-        Vector2 pos =  Mouse.current.position.ReadValue();
-        #elif ENABLE_LEGACY_INPUT_MANAGER
-        Vector2 pos = EventSystem.current.currentInputModule.input.mousePosition;
+        var allMatchingElements = matchingTables.SelectMany(mt => mt.matchingTables);
+        //Debug.Log(ImageElement.Count + "SetSpriteCount" + allMatchingElements.Count());
+        foreach (var matchingElement in allMatchingElements)
+        {
+            var matchingTypeElement = ImageElement.FirstOrDefault(ie => 
+            (ie.UnitType == matchingElement.UnitType)
+            && ("Weapons" == matchingElement.PartType)
+            //&& ie.Index == matchingElement.Index
+            && (ie.Dir == matchingElement.Dir) 
+            && (ie.Structure == matchingElement.Structure)
+            );
+            //Debug.Log(matchingTypeElement != null);
+            if (matchingTypeElement != null)
+            {
+                matchingElement.renderer.sprite = null;
+                matchingElement.renderer.maskInteraction = (SpriteMaskInteraction) matchingTypeElement.MaskIndex;
+                matchingElement.renderer.color = matchingTypeElement.Color;
+                matchingElement.ItemPath = "";
+                matchingElement.Color = matchingTypeElement.Color;
+            }
+        }
+        #if UNITY_2023_1_OR_NEWER
+            var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
+        #else
+            #pragma warning disable CS0618
+            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+            #pragma warning restore CS0618
         #endif
 
-        tex.ReadPixels(new Rect(pos.x, pos.y, 1, 1), 0, 0);
-        tex.Apply();
-        _nowColor = tex.GetPixel(0, 0);
-
-        yield return new WaitForSecondsRealtime(0.1f);
-
-        _nowColorShow.color = _nowColor;
-        _hexColorText.text = ColorToStr(_nowColor);
-        SetObjColor();
-        _nowSelectColor.SetActive(false);
+        foreach (var matchingElement in allMatchingElements)
+        {
+            var matchingTypeElement = ImageElement.FirstOrDefault(ie => 
+            (ie.UnitType == matchingElement.UnitType)
+            && (ie.PartType == matchingElement.PartType)
+            //&& ie.Index == matchingElement.Index
+            && (ie.Dir == matchingElement.Dir) 
+            && (ie.Structure == matchingElement.Structure) 
+            && (ie.PartSubType == matchingElement.PartSubType)
+            //&& !string.IsNullOrEmpty( matchingElement.PartSubType )
+            );
+            //Debug.Log(matchingTypeElement != null);
+            if (matchingTypeElement != null)
+            {
+                var existingElement = ItemButtons.FirstOrDefault(e => e.PartType == matchingTypeElement.PartType);
+                var LoadSprite = LoadSpriteFromMultiple(matchingTypeElement.ItemPath , matchingTypeElement.Structure);
+                matchingElement.renderer.sprite = LoadSprite;
+                matchingElement.renderer.maskInteraction = (SpriteMaskInteraction) matchingTypeElement.MaskIndex;
+                Color PartColor = existingElement.ignoreColorPart.Contains(matchingTypeElement.PartType) ? Color.white : matchingTypeElement.Color;
+                matchingElement.renderer.color = PartColor;
+                matchingElement.ItemPath = matchingTypeElement.ItemPath;
+                matchingElement.Color =  PartColor;
+            }
+        }
+        UIManager.DrawItemOff();
     }
 
-    public void SetObjColor()
+    public void SetPartRandom(SPUM_SpriteButtonST ButtonData)
     {
-        switch(_nowColorNum)
+        var isSpriteFixed = ButtonData.IsSpriteFixed;
+        var UnitType = ButtonData.UnitType;
+        var PartType = ButtonData.PartType;
+
+        if(isSpriteFixed) return;
+        string unitType = UnitType;
+        string partType = PartType;
+
+        //패키지 구룹화
+        var groupedData = spumPackages
+            .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
+            .Where(x => x.Texture.PartType.Equals(partType) && x.Texture.UnitType.Equals(unitType))
+            .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 구룹 키
+            .Select(g => new 
+            { 
+                Key = g.Key, 
+                Items = g.ToList() 
+            })
+            .ToList();
+        int randomValue = UnityEngine.Random.Range(0, groupedData.Count+1);
+
+        if(randomValue.Equals(groupedData.Count)) 
         {
-            case 0: //머리의 경우
-            _spriteObj._hairList[0].color = _nowColor;
+            ButtonData.RemoveSprite();
+            return;
+        }
+        var randomGroup = groupedData[randomValue];
+
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var item in randomGroup.Items)
+        {
+            //Debug.Log($"Path: {PartType}, SubType: { item.Texture.SubType}");
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.PartSubType = item.Texture.PartSubType;
+            part.Dir = ButtonData.Direction;
+            part.ItemPath = item.Texture.Path;
+            part.Structure = item.Texture.SubType.Equals(item.Texture.Name) ? PartType : item.Texture.SubType;
+            part.MaskIndex = (int)ButtonData.SpriteMask;
+            Color PartColor = ButtonData.ignoreColorPart.Contains(item.Texture.SubType) ? Color.white : ButtonData.InitColor;
+            part.Color = PartColor;
+
+            ListElement.Add(part);
+        }
+        SetSprite(ListElement);
+    }
+    public void SetDefaultPart(SPUM_SpriteButtonST ButtonData)
+    {
+        var isSpriteFixed = ButtonData.IsSpriteFixed;
+        var IsActive = ButtonData.IsActive;
+        var UnitType = ButtonData.UnitType;
+        var PartType = ButtonData.PartType;
+        var PackageName = ButtonData.DefaultPackageName;
+        var TextureName = ButtonData.DefaultTextureName;
+        if(isSpriteFixed) return;
+        IsActive = true;
+        ButtonData.PartSpriteColor = ButtonData.InitColor;
+        //Debug.Log(ButtonData.PartType + " " +  ButtonData.InitColor);
+        //패키지 구룹화
+        var groupedData = spumPackages
+            .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
+            .Where(x => x.Texture.PartType.Equals(PartType) && x.Texture.UnitType.Equals(UnitType) && x.Package.Name.Equals(PackageName) && x.Texture.Name.Equals(TextureName))
+            .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 그룹 키
+            .Select(g => new 
+            { 
+                Key = g.Key, 
+                Items = g.ToList() 
+            })
+            .ToList();
+        //Debug.Log($"UnitType: {UnitType}, PartType: { PartType}, PackageName: { PackageName}, TextureName: { TextureName} / {groupedData.Count}");
+        var randomGroup = groupedData[0];
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var item in randomGroup.Items)
+        {
+            //Debug.Log($"Path: {PartType}, SubType: { item.Texture.Name}");
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.PartSubType = item.Texture.PartSubType;
+            part.Dir = ButtonData.Direction;
+            part.ItemPath = item.Texture.Path;
+            part.Structure = item.Texture.SubType.Equals(item.Texture.Name) ? PartType : item.Texture.SubType;  
+            part.MaskIndex = 0;
+            //part.Color = ButtonData.InitColor;
             
-            break;
+            Color PartColor = ButtonData.ignoreColorPart.Contains(item.Texture.SubType) ? Color.white : ButtonData.InitColor;
+            part.Color = PartColor;
 
-            case 1: //수염의 경우
-            _spriteObj._hairList[3].color = _nowColor;
-            break;
-
-            case 2: //헬멧
-            _spriteObj._hairList[1].color = _nowColor;
-            break;
-
-            case 3: //옷
-            _spriteObj._clothList[0].color = _nowColor;
-            _spriteObj._clothList[1].color = _nowColor;
-            _spriteObj._clothList[2].color = _nowColor;
-            break;
-
-            case 4: //바지
-            _spriteObj._pantList[0].color = _nowColor;
-            _spriteObj._pantList[1].color = _nowColor;
-            break;
-
-            case 5: //아머
-            _spriteObj._armorList[0].color = _nowColor;
-            _spriteObj._armorList[1].color = _nowColor;
-            _spriteObj._armorList[2].color = _nowColor;
-            break;
-
-            case 6: //뒤
-            _spriteObj._backList[0].color = _nowColor;
-            break;
-
-            case 7: //오른손
-            if(_spriteObj._weaponList[0]!=null) _spriteObj._weaponList[0].color = _nowColor;
-            if(_spriteObj._weaponList[1]!=null) _spriteObj._weaponList[1].color = _nowColor;
-            break;
-
-            case 8: //왼손
-            if(_spriteObj._weaponList[2]!=null) _spriteObj._weaponList[2].color = _nowColor;
-            if(_spriteObj._weaponList[3]!=null) _spriteObj._weaponList[3].color = _nowColor;
-            break;
-
-            case 9: //눈의 경우
-            _spriteObj._eyeList[2].color = _nowColor;
-            _spriteObj._eyeList[3].color = _nowColor;
-            break;
+            ListElement.Add(part);
         }
+        SetSprite(ListElement);
+    }
+    public void RemoveSprite(SPUM_SpriteButtonST ButtonData)
+    {
+        var PreviewUnit = PreviewPrefab;
+        var isSpriteFixed = ButtonData.IsSpriteFixed;
+        var IsActive = ButtonData.IsActive;
+        var UnitType = ButtonData.UnitType;
+        var PartType = ButtonData.PartType;
 
-        _textureList[_nowColorNum]._colorBG.color = _nowColor;
-        // CloseColorPick();
+        if(isSpriteFixed) return;
+        ButtonData.IsActive = false;
+        ButtonData.PartSpriteColor = ButtonData.InitColor;
+        var matchingTables = PreviewUnit.GetComponentsInChildren<SPUM_MatchingList>(true);
+
+        var allMatchingElements = matchingTables.SelectMany(mt => mt.matchingTables)
+            .Where(element => 
+                element.UnitType == UnitType &&
+                element.PartType == PartType &&
+                element.Dir == ButtonData.Direction
+            );
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var matchingElement in allMatchingElements)
+        {
+            //Debug.Log($"{matchingElement.UnitType} {matchingElement.Structure} {matchingElement.Dir}");
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.PartSubType = matchingElement.PartSubType;
+            part.Dir = matchingElement.Dir;
+            part.Structure = matchingElement.Structure;
+
+            matchingElement.renderer.sprite = null;
+            matchingElement.renderer.color = ButtonData.InitColor;
+            matchingElement.ItemPath = "";
+            matchingElement.Color = ButtonData.InitColor;
+            ListElement.Add(part);
+        }
+        RemoveElementData(ListElement);
     }
 
-    public void RandomObjColor(int num)
+    public void SetSpriteColor(SPUM_SpriteButtonST ButtonData)
     {
-        Color tColor = Color.white;
-        if(Random.Range(0,1.0f) > 0.1f) 
-        {
-            tColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f),1f);
-            _textureList[num].SetUse(true);
-        }
-        else _textureList[num].SetUse(false);
+        var PreviewUnit = PreviewPrefab;
+        var isSpriteFixed = ButtonData.IsSpriteFixed;
+        var IsActive = ButtonData.IsActive;
+        var UnitType = ButtonData.UnitType;
+        var PartType = ButtonData.PartType;
 
+        if(isSpriteFixed) return;
+        var matchingTables = PreviewUnit.GetComponentsInChildren<SPUM_MatchingList>(true);
+
+        var allMatchingElements = matchingTables.SelectMany(mt => mt.matchingTables)
+            .Where(element => 
+                element.UnitType == UnitType &&
+                element.PartType == PartType &&
+                element.Dir == ButtonData.Direction
+            );
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var matchingElement in allMatchingElements)
+        {
+            //Debug.Log($"{matchingElement.UnitType} {matchingElement.Structure} {matchingElement.Dir}");
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.Dir = matchingElement.Dir;
+            part.Structure = matchingElement.Structure;  
+            Color PartColor = ButtonData.ignoreColorPart.Contains(matchingElement.Structure) ? Color.white : ButtonData.PartSpriteColor;
+            part.Color = PartColor;
+            matchingElement.Color = PartColor;
+            matchingElement.renderer.color = PartColor;
+            ListElement.Add(part);
+        }
+        SetElementColorData(ListElement);
+    }
+    public void SetSpriteVisualMaskIndex(SPUM_SpriteButtonST ButtonData)
+    {
+        var PreviewUnit = PreviewPrefab;
+        var isSpriteFixed = ButtonData.IsSpriteFixed;
+        var IsActive = ButtonData.IsActive;
+        var UnitType = ButtonData.UnitType;
+        var PartType = ButtonData.PartType;
+
+        //if(isSpriteFixed) return;
+        var matchingTables = PreviewUnit.GetComponentsInChildren<SPUM_MatchingList>(true);
+
+        var allMatchingElements = matchingTables.SelectMany(mt => mt.matchingTables)
+            .Where(element => 
+                element.UnitType == UnitType &&
+                element.PartType == PartType &&
+                element.Dir == ButtonData.Direction
+            );
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var matchingElement in allMatchingElements)
+        {
+            matchingElement.renderer.maskInteraction = ButtonData.SpriteMask;
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.Dir = matchingElement.Dir;
+            part.Structure = matchingElement.Structure;  
+            part.MaskIndex = (int)ButtonData.SpriteMask;
+            ListElement.Add(part);
+        }
+        SetElementMaskData(ListElement);
+    }
+    public void ItemRandomAll()
+    {
+        #if UNITY_2023_1_OR_NEWER
+            var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
+        #else
+            #pragma warning disable CS0618
+            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+            #pragma warning restore CS0618
+        #endif
+        List<string> conditionTypes = new List<string> {"Body", "Horse" };
+
+        var filteredButtons = ItemButtons.Where(button => !conditionTypes.Contains(button.ItemShowType)).ToList();
+        foreach (var button in filteredButtons)
+        {
+            button.SetPartRandom();
+        }
+    }
+    public void ItemResetAll()
+    {
+        //Debug.Log("ItemResetAll");
+        #if UNITY_2023_1_OR_NEWER
+            var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
+        #else
+            #pragma warning disable CS0618
+            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+            #pragma warning restore CS0618
+        #endif
+        foreach (var button in ItemButtons)
+        {
+            button.RemoveSprite();
+        }
         
-        switch(num)
-        {
-            case 0: //머리의 경우
-            _spriteObj._hairList[0].color = tColor;
-            break;
+        ResetBody();
+    }
+    public void ResetBody()
+    {
+        SetType(PreviewPrefab.UnitType);
 
-            case 1: //수염의 경우
-            _spriteObj._hairList[3].color = tColor;
-            break;
-
-            case 2: //헬멧
-            _spriteObj._hairList[1].color = tColor;
-            break;
-
-            case 3: //옷
-            _spriteObj._clothList[0].color = tColor;
-            _spriteObj._clothList[1].color = tColor;
-            _spriteObj._clothList[2].color = tColor;
-            break;
-
-            case 4: //바지
-            _spriteObj._pantList[0].color = tColor;
-            _spriteObj._pantList[1].color = tColor;
-            break;
-
-            case 5: //아머
-            _spriteObj._armorList[0].color = tColor;
-            _spriteObj._armorList[1].color = tColor;
-            _spriteObj._armorList[2].color = tColor;
-            break;
-
-            case 6: //뒤
-            _spriteObj._backList[0].color = tColor;
-            break;
-
-            case 7: //오른손
-            if(_spriteObj._weaponList[0]!=null) _spriteObj._weaponList[0].color = tColor;
-            if(_spriteObj._weaponList[1]!=null) _spriteObj._weaponList[1].color = tColor;
-            break;
-
-            case 8: //왼손
-            if(_spriteObj._weaponList[2]!=null) _spriteObj._weaponList[2].color = tColor;
-            if(_spriteObj._weaponList[3]!=null) _spriteObj._weaponList[3].color = tColor;
-            break;
-
-            case 9: //눈의 경우
-            _spriteObj._eyeList[2].color = tColor;
-            _spriteObj._eyeList[3].color = tColor;
-            break;
+        #if UNITY_2023_1_OR_NEWER
+            var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
+        #else
+            #pragma warning disable CS0618
+            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+            #pragma warning restore CS0618
+        #endif
+        List<string> conditionTypes = new List<string> { "Eye" , "Body" };
+        if(PreviewPrefab.UnitType.Equals("Horse")){
+            conditionTypes.Add("Horse");
         }
-
-        _textureList[num]._colorBG.color = tColor;
+        var filteredButtons = ItemButtons.Where(button => conditionTypes.Contains(button.ItemShowType)).ToList();
+        foreach (var button in filteredButtons)
+        {
+            //Debug.Log(button.ItemShowType);
+            button.SetInitPart();
+        }
     }
 
-    public void CheckPrefabVersionData()
+    public void ItemLoadButtonActive(List<PreviewMatchingElement> ImageElement)
     {
-        if(Directory.Exists(unitPath))
+        string[] uniquePartTypes = ImageElement.Select(m => m.PartType).Distinct().ToArray();
+        var partTypeUnitTypeColorDict = ImageElement
+                                            .GroupBy(m => new { m.PartType, m.UnitType, m.Dir })
+                                            .ToDictionary(g => g.Key, g => g.First().Color);
+        #if UNITY_2023_1_OR_NEWER
+            var ItemButtons = FindObjectsByType<SPUM_SpriteButtonST>(FindObjectsSortMode.None);
+        #else
+            #pragma warning disable CS0618
+            var ItemButtons = FindObjectsOfType<SPUM_SpriteButtonST>();
+            #pragma warning restore CS0618
+        #endif
+
+        foreach (var button in ItemButtons)
         {
-            Debug.Log("Now sync version data..");
-            DirectoryInfo dirInfo = new DirectoryInfo(unitPath);
-            FileInfo[] fileInf = dirInfo.GetFiles("*.prefab");
-            foreach (FileInfo fileInfo in fileInf)
+            var key = new { PartType = button.ItemShowType, UnitType = button.UnitType, Dir = button.Direction };
+            
+            if (partTypeUnitTypeColorDict.ContainsKey(key))
             {
-                string path = unitPath + fileInfo.Name;
-                GameObject prefab = AssetDatabase.LoadAssetAtPath(path, typeof(GameObject)) as GameObject;
-                //데이터 싱크 부분
-                SPUM_Prefabs tST = prefab.GetComponent<SPUM_Prefabs>();
-                SPUM_SpriteList tObjST = tST._spriteOBj;
-                _spriteObj.LoadSprite(tObjST);
-
-                //UI연동.
-                // _colorButton[0].color = tObjST._eyeList[0].color;
-                // _colorButton[1].color = tObjST._hairList[3].color;
-                // _colorButton[2].color = tObjST._hairList[0].color;
-                
-                _spriteObj.ResyncData();
-                _unitObjSet._version = _version;
-                _unitObjSet._code = tST._code;
-
-                bool _bodyDataCheck = false;
-                for(var i = 0 ; i <tST._spriteOBj._bodyList.Count; i++)
-                {
-                    if(tST._spriteOBj._bodyList[i]==null)
-                    {
-                        _bodyDataCheck = true;
-                    }
-                }
-
-                if(_bodyDataCheck || tST._spriteOBj._bodyString.Length < 1)
-                {
-                    _unitObjSet._spriteOBj._bodyList[0].sprite = _mainBodyList[5];
-                    _unitObjSet._spriteOBj._bodyList[1].sprite = _mainBodyList[2];
-                    _unitObjSet._spriteOBj._bodyList[2].sprite = _mainBodyList[0];
-                    _unitObjSet._spriteOBj._bodyList[3].sprite = _mainBodyList[1];
-                    _unitObjSet._spriteOBj._bodyList[4].sprite = _mainBodyList[3];
-                    _unitObjSet._spriteOBj._bodyList[5].sprite = _mainBodyList[4];
-                    _spriteObj._bodyTexture = _mainBody;
-                    _spriteObj._bodyString = AssetDatabase.GetAssetPath(_mainBody);
-                }
-
-                GameObject tSObj = Instantiate(_unitObjSet.gameObject);
-                List<GameObject> tLObj = new List<GameObject>();
-                for(var i = 0 ; i < tSObj.transform.childCount;i++)
-                {
-                    if(!tSObj.transform.GetChild(i).gameObject.activeInHierarchy)
-                    {
-                        tLObj.Add(tSObj.transform.GetChild(i).gameObject);
-                    }
-                }
-
-                if(tLObj.Count>0)
-                {
-                    foreach(var obj in tLObj) 
-                    {
-                        DestroyImmediate(obj);
-                    }
-                }
-
-                GameObject tObj = PrefabUtility.SaveAsPrefabAsset(tSObj,unitPath+prefab.name+".prefab");
-                DestroyImmediate(tSObj);
+                button.IsActive = true;
+                button.PartSpriteColor = partTypeUnitTypeColorDict[key];
+            }
+            else
+            {
+                button.IsActive = false;
             }
         }
-
-        Debug.Log("Now sync data process done...");
-        SetInit();
     }
-
-    public List<GameObject> _prefabUnitList = new List<GameObject>();
-    public IEnumerator GetPrefabList()
+    
+    public void SetPrefabToPreviewPackageData(List<SpumPackage> packages){
+        if(packages.Count.Equals(0)){
+            PreviewPrefab.spumPackages = GetSpumLegacyData();
+        }else{
+            PreviewPrefab.spumPackages = packages;
+        }
+        // 패키지 체크
+        Debug.Log($"Prefab Package { packages.Count } / Total Package { spumPackages.Count }");
+        animationManager.PlayFirstAnimation();
+    }
+    
+#endregion
+    
+#region ElementData
+    private bool AreElementsEqual(PreviewMatchingElement element1, PreviewMatchingElement element2)
     {
-        if(Directory.Exists(unitPath))
+        return element1.UnitType == element2.UnitType &&
+            element1.PartType == element2.PartType &&
+            element1.Dir == element2.Dir &&
+            element1.Structure == element2.Structure
+            ;
+        // 필요한 만큼 조건을 추가할 수 있습니다.
+    }
+    public void SaveElementData(List<PreviewMatchingElement> ElementList)
+    {
+        var PreviewUnit = PreviewPrefab;
+        foreach (var newElement in ElementList)
         {
+            var existingElement = PreviewUnit.ImageElement.FirstOrDefault(e => AreElementsEqual(e, newElement));
 
-            DirectoryInfo dirInfo = new DirectoryInfo(unitPath);
-            FileInfo[] fileInf = dirInfo.GetFiles("*.prefab");
-
-            //loop through directory loading the game object and checking if it has the component you want
-            _prefabUnitList.Clear();
-            foreach (FileInfo fileInfo in fileInf)
+            if (existingElement != null)
             {
-                string path = unitPath + fileInfo.Name;
-                GameObject prefab = AssetDatabase.LoadAssetAtPath(path, typeof(GameObject)) as GameObject;
-                //데이터 싱크 부분
-                SPUM_Prefabs tST = prefab.GetComponent<SPUM_Prefabs>();
-                // Debug.Log(tST._version);
-                // Debug.Log(_version);
-                // Debug.Log(tST._spriteOBj._bodyString.Length);
-                if(tST._version == 0 || tST._version < _version)
-                {
-                    Debug.Log("Old Version data found.. Now sync version data..");
-                    //이 경우는 데이터를 싱크해줘야한다.
-                    SPUM_SpriteList tObjST = tST._spriteOBj;
-                    if(tObjST._spHorseSPList !=null)
-                    {
-                        SetHorse(true,tObjST._spHorseString);
-                    }
-                    else
-                    {
-                        SetHorse(false,null);
-                    }
-                    _spriteObj.LoadSprite(tObjST);
-
-                    //UI연동.
-                    // _colorButton[0].color = tObjST._eyeList[0].color;
-                    // _colorButton[1].color = tObjST._hairList[3].color;
-                    // _colorButton[2].color = tObjST._hairList[0].color;
-                    
-                    _spriteObj.ResyncData();
-                    _unitObjSet._version = _version;
-                    _unitObjSet._code = tST._code;
-
-                    bool _bodyDataCheck = false;
-                    for(var i = 0 ; i <tST._spriteOBj._bodyList.Count; i++)
-                    {
-                        if(tST._spriteOBj._bodyList[i]==null)
-                        {
-                            _bodyDataCheck = true;
-                        }
-                    }
-
-                    GameObject tObj = PrefabUtility.SaveAsPrefabAsset(_unitObjSet.gameObject,unitPath+prefab.name+".prefab");
-                    _prefabUnitList.Add(tObj);
-                    yield return null;
-                }
-                else
-                {
-                    _prefabUnitList.Add(prefab);
-                }
+                int index = PreviewUnit.ImageElement.IndexOf(existingElement);
+                PreviewUnit.ImageElement[index] = newElement;
+            }
+            else
+            {
+                PreviewUnit.ImageElement.Add(newElement);
             }
         }
-        else
-        {
-            yield return null;
-        }
-
-        
     }
+    public void RemoveElementData(List<PreviewMatchingElement> ElementList)
+    {
+        var PreviewUnit = PreviewPrefab;
+        foreach (var newElement in ElementList)
+        {
+            var existingElement = PreviewUnit.ImageElement.FirstOrDefault(e => AreElementsEqual(e, newElement));
+
+            if (existingElement != null)
+            {
+                int index = PreviewUnit.ImageElement.IndexOf(existingElement);
+                PreviewUnit.ImageElement.RemoveAt(index);
+            }
+        }
+    }
+    public void SetElementColorData(List<PreviewMatchingElement> ElementList)
+    {
+         var PreviewUnit = PreviewPrefab;
+        foreach (var newElement in ElementList)
+        {
+            var existingElement = PreviewUnit.ImageElement.FirstOrDefault(e => AreElementsEqual(e, newElement));
+
+            if (existingElement != null)
+            {
+                int index = PreviewUnit.ImageElement.IndexOf(existingElement);
+                var ElementData = PreviewUnit.ImageElement[index];
+                ElementData.Color = newElement.Color;
+            }
+        }
+    }
+    public void SetElementMaskData(List<PreviewMatchingElement> ElementList)
+    {
+         var PreviewUnit = PreviewPrefab;
+        foreach (var newElement in ElementList)
+        {
+            var existingElement = PreviewUnit.ImageElement.FirstOrDefault(e => AreElementsEqual(e, newElement));
+
+            if (existingElement != null)
+            {
+                int index = PreviewUnit.ImageElement.IndexOf(existingElement);
+                var ElementData = PreviewUnit.ImageElement[index];
+                ElementData.MaskIndex = newElement.MaskIndex;
+            }
+        }
+    }
+
+#endregion
+
+#region Prefab
+
+
     //프리팹 저장 부분
     public void SavePrefabs()
     {
-        if(_prefabUnitList.Count < _maxNumber)
+        animationManager.CloseAnimationPanels();
+        var SpumPreviewUnit = PreviewPrefab;
+        string prefabName = UIManager._unitCode.text;
+
+        SpumPreviewUnit._code = prefabName;
+        //SpumPreviewUnit.EditChk = false;
+        
+        GameObject prefabs = Instantiate(SpumPreviewUnit.gameObject);
+        SPUM_Prefabs SpumUnitData = prefabs.GetComponent<SPUM_Prefabs>();
+        SpumUnitData.ImageElement = SpumPreviewUnit.ImageElement;
+        SpumUnitData.spumPackages = SpumPreviewUnit.spumPackages;
+        // 비활성화된 오브젝트 삭제하기
+        var inactiveObjects = prefabs.transform.Cast<Transform>()
+            .Where(child => !child.gameObject.activeInHierarchy)
+            .Select(child => child.gameObject)
+            .ToList();
+
+        inactiveObjects.ForEach(DestroyImmediate);
+        
+        prefabs.transform.localScale = Vector3.one;
+        SpumUnitData._anim = prefabs.GetComponentInChildren<Animator>();
+        SpumUnitData._anim.runtimeAnimatorController = SPUM_AnimatorDic[SpumPreviewUnit.UnitType];
+        SpumUnitData._version = _version;
+        SpumUnitData.PopulateAnimationLists();
+        if (!Directory.Exists(unitPath))
         {
-            string prefabName = _unitCode.text;
+            Directory.CreateDirectory(unitPath);
+            AssetDatabase.Refresh();
+            Debug.Log("Folder created at: " + unitPath);
+        }  
+        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs,unitPath+prefabName+".prefab");
+        DestroyImmediate(prefabs);
+        
+        UIManager.ToastOn("Saved Unit Object " + prefabName);
+        //초기화
+        var Prefab = SavePrefab.GetComponent<SPUM_Prefabs>();
+        //Prefab.PopulateAnimationLists();
+        paginationManager.AddNewPrefab(Prefab);
+        SpumPreviewUnit._code = "";
+        UIManager.ResetUniqueID();
+        //SpumPreviewUnit.EditChk = true;
 
-            SPUM_Prefabs ttObjST = _unitObjSet.GetComponent<SPUM_Prefabs>();
-            ttObjST._code = prefabName;
-            ttObjST.EditChk = false;
-
-            SPUM_SpriteList tSpST = ttObjST._spriteOBj;
-            SyncPath(tSpST._hairList,tSpST._hairListString);
-            SyncPath(tSpST._clothList,tSpST._clothListString);
-            SyncPath(tSpST._armorList,tSpST._armorListString);
-            SyncPath(tSpST._pantList,tSpST._pantListString);
-            SyncPath(tSpST._weaponList,tSpST._weaponListString);
-            SyncPath(tSpST._backList,tSpST._backListString);
-
-            GameObject tSObj = Instantiate(_unitObjSet.gameObject);
-            List<GameObject> tLObj = new List<GameObject>();
-            for(var i = 0 ; i < tSObj.transform.childCount;i++)
-            {
-                if(!tSObj.transform.GetChild(i).gameObject.activeInHierarchy)
-                {
-                    tLObj.Add(tSObj.transform.GetChild(i).gameObject);
-                }
-            }
-
-            if(tLObj.Count>0)
-            {
-                foreach(var obj in tLObj) 
-                {
-                    DestroyImmediate(obj);
-                }
-            }
-            
-            tSObj.transform.localScale = new Vector3(1,1,1); //크기 정보 변경
-            tSObj.transform.localPosition = Vector3.zero;
-            tSObj.transform.GetChild(0).GetComponent<Animator>().runtimeAnimatorController = _animControllerList[0];
-            GameObject tObj = PrefabUtility.SaveAsPrefabAsset(tSObj,unitPath+prefabName+".prefab");
-            DestroyImmediate(tSObj);
-
-            _prefabUnitList.Add(tObj);
-
-            ttObjST._code = "";
-            ttObjST._version = _version;
-            ttObjST.EditChk = true;
-
-            ToastOn("Saved Unit Object " + prefabName);
-            _unitCode.text = GetFileName();
-
-            ShowNowUnitNumber();
-            editObjNum = -1;
-        }
+        UIManager.ShowNowUnitNumber();
+        NewMake();
     }
 
-    public void ShowNowUnitNumber()
-    {
-        bool dirUnitChk = Directory.Exists("Assets/Resources/SPUM/SPUM_Units");
-        if(dirUnitChk)
-        {
-            DirectoryInfo dirInfo = new DirectoryInfo(unitPath);
-            FileInfo[] fileInfo = dirInfo.GetFiles("*.prefab");
-
-            _unitNumber.text = fileInfo.Length + " / 100";
-        }
-    }
-
-    public void SyncPath(List<SpriteRenderer> _objList, List<string> _pathList)
-    {
-        _pathList.Clear();
-        for(var i = 0 ; i < _objList.Count ; i++)
-        {
-            if(_objList[i].sprite !=null) 
-            {
-                string gPath = AssetDatabase.GetAssetPath(_objList[i].sprite);
-                _pathList.Add(gPath);
-            }
-            else
-            {
-                _pathList.Add("");
-            }
-        }
-    }
-
-    public int editObjNum;
+    //프리펩 수정 부분
     public void EditPrefabs()
     {
-        if(editObjNum!=-1)
+        var SpumPreviewUnit = PreviewPrefab;
+
+        string prefabCode = SpumPreviewUnit._code;
+
+        SPUM_Prefabs PreviewUnit = SpumPreviewUnit.GetComponent<SPUM_Prefabs>();
+
+        //SpumPreviewUnit._code = prefabName;
+        SpumPreviewUnit._version = _version;
+        //SpumPreviewUnit.EditChk = false;
+
+        GameObject prefabs = Instantiate(SpumPreviewUnit.gameObject);
+        SPUM_Prefabs SpumUnitData = prefabs.GetComponent<SPUM_Prefabs>();
+        SpumUnitData.ImageElement = SpumPreviewUnit.ImageElement;
+        SpumUnitData.spumPackages = SpumPreviewUnit.spumPackages;
+
+        // 비활성화된 오브젝트 삭제하기
+        var inactiveObjects = prefabs.transform.Cast<Transform>()
+            .Where(child => !child.gameObject.activeInHierarchy)
+            .Select(child => child.gameObject)
+            .ToList();
+
+        inactiveObjects.ForEach(DestroyImmediate);
+
+        prefabs.transform.localScale = Vector3.one;
+        SpumUnitData._anim = prefabs.GetComponentInChildren<Animator>();
+        SpumUnitData._anim.runtimeAnimatorController = SPUM_AnimatorDic[SpumPreviewUnit.UnitType];
+
+        var sourcePath = AssetDatabase.GetAssetPath(EditPrefab);
+        Debug.Log(sourcePath);
+        if(string.IsNullOrWhiteSpace(sourcePath)) 
         {
-            string prefabName = _unitCode.text;
-
-            SPUM_Prefabs ttObjST = _unitObjSet.GetComponent<SPUM_Prefabs>();
-            ttObjST._code = prefabName;
-            ttObjST._version = _version;
-            ttObjST.EditChk = false;
-
-            SPUM_SpriteList tSpST = ttObjST._spriteOBj;
-            SyncPath(tSpST._hairList,tSpST._hairListString);
-            SyncPath(tSpST._clothList,tSpST._clothListString);
-            SyncPath(tSpST._armorList,tSpST._armorListString);
-            SyncPath(tSpST._pantList,tSpST._pantListString);
-            SyncPath(tSpST._weaponList,tSpST._weaponListString);
-            SyncPath(tSpST._backList,tSpST._backListString);
-
-            GameObject tSObj = Instantiate(_unitObjSet.gameObject);
-            List<GameObject> tLObj = new List<GameObject>();
-            for(var i = 0 ; i < tSObj.transform.childCount;i++)
-            {
-                if(!tSObj.transform.GetChild(i).gameObject.activeInHierarchy)
-                {
-                    tLObj.Add(tSObj.transform.GetChild(i).gameObject);
-                }
-            }
-
-            if(tLObj.Count>0)
-            {
-                foreach(var obj in tLObj) 
-                {
-                    DestroyImmediate(obj);
-                }
-            }
-
-            GameObject tObj = PrefabUtility.SaveAsPrefabAsset(tSObj,unitPath+prefabName+".prefab");
-            DestroyImmediate(tSObj);
-
-            _prefabUnitList[editObjNum] = tObj;
-
-            ttObjST._code = "";
-            ttObjST.EditChk = true;
-
-            ToastOn("Edited Unit Object " + prefabName);
-            NewMake();
+            sourcePath = Path.Combine(unitPath,SpumUnitData._code );
         }
+        var FileName = sourcePath.Split("/");
+        var path = isSaveSamePath ? sourcePath.Replace(FileName[FileName.Length-1], "") : unitPath;
+        SpumUnitData.PopulateAnimationLists();
+        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs,path+SpumUnitData._code+".prefab");
+        // //GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset( prefabs, unitPath + prefabCode + ".prefab" );
+        // var Prefab = SavePrefab.GetComponent<SPUM_Prefabs>();
+        // Prefab.PopulateAnimationLists();
+        DestroyImmediate(prefabs);
+
+        PreviewUnit._code = "";
+        UIManager.ResetUniqueID();
+        //PreviewUnit.EditChk = true;
+
+        UIManager.ToastOn("Edited Unit Object Unit" + prefabCode);
+
+        NewMake();
     }
-
-    public string GetFileName()
-    {
-        string tName ="Unit";
-        int tNameNum = 0;
-        List<string> _prefabNameList = new List<string>();
-        for(var i = 0 ; i < _prefabUnitList.Count;i++)
-        {
-            _prefabNameList.Add(_prefabUnitList[i].name);
-        }
-
-        for(var i = 0; i < 10000; i++)
-        {
-            if(_prefabNameList.Contains(tName+i.ToString("D3")) == false)
-            {
-                tNameNum = i;
-                break;
-            }
-        }
-        
-        tName = tName + tNameNum.ToString("D3");
-        return tName;
-    }
-
 
     public void NewMake()
     {
-        _unitCode.text = GetFileName();
-        LoadButtonSet(false);
-        SetInit();
+        ItemResetAll();
+        EditPrefab = null;
+        //UIManager._unitCode.text = UIManager.GetFileName();
+        UIManager.LoadButtonSet(false);
+        animationManager.CloseAnimationPanels();
+        UIManager.CloseColorPick();
+        animationManager.InitPreviewUnitPackage();
+        ResetBody();
     }
-
-    public GameObject _loadObjCanvas;
-    public Transform _loadPool;
-    public List<GameObject> _buttonList = new List<GameObject>();
-
+    //프리팹 프리펩 리스트 불러오기
     public void OpenLoadData()
     {
-        if(_prefabUnitList.Count == 0)
-        {
-            ToastOn("There is no any saved Unit");
-            return;
-        }
+        // 애니메이션 패널 닫기
+        animationManager.CloseAnimationPanels();
+        animationManager.InitializeDropdown();
+        // 로드 오브젝트 캔버스 활성화
+        paginationManager.LoadPrefabs();
 
-        if(_loadPool.childCount > 0)
+        UIManager.SetActiveLoadPanel(true);
+    }
+    public List<PreviewMatchingElement> DebugList = new List<PreviewMatchingElement>();
+    public List<string> MissingPackageNames = new List<string>();
+    public SPUM_Prefabs previewUnit;
+    public void SetUnitConverter(string Type)
+    {
+        int UnitBodyCount = DebugList.Count(element => element.PartType == "Body");
+        if(UnitBodyCount < 6)
         {
-            for(var i=0; i < _loadPool.childCount;i++)
+            DebugList.AddRange(DefaultData("Unit", "Body", "Human_1", Color.white));
+        }
+        UIManager.ConvertView.WarningText.SetActive(UnitBodyCount < 6);
+        //Debug.Log("UnitBodyCount " + UnitBodyCount);
+        int UnitEyeCount = DebugList.Count(element => element.PartType == "Eye");
+        UIManager.ConvertView.WarningEyeText.SetActive(UnitEyeCount < 2);
+        if(UnitEyeCount < 2){
+            DebugList.AddRange(DefaultData("Unit", "Eye", "Eye0", new Color32(71, 26,26, 255)));
+        }
+        var DistinctPackageList = MissingPackageNames.Distinct().ToList();
+        MissingPackageNames = DistinctPackageList;
+
+        UIManager.ConvertView.MissingPackageNames.transform.parent.gameObject.SetActive(MissingPackageNames.Count > 0);
+        if(MissingPackageNames.Count > 0){
+            string Text = "";
+            foreach (var item in MissingPackageNames)
             {
-                Destroy(_loadPool.GetChild(i).gameObject);
+                Text += "\n-" + item ;
+            }
+           
+            string format = $"Missing\nPackages\n--------------{ Text }";
+            UIManager.ConvertView.MissingPackageNames.text = format;
+        }
+        var containUnitTypes = DebugList
+        .Select(e => e.UnitType)
+        .Distinct()
+        .ToList();
+        bool shouldActivate = containUnitTypes.Any(unitType => unitType.Contains("Horse"));
+        if(shouldActivate) Type = "Horse";
+        previewUnit.UnitType = Type;
+        foreach (Transform child in previewUnit.transform)
+        {
+            child.gameObject.SetActive(child.name.Contains(Type));
+        }
+        var anim = previewUnit.GetComponentInChildren<Animator>();
+        previewUnit._anim = anim;
+
+        var matchingTables = previewUnit.GetComponentsInChildren<SPUM_MatchingList>(true);
+        var allMatchingElements = matchingTables.SelectMany(mt => mt.matchingTables).ToList();
+        foreach (var matchingElement in allMatchingElements)
+        {
+            if (matchingElement.renderer != null)
+            {
+                matchingElement.renderer.sprite = null;
+                matchingElement.renderer.maskInteraction = SpriteMaskInteraction.None;
+                matchingElement.renderer.color = Color.white;
+                matchingElement.ItemPath = "";
+                matchingElement.Color = Color.white;
+            }
+        }
+        foreach (var matchingElement in allMatchingElements)
+        {
+            var matchingTypeElement = DebugList.FirstOrDefault(ie => 
+            (ie.UnitType == matchingElement.UnitType)
+            && (ie.PartType == matchingElement.PartType)
+            //&& ie.Index == matchingElement.Index
+            && (ie.Dir == matchingElement.Dir)
+            && (ie.Structure == matchingElement.Structure) 
+            && ie.PartSubType == matchingElement.PartSubType
+            );
+            //Debug.Log(matchingTypeElement != null);
+            if (matchingTypeElement != null)
+            {
+                var LoadSprite = LoadSpriteFromMultiple(matchingTypeElement.ItemPath , matchingTypeElement.Structure);
+                matchingElement.renderer.sprite = LoadSprite;
+                matchingElement.renderer.maskInteraction = (SpriteMaskInteraction)matchingTypeElement.MaskIndex;
+                matchingElement.renderer.color = matchingTypeElement.Color; 
+                matchingElement.ItemPath = matchingTypeElement.ItemPath;
+                matchingElement.MaskIndex = matchingTypeElement.MaskIndex;
+                matchingElement.Color = matchingTypeElement.Color;
+                //Debug.Log( matchingTypeElement.PartType + "/" + matchingTypeElement.Color);
             }
         }
 
-        _prefabUnitList = _prefabUnitList.OrderBy(go=>go.name).ToList();
 
-        for ( var j = 0 ; j < _prefabUnitList.Count ; j++)
-        {
-            GameObject tObj = _prefabUnitList[j];
-            SPUM_SpriteList tObjST = tObj.GetComponent<SPUM_Prefabs>()._spriteOBj;
+        previewUnit.ImageElement = DebugList;
 
-            GameObject ttObj = Instantiate(_childItem) as GameObject;
-            ttObj.transform.SetParent(_loadPool);
-            ttObj.transform.localScale = new Vector3(1,1,1);
-
-            SPUM_PreviewItem ttObjST = ttObj.GetComponent<SPUM_PreviewItem>();
-            ttObjST.ShowObj(5);
-            //아이템 연동 부분
-            ttObjST._fullSetList[0].sprite = tObjST._bodyList[0].sprite;
-            if(tObjST._bodyList[0].sprite!=null) ttObjST._fullSetList[0].color = tObjST._bodyList[0].color;
-            ttObjST._fullSetList[1].sprite = tObjST._bodyList[1].sprite;
-            if(tObjST._bodyList[1].sprite!=null) ttObjST._fullSetList[1].color = tObjST._bodyList[1].color;
-            ttObjST._fullSetList[2].sprite = tObjST._bodyList[2].sprite;
-            if(tObjST._bodyList[2].sprite!=null) ttObjST._fullSetList[2].color = tObjST._bodyList[2].color;
-            ttObjST._fullSetList[3].sprite = tObjST._bodyList[3].sprite;
-            if(tObjST._bodyList[3].sprite!=null) ttObjST._fullSetList[3].color = tObjST._bodyList[3].color;
-            ttObjST._fullSetList[4].sprite = tObjST._bodyList[4].sprite;
-            if(tObjST._bodyList[4].sprite!=null) ttObjST._fullSetList[4].color = tObjST._bodyList[4].color;
-            ttObjST._fullSetList[5].sprite = tObjST._bodyList[5].sprite;
-            if(tObjST._bodyList[5].sprite!=null) ttObjST._fullSetList[5].color = tObjST._bodyList[5].color;
-
-            ttObjST._fullSetList[6].sprite = tObjST._eyeList[0].sprite;
-            if(tObjST._eyeList[0].sprite!=null) ttObjST._fullSetList[6].color = tObjST._eyeList[0].color;
-            ttObjST._fullSetList[7].sprite = tObjST._eyeList[0].sprite;
-            if(tObjST._eyeList[0].sprite!=null) ttObjST._fullSetList[7].color = tObjST._eyeList[0].color;
-
-            ttObjST._fullSetList[8].sprite = tObjST._hairList[3].sprite;
-            if(tObjST._hairList[3].sprite!=null) ttObjST._fullSetList[8].color = tObjST._hairList[3].color;
-            ttObjST._fullSetList[9].sprite = tObjST._hairList[0].sprite;
-            if(tObjST._hairList[0].sprite!=null) ttObjST._fullSetList[9].color = tObjST._hairList[0].color;
-            ttObjST._fullSetList[10].sprite = tObjST._hairList[1].sprite;
-            if(tObjST._hairList[1].sprite!=null) ttObjST._fullSetList[10].color = tObjST._hairList[1].color;
-
-            ttObjST._fullSetList[11].sprite = tObjST._clothList[0].sprite;
-            if(tObjST._clothList[0].sprite!=null) ttObjST._fullSetList[11].color = tObjST._clothList[0].color;
-            ttObjST._fullSetList[12].sprite = tObjST._clothList[1].sprite;
-            if(tObjST._clothList[1].sprite!=null) ttObjST._fullSetList[12].color = tObjST._clothList[1].color;
-            ttObjST._fullSetList[13].sprite = tObjST._clothList[2].sprite;
-            if(tObjST._clothList[2].sprite!=null) ttObjST._fullSetList[13].color = tObjST._clothList[2].color;
-
-            ttObjST._fullSetList[14].sprite = tObjST._armorList[0].sprite;
-            if(tObjST._armorList[0].sprite!=null) ttObjST._fullSetList[14].color = tObjST._armorList[0].color;
-            ttObjST._fullSetList[15].sprite = tObjST._armorList[1].sprite;
-            if(tObjST._armorList[1].sprite!=null) ttObjST._fullSetList[15].color = tObjST._armorList[1].color;
-            ttObjST._fullSetList[16].sprite = tObjST._armorList[2].sprite;
-            if(tObjST._armorList[2].sprite!=null) ttObjST._fullSetList[16].color = tObjST._armorList[2].color;
-
-            ttObjST._fullSetList[17].sprite = tObjST._pantList[0].sprite;
-            if(tObjST._pantList[0].sprite!=null) ttObjST._fullSetList[17].color = tObjST._pantList[0].color;
-            ttObjST._fullSetList[18].sprite = tObjST._pantList[1].sprite;
-            if(tObjST._pantList[1].sprite!=null) ttObjST._fullSetList[18].color = tObjST._pantList[1].color;
-
-            ttObjST._fullSetList[19].sprite = tObjST._weaponList[0].sprite;
-            if(tObjST._weaponList[0].sprite!=null) ttObjST._fullSetList[19].color = tObjST._weaponList[0].color;
-            ttObjST._fullSetList[20].sprite = tObjST._weaponList[1].sprite;
-            if(tObjST._weaponList[1].sprite!=null) ttObjST._fullSetList[20].color = tObjST._weaponList[1].color;
-
-            ttObjST._fullSetList[21].sprite = tObjST._weaponList[2].sprite;
-            if(tObjST._weaponList[2].sprite!=null) ttObjST._fullSetList[21].color = tObjST._weaponList[2].color;
-            ttObjST._fullSetList[22].sprite = tObjST._weaponList[3].sprite;
-            if(tObjST._weaponList[3].sprite!=null) ttObjST._fullSetList[22].color = tObjST._weaponList[3].color;
-
-            ttObjST._fullSetList[23].sprite = tObjST._backList[0].sprite;
-            if(tObjST._backList[0].sprite!=null) ttObjST._fullSetList[23].color = tObjST._backList[0].color;
-
-            //string 연동
-
+        
+        //애니메이션 경로 체크
+        if(previewUnit.spumPackages.Count > 0){
+            bool clipPathExists = true;
+            var ClipList = previewUnit.spumPackages.SelectMany(package => package.SpumAnimationData).ToList();
             
-            //색연동
-            if(!tObjST._eyeList[0].gameObject.activeInHierarchy) 
+            foreach (var clip in ClipList)
             {
-                ttObjST._fullSetList[6].gameObject.SetActive(true);
-                ttObjST._fullSetList[7].gameObject.SetActive(true);
-            }
-            else
-            {
-                // ttObjST._fullSetList[6].gameObject.SetActive(false);
-                // ttObjST._fullSetList[7].gameObject.SetActive(false);
-            }
+                clipPathExists = ValidateAnimationClips(clip);
+                if(!clipPathExists){
+                    // 패키지 네임 // 애니메이션 타입 // 애니메이션 이름
+                    var dataArray = clip.ClipPath.Split("/");
 
-            if(!tObjST._hairList[3].gameObject.activeInHierarchy)
-            {
-                ttObjST._fullSetList[8].gameObject.SetActive(true);
-                ttObjST._fullSetList[8].color = tObjST._hairList[3].color;
-            }
-            else
-            {
-                ttObjST._fullSetList[8].gameObject.SetActive(false);
-            }
-
-            if(!tObjST._hairList[0].gameObject.activeInHierarchy)
-            {
-                ttObjST._fullSetList[9].gameObject.SetActive(true);
-                ttObjST._fullSetList[9].color = tObjST._hairList[0].color;
-            }
-            else
-            {
-                ttObjST._fullSetList[9].gameObject.SetActive(true);
-            }
-
-            for(var i = 0 ; i < ttObjST._fullSetList.Count; i++)
-            {
-                ttObjST._fullSetList[i].SetNativeSize();
-                if(ttObjST._fullSetList[i].sprite != null)
-                {
-                    ttObjST._fullSetList[i].gameObject.SetActive(true);
-                    ttObjST._fullSetList[i].rectTransform.pivot =  new Vector2(ttObjST._fullSetList[i].sprite.pivot.x/ttObjST._fullSetList[i].sprite.rect.width,ttObjST._fullSetList[i].sprite.pivot.y/ttObjST._fullSetList[i].sprite.rect.height);
-                }
-                else ttObjST._fullSetList[i].gameObject.SetActive(false);
-            }
-
-            // 말 데이터가 있는지.
-            if(tObj.GetComponent<SPUM_Prefabs>()._horse)
-            {
-                ttObjST._objList[7].SetActive(true);
-
-                string tPath = tObj.GetComponent<SPUM_Prefabs>()._horseString;
-                Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(tPath);
-                var sortedList = sprites.OrderBy(go=>go.name).ToList();
-
-                ttObjST._horseList[14].gameObject.SetActive(false);
-                ttObjST._horseList[15].gameObject.SetActive(false);
-                ttObjST._horseList[16].gameObject.SetActive(false);
-                for(var k = 0 ; k < sortedList.Count;k++)
-                {
-                    if(sortedList[k].GetType() == typeof(Sprite))
+                    var PackageDataName = dataArray[0];
+                    if(PackageDataName.Equals("Addons")){
+                        PackageDataName = dataArray[1];
+                    }
+                    var PackageNameExist = SpritePackageNameList.Contains(PackageDataName);
+                    if(!PackageNameExist)
                     {
-                        switch(sortedList[k].name)
-                        {
-                            case "Head":
-                            ttObjST._horseList[0].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[0].SetNativeSize();
-                            break;
-
-                            case "Neck":
-                            ttObjST._horseList[1].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[0].SetNativeSize();
-                            break;
-
-                            case "BodyFront":
-                            ttObjST._horseList[2].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[2].SetNativeSize();
-                            break;
-
-                            case "BodyBack":
-                            ttObjST._horseList[3].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[3].SetNativeSize();
-                            break;
-
-                            case "FootFrontTop":
-                            ttObjST._horseList[4].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[4].SetNativeSize();
-                            ttObjST._horseList[5].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[5].SetNativeSize();
-                            break;
-
-                            case "FootFrontBottom":
-                            ttObjST._horseList[6].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[6].SetNativeSize();
-                            ttObjST._horseList[7].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[7].SetNativeSize();
-                            break;
-
-                            case "FootBackTop":
-                            ttObjST._horseList[8].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[8].SetNativeSize();
-                            ttObjST._horseList[9].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[9].SetNativeSize();
-                            break;
-
-                            case "FootBackBottom":
-                            ttObjST._horseList[10].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[10].SetNativeSize();
-                            ttObjST._horseList[11].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[11].SetNativeSize();
-                            break;
-
-                            case "Tail":
-                            ttObjST._horseList[12].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[12].SetNativeSize();
-                            break;
-
-                            case "Acc":
-                            ttObjST._horseList[13].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[13].SetNativeSize();
-                            break;
-
-                            case "Acc2":
-                            ttObjST._horseList[14].gameObject.SetActive(true);
-                            ttObjST._horseList[14].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[14].SetNativeSize();
-                            break;
-
-                            case "Acc3":
-                            ttObjST._horseList[15].gameObject.SetActive(true);
-                            ttObjST._horseList[15].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[15].SetNativeSize();
-                            break;
-
-                            case "Acc4":
-                            ttObjST._horseList[16].gameObject.SetActive(true);
-                            ttObjST._horseList[16].sprite = (Sprite)sortedList[k];
-                            ttObjST._horseList[16].SetNativeSize();
-                            break;
-                        }
+                        //Debug.Log("MissingPackage");
+                        MissingPackageNames.Add(PackageDataName);
+                    }
+                    var PackageName = PackageNameExist ? PackageDataName : "";
+                    var ClipName = dataArray[dataArray.Length-1];
+                    var ExtractList = ExtractTextureData(PackageName, clip.UnitType, clip.StateType, ClipName);
+                    var data = ExtractList.FirstOrDefault();
+                    if(data != null){
+                    Debug.Log($" Package {PackageNameExist} {PackageName} {ClipName} {data.Name} {data.Path}");
+                        
+                        clip.ClipPath = data.Path;
                     }
                 }
             }
+
+        }else{
+            //애니메이션 데이터 초기화
+            previewUnit.spumPackages = GetSpumLegacyData();
+        }
+    }
+    public bool ValidateAnimationClips(SpumAnimationClip clipData)
+    {
+        bool clipPathExists = true;
+        // #if UNITY_EDITOR
+        // var asset = AssetDatabase.LoadAssetAtPath<AnimationClip>(clipData.ClipPath.Replace(".anim", ""));
+        // if (asset == null)
+        // {
+        //     Debug.LogWarning($"Failed to load animation clip '{clipData.ClipPath}'.");
+        //     clipPathExists = false;
+        // }
+        // #else
+        
+        AnimationClip LoadClip = Resources.Load<AnimationClip>(clipData.ClipPath.Replace(".anim", ""));
+        
+        if (LoadClip == null)
+        {
+            Debug.LogWarning($"Failed to load animation clip '{clipData.ClipPath}'.");
+            clipPathExists = false;
+        }
+        return clipPathExists;
+    }
+    
+    public SPUM_Prefabs SaveConvertPrefabs(UnityEngine.Object asset)
+    {
+        var SpumPreviewUnit = PreviewPrefab;
+        string prefabName = UIManager._unitCode.text;
+
+        SpumPreviewUnit._code = prefabName;
+        //SpumPreviewUnit.EditChk = false;
+        
+        GameObject prefabs = Instantiate(previewUnit.gameObject);
+        SPUM_Prefabs SpumUnitData = prefabs.GetComponent<SPUM_Prefabs>();
+        SpumUnitData.ImageElement = DebugList;
+        SpumUnitData.spumPackages = SpumPreviewUnit.spumPackages;
+        // 비활성화된 오브젝트 삭제하기
+        
+        prefabs.transform.localScale = Vector3.one;
+        prefabs.transform.position = Vector3.zero;
+        SpumUnitData._version = _version;
+        var UniqueID = System.DateTime.Now.ToString("yyyyMMddHHmmssfff");
+        SpumUnitData._code = "SPUM" + "_" + UniqueID;
+        SpumUnitData._anim.Rebind();
+        var sourcePath = AssetDatabase.GetAssetPath(asset);
+        var FileName = sourcePath.Split("/");
+        var path = isSaveSamePath ? sourcePath.Replace(FileName[FileName.Length-1], "") : unitPath;
+        Debug.Log(sourcePath.Replace(asset.name+".prefab", "").Replace(asset.name+".Prefab", "")  );
+        GameObject SavePrefab = PrefabUtility.SaveAsPrefabAsset(prefabs,path+SpumUnitData._code+".prefab");
+        DestroyImmediate(prefabs);
+        AssetDatabase.Refresh();
+        UIManager.ToastOn("Saved Unit Object " + prefabName);
+        //초기화
+        SpumPreviewUnit._code = "";
+        DebugList.Clear();
+        var Prefab = SavePrefab.GetComponent<SPUM_Prefabs>();
+        Prefab.PopulateAnimationLists();
+        return Prefab;
+        
+    }
+    public void MoveOldPrefabBackup(UnityEngine.Object asset)
+    {
+        var sourcePath = AssetDatabase.GetAssetPath(asset);
+        if (!Directory.Exists(unitBackUpPath))
+        {
+            Directory.CreateDirectory(unitBackUpPath);
+            AssetDatabase.Refresh();
+            Debug.Log("Folder created at: " + unitBackUpPath);
+        }  
+        var destinationPath = unitBackUpPath+asset.name+"_Backup.Prefab";
+        AssetDatabase.MoveAsset(sourcePath, destinationPath);
+        AssetDatabase.Refresh();
+    }
+    public List<PreviewMatchingElement> SetLegacyHorseData(){
+        string PackageName = "Legacy";
+        string UnitType = "Horse";
+        string PartType = "Body";
+        string TextureName = "Horse1";
+        //패키지 구룹화
+        var groupedData = spumPackages
+            .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
+            .Where(x => x.Texture.PartType.Equals(PartType) && x.Texture.UnitType.Equals(UnitType) && x.Package.Name.Equals(PackageName) && x.Texture.Name.Equals(TextureName))
+            .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 그룹 키
+            .Select(g => new 
+            { 
+                Key = g.Key, 
+                Items = g.ToList() 
+            })
+            .ToList();
+
+        var randomGroup = groupedData[0];
+
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var item in randomGroup.Items)
+        {
+            //Debug.Log($"Path: {PartType}, SubType: { item.Texture.SubType}");
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.PartSubType = item.Texture.PartSubType;
+            part.Dir = "";
+            part.ItemPath = item.Texture.Path;
+            part.Structure = item.Texture.SubType.Equals(item.Texture.Name) ? PartType : item.Texture.SubType;
+            part.MaskIndex = 0;
+            part.Color = Color.white;
+
+            ListElement.Add(part);
+        }
+        return ListElement;
+    }
+    public (int, List<PreviewMatchingElement>) ValidateSpumFile(SPUM_Prefabs PrefabObject)
+    {
+        var SpumPrefab = PrefabObject;
+        var version = SpumPrefab._version;
+        var UnitType =  SpumPrefab.UnitType;
+        var MatchingList = SpumPrefab.GetComponentsInChildren<SPUM_MatchingList>();
+        bool isMatchingListExist = MatchingList != null || MatchingList.Length > 0; // 2.0 시스템
+        bool isVersionSame = SpumPrefab._version == version;
+        var NewDataListElement = new List<PreviewMatchingElement>();
+        var OldData = SpumPrefab.GetComponentInChildren<SPUM_SpriteList>(); // 1.0 시스템
+        if(OldData == null) {
+            //DebugList.AddRange(PrefabObject.ImageElement);
+            return (2, PrefabObject.ImageElement);
+        }
+        var horseString = OldData._spHorseString;
+
+        var path = AssetDatabase.GetAssetPath(PrefabObject);
+        Debug.Log(path);
+        bool HorseExist = !string.IsNullOrWhiteSpace(horseString);
+        // var horseList = OldData._spHorseSPList._spList;
+        // var HorseBodySet = new List<PreviewMatchingElement>();
+        // foreach (var renderer in horseList)
+        // {
+        //     HorseBodySet.AddRange(StringToSpumElementList("Horse", (horseString, renderer)));
+        // }
+        // NewDataListElement.AddRange(HorseBodySet);
+        if(HorseExist){
+            var horseReset = SetLegacyHorseData();
+            NewDataListElement.AddRange(horseReset);
+        }
+
+        string Unitype = "Unit";
+
+        // 메인 바디 
+        
+
+
+        var hairString = OldData._hairListString;
+        var hairList = OldData._hairList;
+        var TuppleHair = CreateTupleList(hairString, hairList);
+        //LoopStringColor(TuppleHair);
+        var MaskSet = new List<PreviewMatchingElement>();
+        foreach (var tuple in TuppleHair)
+        {
+            // 투구 및 헤어
+            MaskSet.AddRange(StringToSpumElementList(Unitype, tuple));
+        }
+        //Debug.Log("count " + MaskSet.Count);
+        List<string> requiredPartTypes = new List<string> { "Hair", "Helmet"};
+        bool result = requiredPartTypes.All(partType => MaskSet.Any(element => element.PartType == partType));
+        if(result) 
+        {
+            foreach (var item in MaskSet)
+            {
+                if(item.PartType.Equals("Hair")) item.MaskIndex = 1;
+            }
+        }
+
+        NewDataListElement.AddRange(MaskSet);
+        var clothString = OldData._clothListString;
+        var clothList = OldData._clothList;
+        var TuppleCloth = CreateTupleList(clothString, clothList);
+        foreach (var tuple in TuppleCloth)
+        {
+            NewDataListElement.AddRange(StringToSpumElementList(Unitype, tuple));
+        }
+
+        var armorString = OldData._armorListString;
+        var armorList = OldData._armorList;
+        var TuppleArmor = CreateTupleList(armorString, armorList);
+        foreach (var tuple in TuppleArmor)
+        {
+            NewDataListElement.AddRange(StringToSpumElementList(Unitype, tuple));
+        }
+
+        var pantString = OldData._pantListString;
+        var pantList = OldData._pantList;
+        var TupplePant = CreateTupleList(pantString, pantList);
+        foreach (var tuple in TupplePant)
+        {
+            NewDataListElement.AddRange(StringToSpumElementList(Unitype, tuple));
+        }
+
+        var weaponString = OldData._weaponListString;
+        var weaponList = OldData._weaponList;
+        var TuppleWeapon = CreateTupleList(weaponString, weaponList);
+        foreach (var tuple in TuppleWeapon)
+        {
+            // 예외 케이스 설정 / 왼쪽 오른쪽
+            var WeaponsData = StringToSpumElementList(Unitype, tuple);
+            NewDataListElement.AddRange(WeaponsData);
+        }
+
+        var backString = OldData._backListString;
+        var backList = OldData._backList;
+        var TuppleBack = CreateTupleList(backString, backList);
+        foreach (var tuple in TuppleBack)
+        {
+            NewDataListElement.AddRange(StringToSpumElementList(Unitype, tuple));
+        }
+
+
+
+        var bodyString = OldData._bodyString;
+        var bodyList = OldData._bodyList;
+        var BodySet = new List<PreviewMatchingElement>();
+        foreach (var renderer in bodyList)
+        {
+            BodySet.AddRange(StringToSpumElementList(Unitype, (bodyString, renderer)));
+        }
+        // if(!BodySet.Count.Equals(6))
+        // {
+        //     BodySet.AddRange(DefaultData("Unit", "Body", "Human_1", Color.white));
+        // }
+        // UIManager.ConvertView.WarningText.SetActive(BodySet.Count < 6);
+        //Debug.Log(BodySet.Count + " ======= Body Count");
+        NewDataListElement.AddRange(BodySet);
+
+        //DefaultData("Unit", "Eye", "Eye0", new Color32(71, 26,26, 255));
+        var eyeString = "";
+        var eyeList = OldData._eyeList; 
+        var EyeColorSet = new List<PreviewMatchingElement>();
+        foreach (var renderer in eyeList)
+        {
+            EyeColorSet.AddRange(StringToSpumElementList(Unitype, (eyeString, renderer)));
+        }
+    
+        var EyeDistict = EyeColorSet.Distinct().GroupBy(x => new { x.Structure }).Select(g => g.First()).ToList();
+        //Debug.Log(EyeDistict.Count + " ======= EyeDistict Count");
+        // UIManager.ConvertView.WarningEyeText.SetActive(EyeDistict.Count.Equals(0));
+        // if(EyeDistict.Count.Equals(0)){
+        //     EyeDistict.AddRange(DefaultData("Unit", "Eye", "Eye0", new Color32(71, 26,26, 255)));
+        // }
+        foreach (var item in EyeDistict)
+        {
+            foreach (var sprite in eyeList)
+            {
+                if(sprite.name.Equals(item.Structure)) 
+                { 
+                    item.Color = sprite.color; 
+                }
+            }
+        }
+        // foreach (var item in EyeDistict)
+        // {
+        //     if(item.PartType.Equals("Eye")) Debug.Log(item.Color);
+        // }
+        NewDataListElement.AddRange(EyeDistict);
+        //Debug.Log("Unit? " + string.IsNullOrWhiteSpace(horseString));
+        
+        var distinct = NewDataListElement.Distinct()
+        .GroupBy(x => new { x.UnitType, x.PartType, x.Structure, x.Dir })
+            .Select(g => g.First())
+            .ToList();
+        //Debug.Log( " distinct.Count " + distinct.Count);
+        //DebugList.AddRange(distinct);
+        return (1, distinct);
+        // 버전이 다르거나, 구조가 다르거나, 컴포넌트가 없거나 
+        // 체크 유닛 타입
+        // 체크 패키지 버전
+        // 재구축
+        //GameObject prefabs = Instantiate(SpumPreviewUnit.gameObject);
+        // GameObject tObj = PrefabUtility.SaveAsPrefabAsset(prefabs,unitPath+prefabName+".prefab");
+        // DestroyImmediate(prefabs);
+    }
+    public List<PreviewMatchingElement> DefaultData(string UnitType, string PartType, string TextureName, Color color)
+    {
+        string PackageName ="Legacy";
+        //패키지 구룹화
+        var groupedData = spumPackages
+            .SelectMany(p => p.SpumTextureData.Select(t => new { Package = p, Texture = t }))
+            .Where(x => x.Texture.PartType.Equals(PartType) && x.Texture.UnitType.Equals(UnitType) && x.Package.Name.Equals(PackageName) && x.Texture.Name.Equals(TextureName))
+            .GroupBy(x => new { x.Texture.PartType, x.Texture.Name, x.Texture.UnitType }) // 그룹 키
+            .Select(g => new 
+            { 
+                Key = g.Key, 
+                Items = g.ToList() 
+            })
+            .ToList();
+
+        var randomGroup = groupedData[0];
+
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var item in randomGroup.Items)
+        {
+            //Debug.Log($"Path: {PartType}, SubType: { item.Texture.SubType}");
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.PartSubType = item.Texture.PartSubType;
+            part.Dir = "";
+            part.ItemPath = item.Texture.Path;
+            part.Structure = item.Texture.SubType.Equals(item.Texture.Name) ? PartType : item.Texture.SubType; // item.Texture.SubType.Equals(item.Texture.Name) ? PartType : item.Texture.SubType;
+            part.MaskIndex = 0;
+            part.Color = color;
+
+            ListElement.Add(part);
+        }
+        return ListElement;
+    }
+    public List<PreviewMatchingElement> StringToSpumElementList(string UnitType, (string, SpriteRenderer) Tuple)
+    {
+        var PartPath = Tuple.Item1;
+        string unitType = UnitType;
+        //bool isPackage = PartPath.Contains("Packages");
+        string PackageName = "Legacy";
+        string pattern = @"Packages\/([^\/]+)\/";
+        // 패키지는 없지만 이미지 이름은 있는 경우
+        bool isPackage = false;
+        
+        System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(PartPath, pattern);
+        if (match.Success)
+        {
+            PackageName = match.Groups[1].Value;
+            isPackage = true;
+        }
+        if(PackageName.Equals("Heroes")) PackageName = "RetroHeroes";
+        bool missingPackage = isPackage && !SpritePackageNameList.Contains(PackageName);
+        if(missingPackage)
+        {
+            //예외 처리
             
-            ttObjST._name = _prefabUnitList[j].name;
-            ttObjST._managerST = this;
-            ttObjST._itemType = 11;
-            ttObjST._index = j;
-            ttObjST.DeleteButton.SetActive(true);
+            //Debug.Log("MissingPackage");
+            MissingPackageNames.Add(PackageName);
         }
-        _loadObjCanvas.SetActive(true);
-    }
 
-    public void CloseLoadData()
-    {
-        _loadObjCanvas.SetActive(false);
-    }
+        // 경로가 없지만 이미지 리소스는 있는경우 , 패키지 이름은 매칭되지만 패키지 리스트에 없는 경우
+        if( ((PartPath == "") && (Tuple.Item2.sprite != null)) || missingPackage){
+            var path = AssetDatabase.GetAssetPath(Tuple.Item2.sprite);
+            //Assets/SPUM/Resources/Elf/0_Unit/0_Sprite/0_Body/New_Elf_1.png
+            PartPath = path;
+            //Debug.Log(path);
+            string pattern2 = @"Addons\/(.*?)\/0_Unit";
 
-    public void LoadButtonSet(bool value)
-    {
-        _buttonList[0].SetActive(!value);
-        _buttonList[1].SetActive(value);
-    }
-
-    public void LoadUnitDataName(int index)
-    {
-        SPUM_Prefabs tPrefabST = _prefabUnitList[index].GetComponent<SPUM_Prefabs>();
-        SPUM_SpriteList tObjST = tPrefabST._spriteOBj;
-        if(tObjST._spHorseSPList !=null)
-        {
-            SetHorse(true,tObjST._spHorseString);
-        }
-        else
-        {
-            SetHorse(false,null);
-        }
-        _spriteObj.LoadSprite(tObjST);
-        _unitCode.text = (_prefabUnitList[index].name).Split('.')[0];
-
-        //데이터 유효성 체크
-        if(tPrefabST._version == 0 || tPrefabST._version < _version)
-        {
-            //버젼이 존재하지 않거나 없으면 Resync 실행
-            tObjST.ResyncData();
-            tPrefabST._version = _version;
-            Debug.Log(unitPath+_prefabUnitList[index].name+".prefab");
-            // GameObject tObj = PrefabUtility.SaveAsPrefabAsset(_unitObjSet.gameObject,unitPath+_prefabUnitList[index].name+".prefab");
+            // 등록된 이미지 리소스 경로로 매칭 시작
+            System.Text.RegularExpressions.Match match2 = System.Text.RegularExpressions.Regex.Match(PartPath, pattern2);
+            if (match2.Success)
+            {
+                PackageName = match2.Groups[1].Value;
+            }
             
+
         }
+        if(string.IsNullOrWhiteSpace(PartPath)) return new List<PreviewMatchingElement>();
+        //var SpriteRendererData = Tuple.Item2;
+        
+
+
+        var PathArray =  PartPath.Split("/");
+        string PartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-2],@"[^a-zA-Z가-힣\s]", "");
+        // if(Tuple.Item1 != "") {
+        //     Debug.Log("=====================" +Tuple.Item1);
+        //     var PathArray2 = Tuple.Item1.Split('/');
+        //     PartType = System.Text.RegularExpressions.Regex.Replace(PathArray2[PathArray2.Length-2],@"[^a-zA-Z가-힣\s]", "");
+        //     Debug.Log("=====================" +PartType);
+        // }
+        string NoNamePackagePartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-3],@"[^a-zA-Z가-힣\s]", "");
+        PartType = PartPath.Contains("BodySource") ? "Body" : NoNamePackagePartType.Equals("Weapons") ? "Weapons" : PartType; // 구 바디 예외
+
+        // string NoNamePackagePartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-2],@"[^a-zA-Z가-힣\s]", "");
+        // PartType = PartPath.Contains("BodySource") ? "Body" :  PartType; // 구 바디 예외
+        string PartName = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-1], @"\..*", "");
+        //Debug.Log(PackageName+"/"+unitType +"/"+ PartType+"/"+PartName + "/" + NoNamePackagePartType);
+        if(NoNamePackagePartType.Equals("BasicResources")) 
+        {
+            PartType = PartType.Replace("Backup", "");
+        }
+        var dir = "";
+        bool isHide = false;
+        if(PartType.Equals("Helmet"))
+        {
+            if(Tuple.Item2.name == "12_Helmet2") { dir = "Front"; isHide = Tuple.Item1 == ""; }
+            if(Tuple.Item2.name == "11_Helmet1") { dir = "Front"; isHide = Tuple.Item1 == ""; }
+        }
+
+
+        if(PartType.Equals("Weapons"))
+        {
+            if(Tuple.Item2.name == "R_Weapon") { dir = "Right"; isHide = Tuple.Item1 == ""; }
+            if(Tuple.Item2.name == "R_Shield") { dir = "Right"; isHide = Tuple.Item1 == ""; }
+            if(Tuple.Item2.name == "L_Weapon") { dir = "Left";  isHide = Tuple.Item1 == ""; }
+            if(Tuple.Item2.name == "L_Shield") { dir = "Left";  isHide = Tuple.Item1 == ""; }
+            // r weapon
+            // r shield
+            // l weapon
+            // l shield
+            //Debug.Log(PartName + "/" +dir);
+        }
+        //Debug.Log(PackageName + " : " + unitType+ " : " + PartType+ " : " + PartName);
+        //패키지 구룹화
+        var ExtractList = ExtractTextureData(PackageName, unitType, PartType, PartName);
+        
+        var ListElement = new List<PreviewMatchingElement>();
+        foreach (var item in ExtractList)
+        {
+            //PartColor = Tuple.Item2.color.Equals(Color.white) ? PartColor : Tuple.Item2.color;
+            //Debug.Log($"{ item.Name } { item.UnitType } { item.PartType } { item.PartSubType }");
+            //Debug.Log($"Path: {PartType}, SubType: { item.SubType}");
+            var part = new PreviewMatchingElement();
+            part.UnitType = UnitType;
+            part.PartType = PartType;
+            part.PartSubType = item.PartSubType;
+            part.Dir = dir;//ButtonData.Direction;
+            part.ItemPath =  isHide ? "" : item.Path;
+            part.Structure = item.SubType.Equals(item.Name) ? PartType : item.SubType;
+            part.MaskIndex = 0;//(int)ButtonData.SpriteMask;
+            part.Color = Tuple.Item2.color;//ButtonData.PartSpriteColor;
+            //Debug.Log(PartType + "/" +Tuple.Item2.color.ToString());
+
+            ListElement.Add(part);
+        }
+        return ListElement;
+    }
+    public List<PreviewMatchingElement> ReSyncSpumElementDataList(List<PreviewMatchingElement> List)
+    {
+        // 패키지 이름 존재 여부 2버전
+        // 패키지 이름이 없으면 불가능 오브젝트로 이동동
+        var ModifiyList = new List<PreviewMatchingElement>();
+        foreach (var oldData in List)
+        {
+            var dataArray = oldData.ItemPath.Split("/");
+
+            var PackageDataName = dataArray[0];
+            if(PackageDataName.Equals("Addons")){
+                PackageDataName = dataArray[1];
+            }
+            var PackageNameExist = SpritePackageNameList.Contains(PackageDataName);
+            if(!PackageNameExist)
+            {
+                //Debug.Log("MissingPackage");
+                MissingPackageNames.Add(PackageDataName);
+            }
+            var PackageName = PackageNameExist ? PackageDataName : "";
+            var PartName = dataArray[dataArray.Length-1];
+            var ExtractList = ExtractTextureData(PackageName, oldData.UnitType, oldData.PartType, PartName);
+            var data = ExtractList.FirstOrDefault();
+            //Debug.Log($" Package" + oldData.PartType + "/" + PartName);
+            if(data != null){
+            //Debug.Log($" Package {PackageNameExist} {PackageName} {PartName} {data.Name} {data.Path}");
+                if(oldData.PartType.Equals("Weapons"))
+                {
+                    var PathArray = data.Path.Split("/");
+                    string PartType = System.Text.RegularExpressions.Regex.Replace(PathArray[PathArray.Length-2],@"[^a-zA-Z가-힣\s]", "");
+                    oldData.PartSubType = PartType;
+                }
+                
+                oldData.ItemPath = data.Path;
+                oldData.Color = oldData.Color.Equals(Color.clear) ? Color.white : oldData.Color;
+                ModifiyList.Add(oldData);
+            }
+        }
+        return ModifiyList;
+    }
+
+    List<(string, SpriteRenderer)> CreateTupleList(List<string> stringList, List<SpriteRenderer> spriteRendererList)
+    {
+        // 두 리스트의 길이가 다를 경우 짧은 쪽에 맞춥니다.
+        int minLength = Mathf.Min(stringList.Count, spriteRendererList.Count);
+
+        // LINQ를 사용하여 튜플 리스트 생성
+        return stringList.Take(minLength)
+                         .Zip(spriteRendererList.Take(minLength), (s, sr) => (s, sr))
+                         .ToList();
+    }
+    public List<SpumTextureData> ExtractTextureData(string packageName, string unitType, string partType, string textureName)
+    {
+        var query = spumPackages.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(packageName))
+        {
+            query = query.Where(package => package.Name == packageName);
+        }
+
+        return query
+            .SelectMany(package => package.SpumTextureData)
+            .Where(texture => 
+                texture.UnitType == unitType &&
+                texture.PartType == partType &&
+                texture.Name == textureName)
+            .ToList();
+    }
+    public List<SpumAnimationClip> ExtractAnimationData(string packageName, string unitType, string partType, string clipeName)
+    {
+        var query = spumPackages.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(packageName))
+        {
+            query = query.Where(package => package.Name == packageName);
+        }
+
+        return query
+            .SelectMany(package => package.SpumAnimationData)
+            .Where(clip => 
+                clip.UnitType == unitType &&
+                clip.StateType == partType &&
+                clip.Name == clipeName)
+            .ToList();
     }
 
     //Unit Delete
-    public void DeleteUnit(int index)
+    public void DeleteUnit(UnityEngine.Object prefab)
     {
-        GameObject tObj = _prefabUnitList[index];
-        string pathToDelete = AssetDatabase.GetAssetPath(_prefabUnitList[index]);      
-        _prefabUnitList.Remove(tObj);
+        string pathToDelete = AssetDatabase.GetAssetPath(prefab);
+        Debug.Log(pathToDelete); 
         AssetDatabase.DeleteAsset(pathToDelete);
 
-        ShowNowUnitNumber();
-        CloseLoadData();
+        UIManager.ShowNowUnitNumber();
+        UIManager.SetActiveLoadPanel(false);
         OpenLoadData();
     }
-    
+#endregion
 
-    bool EmptyChk()
+    public Sprite LoadSpriteFromMultiple(string path, string spriteName)
     {
-        bool value = false;
-        if(Random.Range(0,1.0f) < 0.2f) 
+        Sprite[] sprites = Resources.LoadAll<Sprite>(path);
+        
+        if (sprites == null || sprites.Length == 0)
         {
-            value = true;
+            Debug.LogWarning($"No sprites found at path: {path}");
+            return null;
         }
-        return value;
+
+        Sprite foundSprite = System.Array.Find(sprites, sprite => sprite.name == spriteName);
+
+        // 일치하는 spriteName이 없으면 첫 번째 항목 반환
+        return foundSprite != null ? foundSprite : sprites[0];
     }
-
-    public CanvasGroup _toastObj;
-    public Text _toastMSG;
-    bool toastChk = false;
-    float toastTimer = 0;
-    public void ToastOn(string Text)
-    {
-        _toastObj.gameObject.SetActive(true);
-        _toastObj.alpha = 1.0f;
-        _toastMSG.text = Text;
-        toastChk = true;
-        toastTimer = 0;
-    }
-
-    void Update()
-    {
-        if(toastChk)
-        {
-            toastTimer += Time.deltaTime;
-            if(toastTimer > 2.0f) _toastObj.alpha = 1.0f - (toastTimer-2f);
-            if(toastTimer > 3.0f) CloseToast();
-        }
-    }
-
-
-    //애니메이션 컨트롤러를 연동해줍니다.
-    public void AnimContCheck()
-    {
-        // RuntimeAnimatorController tC;
-        // if(File.Exists("Assets/SPUM/Res/Animation/NormalAnimator.controller"))
-        // {
-        //     tC = (RuntimeAnimatorController)AssetDatabase.LoadAssetAtPath("Assets/SPUM/Res/Animation/NormalAnimator.controller",typeof(RuntimeAnimatorController));
-        //     _animControllerList[0]=tC;
-        // }
-        // else
-        // {
-        //     _animControllerList[0]=null;
-        // }
-
-        // if(File.Exists("Assets/SPUM/SPUM_Sprites/Packages/Undead/Animation/UndeadAnimator.controller"))
-        // {
-        //     tC = (RuntimeAnimatorController)AssetDatabase.LoadAssetAtPath("Assets/SPUM/SPUM_Sprites/Packages/Undead/Animation/UndeadAnimator.controller",typeof(RuntimeAnimatorController));
-        //     _animControllerList[1]=tC;
-        // }
-        // else
-        // {
-        //     _animControllerList[1]=null;
-        // }
-    }
-
-    void CloseToast()
-    {
-        toastChk = false;
-        toastTimer = 0;
-        _toastObj.gameObject.SetActive(false);
-    }
-
-    public GameObject _noticeObj;
-    public Text _noticeText;
-    public List<GameObject> _buttonSet = new List<GameObject>();
-    public int callbackNum = 0;
-
-    public void OnNotice(string text,int type = 0, int callback = -1)
-    {
-        _noticeObj.SetActive(true);
-        _noticeText.text = text;
-        callbackNum = callback;
-
-        if(type == 0 ) //버튼 사용 선택
-        {
-            _buttonSet[0].SetActive(true);
-            _buttonSet[1].SetActive(false);
-        }
-        else
-        {
-            _buttonSet[0].SetActive(false);
-            _buttonSet[1].SetActive(true);
-        }
-    }
-
-    public void CloseNotice()
-    {
-        if(callbackNum!=1)CloseOnlyNotice();
-        switch(callbackNum)
-        {
-            case 0:
-            break;
-
-            case 1:
-            Debug.Log("Please Check Error Message");
-            break;
-        }
-    }
-
-    public void CloseOnlyNotice()
-    {
-        _noticeObj.SetActive(false);
-    }
-
-    //인스톨 관련
-    
-    public void InstallSpriteData()
-    {
-        bool Chk = false;
-        //기본 폴더 제작
-        if(Directory.Exists("Assets/Resources/SPUM/SPUM_Sprites/Items"))
-        {
-            Debug.Log("Found Resources Folder Success!!");
-            if(Directory.Exists("Assets/Resources/SPUM/SPUM_Sprites/Items"))
-            {
-                Debug.Log("Found SPUM_Sprite Folder, will delete it");
-                FileUtil.DeleteFileOrDirectory("Assets/Resources/SPUM/SPUM_Sprites/Items");
-            }
-        }
-        else
-        {
-            Debug.Log("Project doesn't have Resources Folder Yet, Will make Resource Project Automatically");
-            Directory.CreateDirectory("Assets/Resources/SPUM/SPUM_Sprites/");
-        }
-
-        //패키지 데이터 제작
-        if(Directory.Exists("Assets/Resources/SPUM/SPUM_Sprites/Packages"))
-        {
-            Debug.Log("Found Package Folder Success!!");
-            if(Directory.Exists("Assets/Resources/SPUM/SPUM_Sprites/Packages"))
-            {
-                Debug.Log("Found SPUM_Sprite Folder, will delete it");
-                FileUtil.DeleteFileOrDirectory("Assets/Resources/SPUM/SPUM_Sprites/Packages");
-            }
-        }
-
-        //어셋 카피
-
-        if(AssetDatabase.CopyAsset("Assets/SPUM/SPUM_Sprites/Items","Assets/Resources/SPUM/SPUM_Sprites/Items"))
-        {
-            Debug.Log("Install SPUM Sprtie Data Success in Resources Folder");
-
-            if(!Directory.Exists("Assets/Resources/SPUM/SPUM_UNITS"))
-            {
-                Directory.CreateDirectory("Assets/Resources/SPUM/SPUM_Units");
-            }
-        }
-        else
-        {
-            Debug.Log("Copy Failed");
-        }
-
-        if(AssetDatabase.CopyAsset("Assets/SPUM/SPUM_Sprites/Packages","Assets/Resources/SPUM/SPUM_Sprites/Packages"))
-        {
-            Debug.Log("Install SPUM Sprtie Packages Data Success in Resources Folder");
-        }
-        else
-        {
-            Debug.Log("Copy Failed");
-        }
-    }
-
-    public void SetBodySprite()
-    {
-        _mainBodyList.Clear();
-        string spritePath = AssetDatabase.GetAssetPath( _mainBody );
-        Object[] sprites = AssetDatabase.LoadAllAssetsAtPath(spritePath);
-        var sortedList = sprites.OrderBy(go=>go.name).ToList();
-        List<Sprite> tSP = new List<Sprite>();
-        for(var i = 0 ; i < sortedList.Count;i++)
-        {
-            if(sortedList[i].GetType() == typeof(Sprite))
-            {
-                tSP.Add((Sprite)sortedList[i]);
-                _mainBodyList.Add((Sprite)sortedList[i]);
-            }
-        }
-
-        // for(var i = 0 ; i < tSP.Count;i++) Debug.Log(tSP[i]);
-        // Debug.Log(tSP.Count);
-        _unitObjSet._spriteOBj._bodyList[0].sprite = tSP[5];
-        _unitObjSet._spriteOBj._bodyList[1].sprite = tSP[2];
-        _unitObjSet._spriteOBj._bodyList[2].sprite = tSP[0];
-        _unitObjSet._spriteOBj._bodyList[3].sprite = tSP[1];
-        _unitObjSet._spriteOBj._bodyList[4].sprite = tSP[3];
-        _unitObjSet._spriteOBj._bodyList[5].sprite = tSP[4];
-
-        string path = AssetDatabase.GetAssetPath(_mainBody);
-        string tName = _mainBody.name + ".png";
-        path = path.Replace(tName,"")+ "Eye/";
-
-      
-
-        DirectoryInfo dir = new DirectoryInfo(path);
-        FileInfo[] info = dir.GetFiles("*.png");
-
-        _mainEye = (Texture2D)AssetDatabase.LoadAssetAtPath(path+info[0].Name,typeof(Texture2D));
-        sprites = AssetDatabase.LoadAllAssetsAtPath(path+info[0].Name);
-        for(var j = 0 ; j < sprites.Length ;j++)
-        {
-            if(sprites[j].GetType() == typeof(Sprite))
-            {
-                if(sprites[j].name == "Back")
-                {
-                    _spriteObj._eyeList[0].sprite = (Sprite)sprites[j];
-                    _spriteObj._eyeList[1].sprite = (Sprite)sprites[j];
-                }
-                else if(sprites[j].name == "Front")
-                {
-                    _spriteObj._eyeList[2].sprite = (Sprite)sprites[j];
-                    _spriteObj._eyeList[3].sprite = (Sprite)sprites[j];
-                }
-            }
-        }
-
-        if(_animControllerList[0]!=null)
-        {
-            _rootAnimList[0].runtimeAnimatorController = _animControllerList[0];
-        }
-        SetInit();
-    }
-
-    public void SetCharPivotSize( float num )
-    {
-        _characterPivot.localScale += new Vector3(num,num,num);
-
-        if( _characterPivot.localScale.x < 0.5f) 
-        {
-            _characterPivot.localScale = new Vector3(0.5f,0.5f,0.5f);
-            ToastOn("Reached Minimum size");
-        }
-        if(_characterPivot.localScale.x > 1.1f)
-        {
-            _characterPivot.localScale = new Vector3(1.1f,1.1f,1.1f);
-            ToastOn("Reached Maximum size");
-        }
-    }
-
     //Resolve
     public void CheckVesionFile()
     {
@@ -2820,220 +1586,6 @@ public class SPUM_Manager : MonoBehaviour
             FileUtil.DeleteFileOrDirectory("Assets/SPUM/Script/SPUM_TexutreList.cs");
         }
     }
-
-    public void SetHorse(bool value, string name)
-    {
-        _unitObjSet.gameObject.SetActive(false);
-        if(value)
-        {
-            _unitObjSet._horseString = name;
-            _unitObjSet._anim = _rootAnimList[1];
-            _unitObjSet.isRideHorse = true;
-            _unitObjSet.transform.parent.localScale = new Vector3(0.7f,0.7f,0.7f);
-            _unitObjSet.transform.GetChild(0).gameObject.SetActive(false);
-            _unitObjSet.transform.GetChild(1).gameObject.SetActive(true);
-            _unitObjSet._spriteOBj.transform.SetParent(_rootList[1]);
-            _unitObjSet._spriteOBj.transform.localPosition = Vector3.zero;
-            _unitObjSet._spriteOBj._spHorseSPList = _rootAnimList[1].GetComponent<SPUM_HorseSpriteList>();
-            _unitObjSet._spriteOBj._spHorseString = name;
-        }
-        else
-        {
-            _unitObjSet._horseString = "";
-            _unitObjSet._anim = _rootAnimList[0];
-            _unitObjSet.isRideHorse = false;
-            _unitObjSet.transform.parent.localScale = new Vector3(0.9f,0.9f,0.9f);
-            _unitObjSet.transform.GetChild(0).gameObject.SetActive(true);
-            _unitObjSet.transform.GetChild(1).gameObject.SetActive(false);
-            _unitObjSet._spriteOBj.transform.SetParent(_rootList[0]);
-            _unitObjSet._spriteOBj.transform.localPosition = Vector3.zero;
-            _unitObjSet._spriteOBj._spHorseSPList = null;
-            _unitObjSet._spriteOBj._spHorseString = "";
-        }
-        _unitObjSet.gameObject.SetActive(true);
-    }
-
-
+    #endif
     //Package 
-
-    public void LinkPackageList()
-    {
-        for(var k = 0 ; k < _textureList.Count;k++)
-        {
-            _textureList[k]._textureList.Clear();
-
-            for(var i = 0 ; i < _textureList[k]._packageList.Count;i++)
-            {
-                if(i==0)
-                {
-                    if(_textureList[k]._packageList[0])
-                    {
-                        switch(k)
-                        {
-                            case 0:
-                            //헤어 종류
-                            SetSpriteList(0,"0_Hair"); //헤어 연결
-                            break;
-
-                            case 1:
-                            //수염
-                            SetSpriteList(1,"1_FaceHair"); //수염 연결
-                            break;
-
-                            case 2:
-                            //헬멧 종류
-                            SetSpriteList(2,"4_Helmet"); //투구 연결
-                            break;
-
-                            case 3:
-                            //옷 종류
-                            SetSpriteList(3,"2_Cloth"); //옷 연결
-                            break;
-
-                            case 4:
-                            //바지 종류
-                                SetSpriteList(4,"3_Pant"); //헤어 연결
-                            break;
-
-                            case 5:
-                            //갑옷 종류
-                            SetSpriteList(5,"5_Armor"); //갑옷 연결
-                            break;
-
-                            case 6:
-                            //뒤 종류
-                            SetSpriteList(6,"7_Back"); //뒤 아이템 연결
-                            break;
-
-                            case 7:
-                            //오른손 무기 종류
-                            SetSpriteList(7,"6_Weapons"); //오른쪽 무기 연결
-                            break;
-
-                            case 8:
-                            //왼손 무기 종류
-                            SetSpriteList(8,"6_Weapons"); //왼쪽 무기 연결
-                            break;
-
-                            case 9:
-                            //왼손 무기 종류
-                            SetSpriteList(9,"Eye"); //눈 연결
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    if(_textureList[k]._packageList[i])
-                    {
-                        switch(k)
-                        {
-                            case 0:
-                            //헤어 종류
-                            SetSpritePackageList(0,"0_Hair",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 1:
-                            //수염
-                            SetSpritePackageList(1,"1_FaceHair",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 2:
-                            //헬멧 종류
-                            SetSpritePackageList(2,"4_Helmet",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 3:
-                            //옷 종류
-                            SetSpritePackageList(3,"2_Cloth",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 4:
-                            //바지 종류
-                            SetSpritePackageList(4,"3_Pant",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 5:
-                            //갑옷 종류
-                            SetSpritePackageList(5,"5_Armor",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 6:
-                            //뒤 종류
-                            SetSpritePackageList(6,"7_Back",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 7:
-                            //오른손 무기 종류
-                            SetSpritePackageList(7,"6_Weapons",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 8:
-                            //왼손 무기 종류
-                            SetSpritePackageList(8,"6_Weapons",_textureList[k]._packageNameList[i]); //헤어 연결
-                            break;
-
-                            case 9:
-                            //왼손 무기 종류
-                            SetSpritePackageList(9,"Eye",_textureList[k]._packageNameList[i]); //눈 연결
-                            break;
-                        }
-                    }
-                }
-            
-            }
-        }
-        
-    }
-    #endif
-    
-    public string ColorToStr(Color color)
-    {
-        string r = ((int)(color.r * 255)).ToString("X2");
-        string g = ((int)(color.g * 255)).ToString("X2");
-        string b = ((int)(color.b * 255)).ToString("X2");
-
-        string result = string.Format("{0}{1}{2}", r, g, b);
-
-
-        return result;
-    }
-
-    public Color StrToColor(string str)
-    {
-        str = str.ToLowerInvariant();
-        if(str.Length == 6)
-        {
-            char[] arr 			= str.ToCharArray();
-            char[] color_arr 	= new char[6];
-
-            for(int i = 0 ; i < 6 ; i++)
-            {
-                if(arr[i] >= '0' && arr[i] <= '9')
-                    color_arr[i] = (char)(arr[i] - '0');
-                else if(arr[i] >= 'a' && arr[i] <= 'f')
-                    color_arr[i] = (char)(10 + arr[i] - 'a');
-                else
-                    color_arr[i] = (char)0;
-            }
-
-            float red 	= (color_arr[0]*16 + color_arr[1])/255.0f;
-            float green = (color_arr[2]*16 + color_arr[3])/255.0f;
-            float blue 	= (color_arr[4]*16 + color_arr[5])/255.0f;
-
-            return new Color(red, green, blue);
-        }
-        else
-            return Color.white;
-    }
-    #if UNITY_EDITOR
-    public void CopyToClipboard()
-    {
-        GUIUtility.systemCopyBuffer = _hexColorText.text;
-        ToastOn("Copied Color Code");
-    }
-    #endif
-    
-    
-
 }

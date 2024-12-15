@@ -1,16 +1,18 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-[ExecuteInEditMode]
 public class PlayerManager : MonoBehaviour
 {
     public PlayerObj _prefabObj;
-    public List<GameObject> _savedUnitList = new List<GameObject>();
+    public List<SPUM_Prefabs> _savedUnitList = new List<SPUM_Prefabs>();
     public Vector2 _startPos;
     public Vector2 _addPos;
     public int _columnNum;
-
+    public int UnitMaxCount = 20;
     public Transform _playerPool;
     public List<PlayerObj> _playerList = new List<PlayerObj>();
     public PlayerObj _nowObj;
@@ -18,12 +20,11 @@ public class PlayerManager : MonoBehaviour
     public Transform _goalObjCircle;
     public Camera _camera;
     Texture2D imageSave;
-
-    public bool _generate;
-    // Start is called before the first frame update
-
     public GameObject _bg;
-    public bool _screenShot;
+    public RectTransform CommandPanel;
+    public Button AnimationButton;
+    public Transform AnimationPanelParent;
+    public GameObject AnimationPanel;
     public enum ScreenShotSize
     {
         HD,
@@ -31,34 +32,29 @@ public class PlayerManager : MonoBehaviour
         UHD
     }
     public ScreenShotSize _screenShotSize = ScreenShotSize.HD;
+
     void Start()
     {
-        
+        if(_savedUnitList.Count.Equals(0) || _playerList.Count.Equals(0))
+            GetPlayerList();
     }
-
     // Update is called once per frame
     void Update()
     {
-        if(_generate)
-        {
-            GetPlayerList();
-            _generate = false;
-        }
-
-        if(_screenShot)
-        {
-            SetScreenShot();
-            _screenShot = false;
-        }
-
+        if(EventSystem.current.IsPointerOverGameObject()) return;
         if(Input.GetMouseButtonDown(0))
         {
             RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            
             if(hit.collider != null)
             {
-                if(hit.collider.CompareTag("Player"))
+                bool isHitPlayer = hit.collider.CompareTag("Player");
+                CommandPanel.gameObject.SetActive(isHitPlayer);
+               
+                if(isHitPlayer)
                 {
                     _nowObj = hit.collider.GetComponent<PlayerObj>();
+                    CreateAnimationPanel(_nowObj);
                 }
                 else
                 {
@@ -78,10 +74,39 @@ public class PlayerManager : MonoBehaviour
             _playerObjCircle.transform.position = _nowObj.transform.position;
         }
     }
-
-    public void GetPlayerList()
+    public void CreateAnimationPanel(PlayerObj Unit)
     {
-        //reset list.
+        foreach (Transform item in AnimationPanelParent.transform)
+        {
+            Destroy(item.gameObject);
+        }
+        var Info = Unit._prefabs.StateAnimationPairs;
+        foreach (var StateName in Info.Keys)
+        {
+            var Panel = Instantiate(AnimationPanel, AnimationPanelParent);
+            string StateNameformat = $"{StateName} State";
+            Panel.GetComponentInChildren<Text>().text = StateNameformat;
+            var ParentTranform = Panel.GetComponentInChildren<ContentSizeFitter>().transform;
+            foreach (var clip in Info[StateName])
+            {
+                var Button = Instantiate(AnimationButton, ParentTranform);
+                Button.GetComponentInChildren<Text>().text = clip.name;
+                Button.onClick.AddListener(()=> {
+                    if(Enum.TryParse(StateName, true, out PlayerState State))
+                    {
+                        Unit.isAction = true;
+                        int index = Info[StateName].FindIndex(x => x == clip);
+                        Debug.Log(State + ":" + index);
+                        Unit._prefabs._anim.Rebind();
+                        Unit.SetStateAnimationIndex(State, index);
+                        Unit.PlayStateAnimation(State);
+                    }
+                });
+            }
+        }
+    }
+    public void ClearPlayerList()
+    {
         List<GameObject> tList = new List<GameObject>();
         for(var i =0; i < _playerPool.transform.childCount; i++)
         {
@@ -94,12 +119,20 @@ public class PlayerManager : MonoBehaviour
         }
 
         //net Edited. 2022.01.18
-        _playerList.Clear();
         _savedUnitList.Clear();
+        _playerList.Clear();
+    }
+    public void GetPlayerList()
+    {
+        ClearPlayerList();
 
-        var saveArray = Resources.LoadAll<GameObject>("SPUM/SPUM_Units");
-        _savedUnitList.AddRange(saveArray);
-        //
+        var saveArray = Resources.LoadAll<SPUM_Prefabs>("");
+        foreach (var unit in saveArray)
+        {
+            if(unit.ImageElement.Count > 0) {
+                _savedUnitList.Add(unit);
+            }
+        }
 
         
         float numXStart = _startPos.x;
@@ -111,8 +144,9 @@ public class PlayerManager : MonoBehaviour
 
         int sColumnNum = _columnNum;
 
-        for(var i = 0 ; i < _savedUnitList.Count;i++)
+        for(var i = 0 ; i < UnitMaxCount;i++)
         {
+            if(i > _savedUnitList.Count-1) continue;
             if(i > sColumnNum-1)
             {
                 numYStart -= 1f;
@@ -126,7 +160,7 @@ public class PlayerManager : MonoBehaviour
             ttObj.transform.localScale = new Vector3(1,1,1);
             
 
-            GameObject tObj = Instantiate(_savedUnitList[i]) as GameObject;
+            var tObj = Instantiate(_savedUnitList[i]);
             tObj.transform.SetParent(ttObj.transform);
             tObj.transform.localScale = new Vector3(1,1,1);
             tObj.transform.localPosition = Vector3.zero;
@@ -134,16 +168,39 @@ public class PlayerManager : MonoBehaviour
             ttObj.name = _savedUnitList[i].name;
 
             PlayerObj tObjST = ttObj.GetComponent<PlayerObj>();
-            SPUM_Prefabs tObjSTT = tObj.GetComponent<SPUM_Prefabs>();
 
-            tObjST._prefabs = tObjSTT;
+            tObjST._prefabs = tObj;
 
             ttObj.transform.localPosition = new Vector3(numXStart + numX * i,numYStart+ttV,0);
             _playerList.Add(tObjST);
-            
         }
     }
+    public void SetAlignUnits()
+    {
+        float numXStart = _startPos.x;
+        float numYStart = _startPos.y;
 
+        float numX = _addPos.x;
+        float numY = _addPos.y;
+        float ttV = 0;
+
+        int sColumnNum = _columnNum;
+        _playerList = _playerList.Where(s => s != null).ToList();
+        for(var i = 0 ; i < _playerList.Count-1;i++)
+        {
+            if(i > sColumnNum-1)
+            {
+                numYStart -= 1f;
+                numXStart -= numX * _columnNum;
+                sColumnNum += _columnNum;
+                ttV += numY;
+            }
+            
+            GameObject ttObj = _playerList[i].gameObject;
+
+            ttObj.transform.localPosition = new Vector3(numXStart + numX * i,numYStart+ttV,0);
+        }
+    }
     //스크린샷 찍기
     public void SetScreenShot()
     {

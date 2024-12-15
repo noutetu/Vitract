@@ -29,6 +29,6 @@ public class SkillDataCreator
         EditorUtility.FocusProjectWindow();
         Selection.activeObject = newSkillData;
 
-        Debug.Log($"新しいスキルデータ '{newSkillData.skillName}' が {assetPath} に保存されました。");
+        Debug.Log($"新しいスキルデータ '{newSkillData.SkillName}' が {assetPath} に保存されました。");
     }
 }

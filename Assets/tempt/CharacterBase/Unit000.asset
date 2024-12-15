@@ -13,19 +13,20 @@ MonoBehaviour:
   m_Name: Unit000
   m_EditorClassIdentifier: 
   characterID: 0
-  prefab: {fileID: 6216484884536752212, guid: 03d2649482f694d63bf6986401b64899, type: 3}
-  name: "\u4E3B\u4EBA\u516C"
+  prefab: {fileID: 4085901933629887194, guid: ad70744459dfe4636be0b120ed530473, type: 3}
+  name: "\u30E9\u30A4\u30A2\u30B9"
   cost: 5
-  maxHp: 100
-  defence: 0
+  maxHp: 120
+  defence: 15
   magicDefence: 0
-  canBlockCount: 1
-  atk: 25
+  atk: 15
+  coolTime: 3
   attackSpeed: 0.6
-  attackCoolTime: 3
-  speed: 0.3
   range: 0
+  speed: 0.3
   specialSkill: {fileID: 11400000, guid: d4464cc28b97e4b7ea28ba2ab8dc1d3b, type: 2}
   normalSkill: {fileID: 11400000, guid: be58d5f0a6c734661ac991ca40cdb68c, type: 2}
   characterType: 0
-  sprite: {fileID: 25119439, guid: 285269b6c10164bb09e19eaf190dc41c, type: 3}
+  roleName: "\u30D0\u30C8\u30EB\u30B9\u30AB\u30A6\u30C8"
+  description: "\u524D\u7DDA\u3067\u7D20\u65E9\u304F\u52D5\u304D\u3001\u6575\u306E\u52D5\u304D\u3092\u30B3\u30F3\u30C8\u30ED\u30FC\u30EB\u3059\u308B\u3002"
+  icon: {fileID: -407420556, guid: 962e4b9b4226f4ecfbc218fee42b91c4, type: 3}

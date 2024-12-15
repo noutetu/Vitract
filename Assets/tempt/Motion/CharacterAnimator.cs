@@ -1,36 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.Events;
 
+// アニメーションの種類を表すEnum
+[System.Serializable]
+public enum AnimType
+{
+    Idle,               // 待機状態
+    Run,                // 移動
+    Attack,             // 攻撃
+    Dead,               // 死亡
+    Debuff,             // デバフ
+    Conecntrate,        // バフ    
+}
 
 public class CharacterAnimator : MonoBehaviour
 {
-    /// <summary>
-    /// 
-    /// AttackState => 0 => NormalAttack
-    ///                1 => SkillAttack
-    ///                
-    /// NormalState => 0 => SwordMan
-    ///                0.5 => BowMan
-    ///                1 => Magician
-    ///                
-    /// NormalState => 0 => SwordMan
-    ///                0.5 => BowMan
-    ///                1 => Magician
-    ///                
-    /// RunState    => 0 => Idle
-    ///             => 0.1~1.2 => Run
-    ///             => 1.3~ => Debuff
-    ///                
-    /// </summary>
-
-
     private Animator anim = null;
     public UnityAction OnAttack;
     public UnityAction OnDead;
-
 
     void Start()
     {
@@ -41,87 +30,68 @@ public class CharacterAnimator : MonoBehaviour
             return;
         }
         Debug.Log("animatorが見つかりました");
-
     }
 
-    public void RunAnim(float speed)
+    public void PlayAnimation(AnimType animType, float speed)
     {
-        anim.speed = speed * 3.5f * GameManager.Instance.gameSpeed;
-        anim.SetFloat("RunState", speed);
-    }
+        if (anim == null)
+        {
+            Debug.LogWarning("Animatorが初期化されていません");
+            return;
+        }
 
-    public void IdleAnim()
-    {
-        anim.speed = 1 * GameManager.Instance.gameSpeed;
-        anim.SetFloat("RunState", 0f);
-    }
+        // 速度設定
+        anim.speed = speed * GameManager.Instance.gameSpeed;
 
-    public void NormalAttackAnim(float attackSpeed)
-    {
-        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
-        anim.SetTrigger("Attack");
-        anim.SetFloat("AttackState", 0f);
-        anim.SetFloat("NormalState", 0f);
-    }
+        // スイッチによるアニメーション制御
+        switch (animType)
+        {
+            case AnimType.Idle:
+                anim.SetBool("1_Move", false);
+                break;
 
-    public void NormalMagicAttackAnim(float attackSpeed)
-    {
-        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
-        anim.SetTrigger("Attack");
-        anim.SetFloat("AttackState", 0f);
-        anim.SetFloat("NormalState", 1f);
-    }
+            case AnimType.Run:
+                anim.SetBool("1_Move", true);
+                break;
 
-    public void NormalBowAttackAnim(float attackSpeed)
-    {
-        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
-        anim.SetTrigger("Attack");
-        anim.SetFloat("AttackState", 0f);
-        anim.SetFloat("NormalState", 0.5f);
-    }
+            case AnimType.Dead:
+                anim.SetTrigger("4_Death");
+                break;
 
-    public void SkillSwordAttackAnim(float attackSpeed)
-    {
-        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
-        anim.SetTrigger("Attack");
-        anim.SetFloat("AttackState", 1f);
-        anim.SetFloat("NormalState", 0f);
-    }
-    public void SkillBowAttackAnim(float attackSpeed)
-    {
-        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
-        anim.SetTrigger("Attack");
-        anim.SetFloat("AttackState", 1f);
-        anim.SetFloat("NormalState", 0.5f);
-    }
-    public void SkillMagicAttackAnim(float attackSpeed)
-    {
-        anim.speed = attackSpeed * GameManager.Instance.gameSpeed;
-        anim.SetTrigger("Attack");
-        anim.SetFloat("AttackState", 1f);
-        anim.SetFloat("NormalState", 1f);
-    }
+            case AnimType.Debuff:
+                anim.SetTrigger("5_Debuff");
+                break;
 
-    
+            case AnimType.Conecntrate:
+                anim.SetTrigger("Conecntrate");
+                break;
 
-    public void DeadAnim()
-    {
-        anim.speed = 0.6f * GameManager.Instance.gameSpeed;
-        anim.SetTrigger("Die");
+            default:
+                Debug.LogWarning("指定されたアニメーションタイプが無効です");
+                break;
+        }
     }
-
-    public void DebuffAnim()
+    public void PlayAnimation(AnimType animType, float speed,int attackType)
     {
-        anim.speed = 1 * GameManager.Instance.gameSpeed;
-        anim.SetFloat("RunState", 3);
-    }
+        if (anim == null)
+        {
+            Debug.LogWarning("Animatorが初期化されていません");
+            return;
+        }
 
-    public void StopAnimator()
-    {
-        anim.speed = 0;
-    }
+        // 速度設定
+        anim.speed = speed * 2f *GameManager.Instance.gameSpeed;
 
-    //---------------------------unity animationEventで呼び出すメソッド---------------------------------
+        // スイッチによるアニメーション制御
+        switch (animType)
+        {
+            case AnimType.Attack:
+                anim.SetTrigger("2_Attack");
+                anim.SetFloat("AttackType",attackType);
+                break;
+        }
+    }
+       //---------------------------unity animationEventで呼び出すメソッド---------------------------------
     public void TriggerAttackEvent()
     {
         if (OnAttack == null)
@@ -142,5 +112,4 @@ public class CharacterAnimator : MonoBehaviour
     {
         OnDead?.Invoke();
     }
-    //------------------------------------------------------------------------------------------------
 }

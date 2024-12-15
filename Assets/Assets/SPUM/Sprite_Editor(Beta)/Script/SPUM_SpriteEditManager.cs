@@ -20,24 +20,24 @@ public class SPUM_SpriteEditManager : MonoBehaviour
     // public Sprite _back;
     public List<SpriteRenderer> _syncList = new List<SpriteRenderer>();
 
-    void OnDrawGizmos()
-    {
-        // Gizmos.color = Color.red;
-        // Gizmos.DrawSphere(this.transform.position, 0.1f);
-    }
+    // void OnDrawGizmos()
+    // {
+    //     // Gizmos.color = Color.red;
+    //     // Gizmos.DrawSphere(this.transform.position, 0.1f);
+    // }
 
-    void Start()
-    {
+    // void Start()
+    // {
 
-    }
+    // }
 
-    void Update()
-    {
-        // if(Selection.activeGameObject == this.gameObject)
-        // {
-        //     SyncSprite();
-        // }
-    }
+    // void Update()
+    // {
+    //     // if(Selection.activeGameObject == this.gameObject)
+    //     // {
+    //     //     SyncSprite();
+    //     // }
+    // }
     // //Sync all sprite added.
     // public void SyncSprite()
     // {

@@ -25,8 +25,6 @@ public class CharacterGenerator : MonoBehaviour
     playerCharacter.gameObject.tag = "Player";
     playerCharacter.gameObject.layer = LayerMask.NameToLayer("Player");
     playerCharacter.isPlayer = true;
-
-    playerCharacter.SmoothAppear();
 }
 
 }

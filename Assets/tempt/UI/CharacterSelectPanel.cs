@@ -33,7 +33,7 @@ public class CharacterSelectPanel : MonoBehaviour
             if (characterBases[i] == null) { return; }
             // 各フレームに対応するCharacterBaseを設定
             characterFlames[i].Base = characterBases[i];
-            characterFlames[i].icon.sprite = characterBases[i].Sprite;
+            characterFlames[i].icon.sprite = characterBases[i].Icon;
         }
     }
 }

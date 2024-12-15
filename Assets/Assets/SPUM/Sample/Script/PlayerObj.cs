@@ -1,68 +1,57 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-[System.Serializable]
-public class MyEvent : UnityEvent<PlayerObj.PlayerState>
-{
 
-}
-
-[ExecuteInEditMode]
 public class PlayerObj : MonoBehaviour
 {
     public SPUM_Prefabs _prefabs;
     public float _charMS;
-    public enum PlayerState
-    {
-        idle,
-        run,
-        attack,
-        death,
-    }
     private PlayerState _currentState;
-    public PlayerState CurrentState{
-        get => _currentState;
-        set {
-            _stateChanged.Invoke(value);
-            _currentState = value;
-        }
-    }
-   
-    private MyEvent _stateChanged = new MyEvent();
 
     public Vector3 _goalPos;
-    // Start is called before the first frame update
-
-    // Update is called once per frame
+    public bool isAction = false;
+    public Dictionary<PlayerState, int> IndexPair = new ();
     void Start()
     {
         if(_prefabs == null )
         {
             _prefabs = transform.GetChild(0).GetComponent<SPUM_Prefabs>();
+            if(!_prefabs.allListsHaveItemsExist()){
+                _prefabs.PopulateAnimationLists();
+            }
         }
-        
-        _stateChanged.AddListener(PlayStateAnimation);
-
-
+        _prefabs.OverrideControllerInit();
+        foreach (PlayerState state in Enum.GetValues(typeof(PlayerState)))
+        {
+            IndexPair[state] = 0;
+        }
     }
-    private void PlayStateAnimation(PlayerState state){
-        _prefabs.PlayAnimation(state.ToString());
+    public void SetStateAnimationIndex(PlayerState state, int index = 0){
+        IndexPair[state] = index;
+    }
+    public void PlayStateAnimation(PlayerState state){
+        _prefabs.PlayAnimation(state, IndexPair[state]);
     }
     void Update()
     {
+        if(isAction) return;
+
         transform.position = new Vector3(transform.position.x,transform.position.y,transform.localPosition.y * 0.01f);
         switch(_currentState)
         {
-            case PlayerState.idle:
+            case PlayerState.IDLE:
+            
             break;
 
-            case PlayerState.run:
+            case PlayerState.MOVE:
             DoMove();
             break;
         }
-
+        PlayStateAnimation(_currentState);
 
     }
 
@@ -72,12 +61,11 @@ public class PlayerObj : MonoBehaviour
         Vector3 _disVec = (Vector2)_goalPos - (Vector2)transform.position ;
         if( _disVec.sqrMagnitude < 0.1f )
         {
-            _currentState = PlayerState.idle;
-            PlayStateAnimation(_currentState);
+            _currentState = PlayerState.IDLE;
             return;
         }
         Vector3 _dirMVec = _dirVec.normalized;
-        transform.position += (_dirMVec * _charMS * Time.deltaTime );
+        transform.position += _dirMVec * _charMS * Time.deltaTime;
         
 
         if(_dirMVec.x > 0 ) _prefabs.transform.localScale = new Vector3(-1,1,1);
@@ -86,8 +74,8 @@ public class PlayerObj : MonoBehaviour
 
     public void SetMovePos(Vector2 pos)
     {
+        isAction = false;
         _goalPos = pos;
-        _currentState = PlayerState.run;
-        PlayStateAnimation(_currentState);
+        _currentState = PlayerState.MOVE;
     }
 }
