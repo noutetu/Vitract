@@ -17,16 +17,16 @@ MonoBehaviour:
   name: Ed
   cost: 10
   maxHp: 150
-  defence: 0
+  defence: 100
   magicDefence: 0
   atk: 10
   coolTime: 3
   attackSpeed: 0.6
   range: 0
   speed: 0.2
-  specialSkill: {fileID: 0}
+  specialSkill: {fileID: 11400000, guid: 9a430168e68b34ea09307ab6447d3daf, type: 2}
   normalSkill: {fileID: 11400000, guid: be58d5f0a6c734661ac991ca40cdb68c, type: 2}
   characterType: 0
   roleName: 
   description: 
-  icon: {fileID: 0}
+  icon: {fileID: 275009122, guid: 44a1f41e8faea45afaa9985d33695155, type: 3}

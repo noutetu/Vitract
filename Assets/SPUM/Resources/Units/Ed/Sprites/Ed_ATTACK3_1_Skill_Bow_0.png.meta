@@ -1,0 +1,593 @@
+fileFormatVersion: 2
+guid: b69dc91409fff42449045e68df5d13b7
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_0
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 1984
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4aee2e0db450f461f9cd6a91953f10f2
+      internalID: 1771603269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_1
+      rect:
+        serializedVersion: 2
+        x: 333
+        y: 1984
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 32481ec7d03504f369e14dfbce2a0a07
+      internalID: -1788799576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_2
+      rect:
+        serializedVersion: 2
+        x: 589
+        y: 1984
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 507f855f55bb2436890d88455a3d426b
+      internalID: -707748151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_3
+      rect:
+        serializedVersion: 2
+        x: 845
+        y: 1984
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc0aef3104d154c02ab48eb0cd6f19b5
+      internalID: 655350705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_4
+      rect:
+        serializedVersion: 2
+        x: 1101
+        y: 1984
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9cd493629d0e494aac59b7e782e1c60
+      internalID: 1924383441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_5
+      rect:
+        serializedVersion: 2
+        x: 1357
+        y: 1984
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 26ca4ae5e5bec4d259c4abad61b735b3
+      internalID: 1851721307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_6
+      rect:
+        serializedVersion: 2
+        x: 1613
+        y: 1984
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 23b08c1b45909493f84d356b02256b16
+      internalID: -1946041707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_7
+      rect:
+        serializedVersion: 2
+        x: 1859
+        y: 1838
+        width: 142
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9f9cb0657b8346d782456c4ef67cd0e
+      internalID: 1477869604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_8
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 1806
+        width: 171
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a03d4f0a00404369a543027721c168f
+      internalID: 1382292898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_9
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 1806
+        width: 167
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72cf5be1510914594ba8e5f54f3e44c1
+      internalID: 1345199950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_10
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 1806
+        width: 149
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 051b3027b94a94a0094445833fc1e399
+      internalID: 1236101344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_11
+      rect:
+        serializedVersion: 2
+        x: 821
+        y: 1806
+        width: 138
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1f67bde4b6104f47908032676adfee2
+      internalID: 502194244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_12
+      rect:
+        serializedVersion: 2
+        x: 1090
+        y: 1806
+        width: 130
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8f0939da9e2b9409e9f07a14e7978b19
+      internalID: 1306465209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_13
+      rect:
+        serializedVersion: 2
+        x: 1347
+        y: 1806
+        width: 132
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4039ddb04f2554b0dbf80b39e21c79af
+      internalID: 351382007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_14
+      rect:
+        serializedVersion: 2
+        x: 1606
+        y: 1806
+        width: 138
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c5c04a7db935d4615b86e504ca206935
+      internalID: -476253878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_15
+      rect:
+        serializedVersion: 2
+        x: 1865
+        y: 1806
+        width: 115
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8589bdbf57d5e4868b546fa25dc6d83e
+      internalID: -110763000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1638
+        width: 179
+        height: 150
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25b9bcf9814f1483085198871b3648b7
+      internalID: -988339661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_17
+      rect:
+        serializedVersion: 2
+        x: 333
+        y: 1728
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53d3eba41922543a08bd536d5059baeb
+      internalID: -1886624987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_18
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 1550
+        width: 114
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cf42aa5d1a1df4cbe9798f645aff25a1
+      internalID: 288797326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK3_1_Skill_Bow_0_19
+      rect:
+        serializedVersion: 2
+        x: 267
+        y: 1550
+        width: 203
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd231a3e1c2df4547befef345f83c502
+      internalID: -647906922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Ed_ATTACK3_1_Skill_Bow_0_0: 1771603269
+      Ed_ATTACK3_1_Skill_Bow_0_1: -1788799576
+      Ed_ATTACK3_1_Skill_Bow_0_10: 1236101344
+      Ed_ATTACK3_1_Skill_Bow_0_11: 502194244
+      Ed_ATTACK3_1_Skill_Bow_0_12: 1306465209
+      Ed_ATTACK3_1_Skill_Bow_0_13: 351382007
+      Ed_ATTACK3_1_Skill_Bow_0_14: -476253878
+      Ed_ATTACK3_1_Skill_Bow_0_15: -110763000
+      Ed_ATTACK3_1_Skill_Bow_0_16: -988339661
+      Ed_ATTACK3_1_Skill_Bow_0_17: -1886624987
+      Ed_ATTACK3_1_Skill_Bow_0_18: 288797326
+      Ed_ATTACK3_1_Skill_Bow_0_19: -647906922
+      Ed_ATTACK3_1_Skill_Bow_0_2: -707748151
+      Ed_ATTACK3_1_Skill_Bow_0_3: 655350705
+      Ed_ATTACK3_1_Skill_Bow_0_4: 1924383441
+      Ed_ATTACK3_1_Skill_Bow_0_5: 1851721307
+      Ed_ATTACK3_1_Skill_Bow_0_6: -1946041707
+      Ed_ATTACK3_1_Skill_Bow_0_7: 1477869604
+      Ed_ATTACK3_1_Skill_Bow_0_8: 1382292898
+      Ed_ATTACK3_1_Skill_Bow_0_9: 1345199950
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

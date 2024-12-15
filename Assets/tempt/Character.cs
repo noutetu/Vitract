@@ -49,7 +49,7 @@ public abstract class Character : MonoBehaviour, IDamageable
     private float maxHp; // 最大HP
     private float speed; // 移動速度
     protected float range; // 射程距離
-    private float deffence; // 防御力
+    public float deffence; // 防御力
     private float magicDeffence; // 魔法防御力
     private int cost; // コスト
     private CharacterType characterType; // キャラクターのタイプ
@@ -366,21 +366,52 @@ public abstract class Character : MonoBehaviour, IDamageable
         if (specialSkillInstance != null && specialSkillInstance.CanUseSkill.Value)
         {
             currentSkill = specialSkillInstance;
+            Debug.Log("currentSkill == special");
         }
         else if (normalSkillInstance != null && normalSkillInstance.CanUseSkill.Value)
         {
             currentSkill = normalSkillInstance;
+            Debug.Log("currentSkill == normal");
         }
         else
         {
             currentSkill = null;
         }
 
-        // currentSkillがセットされ、かつターゲットがいる場合は攻撃イベントをトリガー
-        if (currentSkill != null && enemyObject != null)
+
+        switch (currentSkill.SkillType)
         {
-            AttackEvent();
+            case SkillType.Attack:
+                Debug.Log("Handling an Attack skill.");
+                // currentSkillがセットされ、かつターゲットがいる場合は攻撃イベントをトリガー
+                if (currentSkill != null && enemyObject != null)
+                {
+                    AttackEvent();
+                }
+                break;
+
+            case SkillType.Heal:
+                Debug.Log("Handling a Heal skill.");
+                break;
+
+            case SkillType.Buff:
+                Debug.Log("Handling a Buff skill.");
+                motionFacade.PlayAnim(currentSkill.AnimType,3);
+                currentSkill.Activate(this,this);
+                break;
+
+            case SkillType.Debuff:
+                Debug.Log("Handling a Debuff skill.");
+                break;
         }
+
+
+
+
+
+
+
+        
     }
 }
 

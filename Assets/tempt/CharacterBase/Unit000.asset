@@ -29,4 +29,4 @@ MonoBehaviour:
   characterType: 0
   roleName: "\u30D0\u30C8\u30EB\u30B9\u30AB\u30A6\u30C8"
   description: "\u524D\u7DDA\u3067\u7D20\u65E9\u304F\u52D5\u304D\u3001\u6575\u306E\u52D5\u304D\u3092\u30B3\u30F3\u30C8\u30ED\u30FC\u30EB\u3059\u308B\u3002"
-  icon: {fileID: -407420556, guid: 962e4b9b4226f4ecfbc218fee42b91c4, type: 3}
+  icon: {fileID: -158920843, guid: 962e4b9b4226f4ecfbc218fee42b91c4, type: 3}

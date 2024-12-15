@@ -21,7 +21,7 @@ public class CharacterAnimator : MonoBehaviour
     public UnityAction OnAttack;
     public UnityAction OnDead;
 
-    void Start()
+    public void Initialize()
     {
         anim = GetComponent<Animator>();
         if (anim == null)

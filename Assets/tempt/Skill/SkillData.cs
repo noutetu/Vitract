@@ -2,7 +2,14 @@ using UnityEngine;
 using UniRx;
 using System;
 
-
+[Serializable]
+public enum SkillType
+{
+    Attack,
+    Heal,
+    Buff,
+    Debuff,
+}
 public interface ISkillStrategy
 {
     void Activate(Character character, IDamageable target);
@@ -14,8 +21,8 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
 {
     [Header("基本情報")]
     [Tooltip("スキルの名前")]
-    [SerializeField] private string skillName;
-    public string SkillName { get => skillName; set => skillName = value; }
+    [SerializeField] private SkillType skillType;
+    public SkillType SkillType { get => skillType;}
 
     [Tooltip("スキル説明")]
     [TextArea]
@@ -45,6 +52,12 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
     [Tooltip("スキルのアニメーションタイプ")]
     [SerializeField] private AnimType animType;
     public AnimType AnimType { get => animType; }
+
+
+    [Header("基本情報")]
+    [Tooltip("スキルの種類")]
+    [SerializeField] private string skillName;
+    public string SkillName { get => skillName; set => skillName = value; }
     
     [Header("状態管理")]
     [Tooltip("スキルが使用可能かどうか")]

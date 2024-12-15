@@ -1,0 +1,571 @@
+fileFormatVersion: 2
+guid: 95e967881c49d4e36a5a98d2274fff1a
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_0
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 1984
+        width: 102
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5364523f2f180445da16311d8d371c28
+      internalID: 184195226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_1
+      rect:
+        serializedVersion: 2
+        x: 310
+        y: 1806
+        width: 139
+        height: 189
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6660634a1adb049f79f77f3eaf19a628
+      internalID: -1456155970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_2
+      rect:
+        serializedVersion: 2
+        x: 589
+        y: 1845
+        width: 144
+        height: 163
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3e7d7492a13b44ccbcb1133076ac845
+      internalID: 1885887768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_3
+      rect:
+        serializedVersion: 2
+        x: 845
+        y: 1860
+        width: 150
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3872a9426d794be4a1416bee70f72a8
+      internalID: -608439052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_4
+      rect:
+        serializedVersion: 2
+        x: 1101
+        y: 1868
+        width: 146
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: accf5ed44daac4e7cbc448438c51c938
+      internalID: -1742726542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_5
+      rect:
+        serializedVersion: 2
+        x: 1357
+        y: 1870
+        width: 144
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e135a0553af24904a04ffbbac2d7408
+      internalID: 746753382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_6
+      rect:
+        serializedVersion: 2
+        x: 1613
+        y: 1860
+        width: 148
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 41ee062899534410fae3fc2ecbd0777a
+      internalID: -1586349726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_7
+      rect:
+        serializedVersion: 2
+        x: 1868
+        y: 1859
+        width: 142
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8b11cd3755e64bcca586611c4e77543
+      internalID: 1205279886
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_8
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 1806
+        width: 175
+        height: 174
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2273d36ea42a346849c22fde3d770fa6
+      internalID: -1874199417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_9
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 1807
+        width: 129
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c92ae1f5ad84e4fa784a8e901873036a
+      internalID: 1871481316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_10
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 1807
+        width: 133
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d96686d068fd4418ba0a8d93b2cd7e2c
+      internalID: 2040575955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_11
+      rect:
+        serializedVersion: 2
+        x: 1094
+        y: 1807
+        width: 133
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d4d658aa191141fa990168e4ae51675
+      internalID: -1640352011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_12
+      rect:
+        serializedVersion: 2
+        x: 1350
+        y: 1807
+        width: 133
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5cbf8f40eec34f22bc1afdcc082fee0
+      internalID: 1621764935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_13
+      rect:
+        serializedVersion: 2
+        x: 1606
+        y: 1807
+        width: 133
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8cf8e038ebb44068944259ab3730b20
+      internalID: -257811844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_14
+      rect:
+        serializedVersion: 2
+        x: 1860
+        y: 1807
+        width: 132
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c676dacfacbde4dd8b9dd6087e3cf7e1
+      internalID: -1481015767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_15
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 1609
+        width: 180
+        height: 156
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 881940784672f4fb8bcc99f347ad3c14
+      internalID: -115147488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_16
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 1594
+        width: 180
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b37b1efc93a0746faa427c78a5823864
+      internalID: -1766753394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_17
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 1551
+        width: 125
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e5b78495dbbc4c41969e918a935b7c6
+      internalID: -34131252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ed_ATTACK5_1_Skill_Magic_0_18
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 1551
+        width: 115
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4870a191a791e4bd0b973e1225c86e27
+      internalID: 1764397916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Ed_ATTACK5_1_Skill_Magic_0_0: 184195226
+      Ed_ATTACK5_1_Skill_Magic_0_1: -1456155970
+      Ed_ATTACK5_1_Skill_Magic_0_10: 2040575955
+      Ed_ATTACK5_1_Skill_Magic_0_11: -1640352011
+      Ed_ATTACK5_1_Skill_Magic_0_12: 1621764935
+      Ed_ATTACK5_1_Skill_Magic_0_13: -257811844
+      Ed_ATTACK5_1_Skill_Magic_0_14: -1481015767
+      Ed_ATTACK5_1_Skill_Magic_0_15: -115147488
+      Ed_ATTACK5_1_Skill_Magic_0_16: -1766753394
+      Ed_ATTACK5_1_Skill_Magic_0_17: -34131252
+      Ed_ATTACK5_1_Skill_Magic_0_18: 1764397916
+      Ed_ATTACK5_1_Skill_Magic_0_2: 1885887768
+      Ed_ATTACK5_1_Skill_Magic_0_3: -608439052
+      Ed_ATTACK5_1_Skill_Magic_0_4: -1742726542
+      Ed_ATTACK5_1_Skill_Magic_0_5: 746753382
+      Ed_ATTACK5_1_Skill_Magic_0_6: -1586349726
+      Ed_ATTACK5_1_Skill_Magic_0_7: 1205279886
+      Ed_ATTACK5_1_Skill_Magic_0_8: -1874199417
+      Ed_ATTACK5_1_Skill_Magic_0_9: 1871481316
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -13,6 +13,7 @@ public class CharacterMotionFacade : MonoBehaviour
     {
         // コンポーネントの取得
         anim = GetComponentInChildren<CharacterAnimator>();
+        anim.Initialize();
         charaMover = GetComponent<CharaMover>();
 
         // アニメーションイベントの登録

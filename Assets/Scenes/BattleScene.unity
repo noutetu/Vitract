@@ -622,7 +622,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9188965163503988335, guid: c9d1e95c08ac5450d954ffba180284e1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -766,7 +766,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterBases:
   - {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
-  - {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
+  - {fileID: 11400000, guid: c284ade13ad3046c4a5f3848dd0367b1, type: 2}
   - {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
   - {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
   characterFlames:
@@ -872,7 +872,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9188965163503988335, guid: c9d1e95c08ac5450d954ffba180284e1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2400,7 +2400,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9188965163503988335, guid: c9d1e95c08ac5450d954ffba180284e1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2857,17 +2857,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4540775653350254758, guid: c9d1e95c08ac5450d954ffba180284e1, type: 3}
-      propertyPath: Base
-      value: 
-      objectReference: {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
     - target: {fileID: 4651218282500552286, guid: c9d1e95c08ac5450d954ffba180284e1, type: 3}
       propertyPath: m_Name
       value: CharacterFlame
-      objectReference: {fileID: 0}
-    - target: {fileID: 9188965163503988335, guid: c9d1e95c08ac5450d954ffba180284e1, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
