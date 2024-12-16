@@ -17,22 +17,23 @@ public abstract class Character : MonoBehaviour, IDamageable
     // TODO 攻撃のアニメーション管理をちゃんとする
     // TODO ジャンプ攻撃のアニメーションで直後の通常攻撃が反応しないバグ。　クリア
     // なんかよくわからんけどアニメーションイベントの秒数変更したらいけた。なんで？
+    // TODO スキルの種類ごとに処理タイミングとアニメーションを変えられるようにしたい
+    // TODO Edがスペシャルスキルしか使わない
 
     // ================= フィールド =================
     // キャラクターのステータス
     protected IDamageable enemyObject; // 現在攻撃対象のキャラクター
-    public HPBar uiHpBar; // UI上のHPバー
     [SerializeField] private CharacterBase characterBase; // キャラクターのベースデータ
     public bool isPlayer; // プレイヤーかどうかのフラグ
     private bool isDead; // キャラクターが死亡しているかどうか
     public bool IsDead => isDead; // 死亡状態の取得
 
     // スキル
-    protected SkillData currentSkill; // 現在のスキル
-    protected SkillData normalSkillInstance; // 通常スキルのインスタンス
-    protected SkillData specialSkillInstance; // 特殊スキルのインスタンス
+    SkillData normalSkill;
+    SkillData specialSkill;
 
     // コンポーネント
+    public HPBar uiHpBar; // UI上のHPバー
     private HPBar hpBar; // HPバーのコンポーネント
     private CharacterMotionFacade motionFacade; // アニメーションと移動管理のファサード
     protected CompositeDisposable disposables = new CompositeDisposable(); // 購読の破棄管理
@@ -46,7 +47,9 @@ public abstract class Character : MonoBehaviour, IDamageable
     public float Atk { get; set; } // 攻撃力
     public float AttackSpeed { get; set; } // 攻撃速度
     public float AttackCoolTime { get; set; } // 攻撃クールタイム
-    private float maxHp; // 最大HP
+
+    public float MaxHp { get; protected set; }
+
     private float speed; // 移動速度
     protected float range; // 射程距離
     public float deffence; // 防御力
@@ -60,14 +63,13 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         InitCharacter(); // キャラクターの初期化
         InitializeComponents(); // コンポーネントの初期化
-        InitializeSkills(); // スキルの初期化
-        SubscribeToSkillCooldown(); // スキルのクールダウン購読の設定
+        InitializeSkill();
         InitializeTargetList(); // ターゲットリストの初期化
-        
+
         SmoothAppear();
     }
 
-    
+
 
     private void OnDisable()
     {
@@ -84,14 +86,14 @@ public abstract class Character : MonoBehaviour, IDamageable
 
         Debug.Log("DoTween is killed");
         DOTween.Kill(this); // DOTweenアニメーションの破棄
-        motionFacade.DeInitialize(HitAttack, Dead); // アニメーションイベントの解除
+        motionFacade.DeInitialize(DoNormal,DoSpecial, Dead); // アニメーションイベントの解除
         disposables.Dispose(); // 購読解除
         targetList?.Dispose(); // ターゲットリストの破棄
     }
 
     private void OnDestroy()
     {
-        
+
     }
 
     protected virtual void Start() { }
@@ -102,7 +104,7 @@ public abstract class Character : MonoBehaviour, IDamageable
         {
             characterState = CharacterState.Die; // キャラクターが死亡した場合の状態設定
             Debug.Log("キャラが死亡した");
-            motionFacade.PlayAnim(AnimType.Dead,1f); // 死ぬモーション
+            motionFacade.PlayAnim(AnimType.Dead, 1f); // 死ぬモーション
             return;
         }
         else if (GameManager.Instance.isGameEnd)
@@ -123,8 +125,8 @@ public abstract class Character : MonoBehaviour, IDamageable
 
         // キャラクターパラメータをベースデータから設定
         Name = characterBase.Name;
-        maxHp = characterBase.MaxHp;
-        currentHp.Value = maxHp;
+        MaxHp = characterBase.MaxHp;
+        currentHp.Value = MaxHp;
         Atk = characterBase.Atk;
         AttackSpeed = characterBase.AttackSpeed;
         AttackCoolTime = characterBase.CoolTime;
@@ -141,19 +143,13 @@ public abstract class Character : MonoBehaviour, IDamageable
     private void InitializeComponents()
     {
         hpBar = GetComponentInChildren<HPBar>(); // HPバーの取得
-        motionFacade = GetComponent<CharacterMotionFacade>(); // アニメーション管理の取得
-        motionFacade.Initialize(HitAttack, Dead); // アニメーションイベントの初期化
-        audioSource = GetComponent<AudioSource>();
-        spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
-    }
 
-    private void InitializeSkills()
-    {
-        normalSkillInstance = Instantiate(characterBase.NormalSkill); // 通常攻撃のインスタンス化
-        if (characterBase.SpecialSkill != null)
-        {
-            specialSkillInstance = Instantiate(characterBase.SpecialSkill); // スキルのインスタンス化
-        }
+        motionFacade = GetComponent<CharacterMotionFacade>(); // アニメーション管理の取得
+        motionFacade.Initialize(DoNormal,DoSpecial, Dead); // アニメーションイベントの初期化
+        
+        audioSource = GetComponent<AudioSource>();
+        
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
     private void InitializeTargetList()
@@ -164,12 +160,9 @@ public abstract class Character : MonoBehaviour, IDamageable
             characterState = CharacterState.Idle;
             if (enemyObject == null)
             {
-                SetNextEnemy(); // 新しいターゲットを設定
-
-                if (currentSkill?.CanUseSkill.Value == true)
-                {
-                    AttackEvent(); // 攻撃イベントを呼び出し
-                }
+                Debug.Log("敵にぶつかった");
+                SetEnemy(); // 新しいターゲットを設定
+                AttackEvent();
             }
         }).AddTo(this);
     }
@@ -183,10 +176,10 @@ public abstract class Character : MonoBehaviour, IDamageable
                 motionFacade.RunMotion(speed, isPlayer); // 走るモーション
                 break;
             case CharacterState.Die:
-                motionFacade.PlayAnim(AnimType.Dead,1f); // 死ぬモーション
+                motionFacade.PlayAnim(AnimType.Dead, 1f); // 死ぬモーション
                 break;
             case CharacterState.Idle:
-                motionFacade.PlayAnim(AnimType.Idle,1); // 待機モーション
+                motionFacade.PlayAnim(AnimType.Idle, 1); // 待機モーション
                 break;
         }
     }
@@ -220,18 +213,14 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         if (!IsDead && enemyObject != null)
         {
-            if (currentSkill == specialSkillInstance)
+            if(specialSkill.CanUseSkill.Value)
             {
-                motionFacade.PlayAnim(specialSkillInstance.AnimType,AttackSpeed,specialSkillInstance.AttackType); // 通常攻撃アニメーション
+                StartSkill(specialSkill);
                 return;
             }
-            if (currentSkill == normalSkillInstance)
-            {
-                motionFacade.PlayAnim(normalSkillInstance.AnimType,AttackSpeed,normalSkillInstance.AttackType); // 通常攻撃アニメーション
-            }
-            
+            StartSkill(normalSkill);
+            return;
         }
-        Debug.Log ("AttackEvent");
     }
 
     // ================= ダメージ処理と死亡判定 =================
@@ -239,8 +228,8 @@ public abstract class Character : MonoBehaviour, IDamageable
     {
         motionFacade.DamageAnimation(spriteRenderers);
         float damageAmount = damage - deffence;
-        float minDamage = damage / 10 ; // 最低保証ダメージ
-        if(damageAmount < minDamage){damageAmount = minDamage;}
+        float minDamage = damage / 10; // 最低保証ダメージ
+        if (damageAmount < minDamage) { damageAmount = minDamage; }
         currentHp.Value = Mathf.Max(currentHp.Value - damageAmount, 0); // ダメージを受けた後のHPを計算
 
         Debug.Log($"{this.gameObject.name}は{damageAmount}くらった");
@@ -253,14 +242,29 @@ public abstract class Character : MonoBehaviour, IDamageable
     }
 
     // ================= アニメーションイベント =================
-    private void HitAttack()
+    private void DoNormal()
     {
         // 敵に攻撃を与える
         if (enemyObject != null)
         {
+            normalSkill.Activate(this,enemyObject);
+            audioSource.PlayOneShot(normalSkill.SkillSound);
             Debug.Log("敵への攻撃！！");
-            audioSource?.PlayOneShot(currentSkill?.AttackSound);
-            currentSkill?.Activate(this, enemyObject); // スキルを発動
+        }
+
+    }
+    private void DoSpecial()
+    {
+        // 敵に攻撃を与える
+        if (enemyObject != null)
+        {
+            specialSkill.Activate(this,enemyObject);
+            audioSource.PlayOneShot(specialSkill.SkillSound);
+            if(normalSkill.CanUseSkill.Value)
+            {
+                StartSkill(normalSkill);
+            }
+            Debug.Log("敵への攻撃！！");
         }
     }
 
@@ -296,21 +300,19 @@ public abstract class Character : MonoBehaviour, IDamageable
         targetList.Remove(enemy); // ターゲットリストから削除
         enemyObject = null; // 現在のターゲットをリセット
 
-        if (targetList.Count > 0)
+        if (targetList.Count > 0 && enemyObject == null)
         {
-            SetNextEnemy(); // 次のターゲットを設定
-
-            if (currentSkill?.CanUseSkill.Value == true)
-            {
-                AttackEvent(); // 次の敵に攻撃
-            }
+            SetEnemy(); // 次のターゲットを設定
             return;
         }
 
         characterState = CharacterState.Run;
     }
 
-    protected void SetNextEnemy() => enemyObject = targetList[0]; // 次のターゲットを設定
+    protected void SetEnemy()
+    {
+        enemyObject = targetList[0]; // 次のターゲットを設定
+    }
 
     // ================= その他のメソッド =================
     public void SmoothAppear()
@@ -326,93 +328,88 @@ public abstract class Character : MonoBehaviour, IDamageable
                 .OnKill(() => Debug.Log("Tween killed to prevent null reference."));
         }
     }
+    public void InitializeSkill()
+    {
+        normalSkill = Instantiate(characterBase.NormalSkill); // 通常攻撃のインスタンス化
+        if (characterBase.SpecialSkill != null)
+        {
+            specialSkill = Instantiate(characterBase.SpecialSkill); // スキルのインスタンス化
+        }
 
+        SubscribeToSkillCooldown();
+    }
+    private void SubscribeToSkillCooldown()
+    {
+        normalSkill?.CanUseSkill
+            .DistinctUntilChanged()
+            .Subscribe(value =>
+            {
+                if(value == true)
+                {
+                    StartSkill(normalSkill);
+                    return;
+                }
+                else
+                {
+                    if(enemyObject != null)
+                    {
+                        motionFacade.PlayAnim(AnimType.Idle,1);
+                        Debug.Log("待機しろーーーーー");
+                    }
+                }
+            })
+            .AddTo(this);
 
+        specialSkill?.CanUseSkill
+            .DistinctUntilChanged()
+            .Subscribe(value =>
+            {
+                if(value == true)
+                {
+                    StartSkill(specialSkill);
+                    return;
+                }
+                else
+                {
+                    if(enemyObject != null)
+                    {
+                        motionFacade.PlayAnim(AnimType.Idle,1);
+                    }
+                }
+            })
+            .AddTo(this);
+    }
 
+public void StartSkill(SkillData skill)
+    {
+        switch (skill.SkillType)
+        {
+            case SkillType.Attack:
+            if(enemyObject == null){return;}
+            Debug.Log("スキル発動");
+            motionFacade.PlayAttackAnim(skill.AttackType,1);
+                return ;
+
+            case SkillType.Heal:
+                return;
+
+            case SkillType.Buff:
+            motionFacade.PlayAnim(AnimType.Buff,1);
+            audioSource.PlayOneShot(skill.SkillSound);
+            skill.Activate(this,enemyObject);
+                return;
+        }
+    }
     public void SetHpBar()
     {
         // HPバーの設定
         if (uiHpBar != null)
         {
-            uiHpBar.SubscribeValue(currentHp, maxHp);
+            uiHpBar.SubscribeValue(currentHp, MaxHp);
         }
-        hpBar.SubscribeValue(currentHp, maxHp);
+        hpBar.SubscribeValue(currentHp, MaxHp);
     }
 
-    private void SubscribeToSkillCooldown()
-    {
-        normalSkillInstance?.CanUseSkill
-            .DistinctUntilChanged()
-            .Subscribe(value =>
-            {
-                UpdateCurrentSkill();
-                Debug.Log(value ? "通常スキルが使用可能になりました。" : "通常スキルがクールダウン中です。");
-            })
-            .AddTo(this);
-
-        specialSkillInstance?.CanUseSkill
-            .DistinctUntilChanged()
-            .Subscribe(value =>
-            {
-                UpdateCurrentSkill();
-                Debug.Log(value ? "特殊スキルが使用可能になりました。" : "特殊スキルがクールダウン中です。");
-            })
-            .AddTo(this);
-    }
-
-    private void UpdateCurrentSkill()
-    {
-        // specialSkillが使用可能な場合は常に優先
-        if (specialSkillInstance != null && specialSkillInstance.CanUseSkill.Value)
-        {
-            currentSkill = specialSkillInstance;
-            Debug.Log("currentSkill == special");
-        }
-        else if (normalSkillInstance != null && normalSkillInstance.CanUseSkill.Value)
-        {
-            currentSkill = normalSkillInstance;
-            Debug.Log("currentSkill == normal");
-        }
-        else
-        {
-            currentSkill = null;
-        }
-
-
-        switch (currentSkill.SkillType)
-        {
-            case SkillType.Attack:
-                Debug.Log("Handling an Attack skill.");
-                // currentSkillがセットされ、かつターゲットがいる場合は攻撃イベントをトリガー
-                if (currentSkill != null && enemyObject != null)
-                {
-                    AttackEvent();
-                }
-                break;
-
-            case SkillType.Heal:
-                Debug.Log("Handling a Heal skill.");
-                break;
-
-            case SkillType.Buff:
-                Debug.Log("Handling a Buff skill.");
-                motionFacade.PlayAnim(currentSkill.AnimType,3);
-                currentSkill.Activate(this,this);
-                break;
-
-            case SkillType.Debuff:
-                Debug.Log("Handling a Debuff skill.");
-                break;
-        }
-
-
-
-
-
-
-
-        
-    }
 }
 
 
@@ -429,6 +426,7 @@ public enum CharacterState
     Attack,
     SkillAttack,
     Die,
+    Buff,
     Debuff,
     Idle,
 }

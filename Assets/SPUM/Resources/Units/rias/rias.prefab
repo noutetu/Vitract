@@ -3699,9 +3699,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b00cb527a1d846e4a1736136068fe1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiHpBar: {fileID: 0}
   characterBase: {fileID: 11400000, guid: 256c25061a15c455186089d07eeaf74d, type: 2}
   isPlayer: 0
+  uiHpBar: {fileID: 0}
+  deffence: 0
 --- !u!1 &1503691005426592390
 GameObject:
   m_ObjectHideFlags: 0
@@ -4845,7 +4846,7 @@ GameObject:
   - component: {fileID: 2327202820500051972}
   - component: {fileID: 2771549000447391188}
   - component: {fileID: 5647742273996676892}
-  - component: {fileID: 8107791509803837448}
+  - component: {fileID: 8258043919279314899}
   m_Layer: 0
   m_Name: UnitRoot
   m_TagString: Untagged
@@ -4903,7 +4904,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8107791509803837448
+--- !u!114 &8258043919279314899
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

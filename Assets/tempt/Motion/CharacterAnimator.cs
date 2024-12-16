@@ -12,18 +12,19 @@ public enum AnimType
     Attack,             // 攻撃
     Dead,               // 死亡
     Debuff,             // デバフ
-    Conecntrate,        // バフ    
+    Buff,        // バフ    
 }
 
 public class CharacterAnimator : MonoBehaviour
 {
     private Animator anim = null;
-    public UnityAction OnAttack;
+    public UnityAction OnNormal;
+    public UnityAction OnSpecial;
     public UnityAction OnDead;
 
     public void Initialize()
     {
-        anim = GetComponent<Animator>();
+        anim = GetComponentInChildren<Animator>();
         if (anim == null)
         {
             Debug.LogWarning("animatorが見つかりません");
@@ -62,7 +63,7 @@ public class CharacterAnimator : MonoBehaviour
                 anim.SetTrigger("5_Debuff");
                 break;
 
-            case AnimType.Conecntrate:
+            case AnimType.Buff:
                 anim.SetTrigger("Conecntrate");
                 break;
 
@@ -71,7 +72,7 @@ public class CharacterAnimator : MonoBehaviour
                 break;
         }
     }
-    public void PlayAnimation(AnimType animType, float speed,int attackType)
+    public void PlayAttackAnimation(float speed,int attackType)
     {
         if (anim == null)
         {
@@ -81,29 +82,37 @@ public class CharacterAnimator : MonoBehaviour
 
         // 速度設定
         anim.speed = speed * 2f *GameManager.Instance.gameSpeed;
-
-        // スイッチによるアニメーション制御
-        switch (animType)
-        {
-            case AnimType.Attack:
-                anim.SetTrigger("2_Attack");
-                anim.SetFloat("AttackType",attackType);
-                break;
-        }
+        anim.SetTrigger("2_Attack");
+        anim.SetFloat("AttackType",attackType);
     }
        //---------------------------unity animationEventで呼び出すメソッド---------------------------------
-    public void TriggerAttackEvent()
+    public void TriggerNormal()
     {
-        if (OnAttack == null)
+        if (OnNormal == null)
         {
             Debug.Log("OnAttack event is null. No subscribers to invoke.");
         }
         else
         {
             Debug.Log("OnAttack is called");
-            Debug.Log($"Number of subscribers: {(OnAttack?.GetInvocationList()?.Length ?? 0)}");
+            Debug.Log($"Number of subscribers: {(OnNormal?.GetInvocationList()?.Length ?? 0)}");
 
-            OnAttack?.Invoke();
+            OnNormal?.Invoke();
+        }
+    }
+
+    public void TriggerSpecial()
+    {
+        if (OnNormal == null)
+        {
+            Debug.Log("OnAttack event is null. No subscribers to invoke.");
+        }
+        else
+        {
+            Debug.Log("OnAttack is called");
+            Debug.Log($"Number of subscribers: {(OnNormal?.GetInvocationList()?.Length ?? 0)}");
+
+            OnSpecial?.Invoke();
         }
     }
 

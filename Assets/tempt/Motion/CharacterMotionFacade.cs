@@ -9,7 +9,7 @@ public class CharacterMotionFacade : MonoBehaviour
     private CharaMover charaMover;    // 移動制御
     private bool isAnimating = false;
 
-    public void Initialize(UnityAction HitAttack, UnityAction Dead)
+    public void Initialize(UnityAction onNormal,UnityAction onSpecial, UnityAction Dead)
     {
         // コンポーネントの取得
         anim = GetComponentInChildren<CharacterAnimator>();
@@ -17,14 +17,16 @@ public class CharacterMotionFacade : MonoBehaviour
         charaMover = GetComponent<CharaMover>();
 
         // アニメーションイベントの登録
-        anim.OnAttack += HitAttack;
+        anim.OnNormal += onNormal;
+        anim.OnSpecial += onSpecial;
         anim.OnDead += Dead;
     }
 
-    public void DeInitialize(UnityAction HitAttack, UnityAction Dead)
+    public void DeInitialize(UnityAction onNormal,UnityAction onSpecial, UnityAction Dead)
     {
         // アニメーションイベントの解除
-        anim.OnAttack -= HitAttack;
+        anim.OnNormal -= onNormal;
+        anim.OnSpecial -= onSpecial;
         anim.OnDead -= Dead;
         DOTween.Kill(this);
     }
@@ -68,12 +70,14 @@ public class CharacterMotionFacade : MonoBehaviour
         charaMover.Move(speed * 2, isPlayer);  // キャラクターを移動させる
     }
     
+    // 攻撃以外のモーション
     public void PlayAnim(AnimType animType, float speed)
     {
         anim.PlayAnimation(animType,speed);
     }
-    public void PlayAnim(AnimType animType, float speed,int attackType)
+    //　攻撃関連のアニメーション
+    public void PlayAttackAnim(int attackType, float speed)
     {
-        anim.PlayAnimation(animType,speed,attackType);
+        anim.PlayAttackAnimation(speed,attackType);
     }
 }

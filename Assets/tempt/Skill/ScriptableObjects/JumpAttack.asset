@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 523df488442114d7f8c9da86adf52c4b, type: 3}
   m_Name: JumpAttack
   m_EditorClassIdentifier: 
-  skillName: JumpAttack
+  skillType: 0
   skillDescription: 
   value: 300
   cooldownTime: 10
   icon: {fileID: 21300000, guid: 04e8a961b49d1164e9b9fe2b980c00fd, type: 3}
-  attackSound: {fileID: 8300000, guid: ea5fc2d2350a5d647b0763cc8f00f63e, type: 3}
+  skillSound: {fileID: 8300000, guid: ea5fc2d2350a5d647b0763cc8f00f63e, type: 3}
   attackType: 1
   animType: 2
+  effect: {fileID: 0}
+  skillName: JumpAttack

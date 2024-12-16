@@ -22,7 +22,7 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
     [Header("基本情報")]
     [Tooltip("スキルの名前")]
     [SerializeField] private SkillType skillType;
-    public SkillType SkillType { get => skillType;}
+    public SkillType SkillType { get => skillType; }
 
     [Tooltip("スキル説明")]
     [TextArea]
@@ -30,7 +30,7 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
 
     [Tooltip("スキルの倍率や影響度")]
     [SerializeField] private float value;
-    public float Value { get => value;}
+    public float Value { get => value; }
 
     [Tooltip("スキルのクールダウン時間")]
     [SerializeField] private float cooldownTime;
@@ -41,11 +41,10 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
     public Sprite Icon { get => icon; set => icon = value; }
 
     [Tooltip("スキルの発動時の音")]
-    [SerializeField] private AudioClip attackSound;
-    public AudioClip AttackSound { get => attackSound; set => attackSound = value; }
+    [SerializeField] private AudioClip skillSound;
+    public AudioClip SkillSound { get => skillSound; set => skillSound = value; }
 
-
-    [Tooltip("スキルの発動時アニメーション")]
+    [Tooltip("スキルの発動時攻撃アニメーション")]
     [SerializeField] private int attackType;
     public int AttackType { get => attackType; }
 
@@ -53,12 +52,15 @@ public abstract class SkillData : ScriptableObject, ISkillStrategy
     [SerializeField] private AnimType animType;
     public AnimType AnimType { get => animType; }
 
+    [Tooltip("スキルのエフェクト")]
+    [SerializeField] private ParticleSystem effect;
+    public ParticleSystem Effect { get => effect; }
 
     [Header("基本情報")]
     [Tooltip("スキルの種類")]
     [SerializeField] private string skillName;
     public string SkillName { get => skillName; set => skillName = value; }
-    
+
     [Header("状態管理")]
     [Tooltip("スキルが使用可能かどうか")]
     private ReactiveProperty<bool> canUseSkill = new ReactiveProperty<bool>(true);

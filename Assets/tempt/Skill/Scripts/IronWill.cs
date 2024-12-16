@@ -15,42 +15,36 @@ public class IronWill : SkillData
 
     public override void Activate(Character character, IDamageable target)
     {
+
         Debug.Log("IronWill activated!");
-
-        if (CanUseSkill.Value)
+        // 元の防御力が未保存の場合のみ保存
+        if (originalDefence == 0)
         {
-            // 元の防御力が未保存の場合のみ保存
-            if (originalDefence == 0)
+            originalDefence = character.deffence;
+        }
+
+        // 倍率を計算
+        float multiplier = Mathf.Clamp(Value / 100f, 0.1f, 3f);
+        character.deffence = originalDefence * multiplier;
+
+        Debug.Log($"Value: {Value}, Multiplier: {multiplier}, Original Defence: {originalDefence}");
+
+        // Timerで防御力を元に戻し、クールダウンを開始
+        Observable.Timer(System.TimeSpan.FromSeconds(time))
+            .Subscribe(_ =>
             {
-                originalDefence = character.deffence;
-            }
-
-            // 倍率を計算
-            float multiplier = Mathf.Clamp(Value / 100f, 0.1f, 3f);
-            character.deffence = originalDefence * multiplier;
-
-            Debug.Log($"Value: {Value}, Multiplier: {multiplier}, Original Defence: {originalDefence}");
-
-            // Timerで防御力を元に戻し、クールダウンを開始
-            Observable.Timer(System.TimeSpan.FromSeconds(time))
-                .Subscribe(_ =>
-                {
-                    character.deffence = originalDefence; // 防御力を元に戻す
-                    originalDefence = 0; // 元の防御力をリセット
-                    StartCoolDown();
-                    Debug.Log($"Defence reset to {originalDefence} after {time} seconds.");
-                },
-                () =>
-                {
-                    Debug.Log("Timer subscription completed and disposed.");
-                })
-                .AddTo(character); // キャラクターのライフサイクルに購読を紐付ける
-        }
-        else
-        {
-            Debug.LogWarning("Skill activation failed: Skill is not ready.");
-        }
+                character.deffence = originalDefence; // 防御力を元に戻す
+                originalDefence = 0; // 元の防御力をリセット
+                StartCoolDown();
+                Debug.Log($"Defence reset to {originalDefence} after {time} seconds.");
+            },
+            () =>
+            {
+                Debug.Log("Timer subscription completed and disposed.");
+            })
+            .AddTo(character); // キャラクターのライフサイクルに購読を紐付ける
     }
 }
+
 
 

@@ -8,15 +8,9 @@ public class JumpAttack : SkillData
 {
     public override void Activate(Character character, IDamageable target)
     {
-        if(CanUseSkill.Value && target is not null)
-        {
-            float attackValue = character.Atk * Value / 100;
-            target.TakeDamage(attackValue);
-            StartCoolDown();
-        }
-        else
-        {
-            Debug.Log("Activate is miss");
-        }
+        float attackValue = character.Atk * Value / 100;
+        target.TakeDamage(attackValue);
+        StartCoolDown();
+
     }
 }
